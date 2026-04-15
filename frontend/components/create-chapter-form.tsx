@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 
 import { createChapter } from "@/lib/api-client";
 
@@ -14,7 +14,7 @@ export function CreateChapterForm({ bookId }: CreateChapterFormProps) {
   const [title, setTitle] = useState("");
   const [sourceText, setSourceText] = useState("");
   const [message, setMessage] = useState("");
-  const [isPending, startTransition] = useTransition();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -26,18 +26,19 @@ export function CreateChapterForm({ bookId }: CreateChapterFormProps) {
     }
 
     try {
+      setIsSubmitting(true);
       await createChapter(bookId, {
         title: title.trim(),
         source_text: sourceText.trim(),
       });
       setTitle("");
       setSourceText("");
-      startTransition(() => {
-        router.refresh();
-      });
+      router.refresh();
       setMessage("Chapter created.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Failed to create the chapter.");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -65,8 +66,8 @@ export function CreateChapterForm({ bookId }: CreateChapterFormProps) {
           placeholder="Paste the Japanese chapter text here."
         />
       </div>
-      <button className="button" type="submit" disabled={isPending}>
-        {isPending ? "Saving..." : "Create chapter"}
+      <button className="button" type="submit" disabled={isSubmitting}>
+        {isSubmitting ? "Saving..." : "Create chapter"}
       </button>
       <p className={`feedback${message && message.includes("Failed") ? " error" : ""}`}>{message}</p>
     </form>

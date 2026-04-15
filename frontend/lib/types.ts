@@ -34,3 +34,24 @@ export type ImportResult = {
   chapter_count: number;
   chapters: Chapter[];
 };
+
+export type TranslationSettings = {
+  id: number;
+  provider_type: "openai_compatible" | "gemini";
+  api_base_url: string;
+  model_name: string;
+  api_key: string;
+  prompt_template: string;
+  chunk_size: number;
+  translation_mode: string;
+  updated_at: string;
+};
+
+export type GlossaryEntry = {
+  id: number;
+  source_term: string;
+  target_term: string;
+  note: string | null;
+  created_at: string;
+  updated_at: string;
+};

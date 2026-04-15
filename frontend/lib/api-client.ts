@@ -1,4 +1,4 @@
-import type { ChapterCreateInput, ImportResult } from "@/lib/types";
+import type { ChapterCreateInput, GlossaryEntry, ImportResult, TranslationSettings } from "@/lib/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 
@@ -73,4 +73,54 @@ export async function importBookFile(input: {
   }
 
   return response.json() as Promise<ImportResult>;
+}
+
+export async function updateSettings(payload: {
+  provider_type: TranslationSettings["provider_type"];
+  api_base_url: string;
+  api_key: string;
+  model_name: string;
+  prompt_template: string;
+  chunk_size: number;
+  translation_mode: string;
+}) {
+  return request<TranslationSettings>("/settings", {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function createGlossaryEntry(payload: {
+  source_term: string;
+  target_term: string;
+  note?: string;
+}) {
+  return request<GlossaryEntry>("/glossary", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function updateGlossaryEntry(
+  entryId: number,
+  payload: {
+    source_term: string;
+    target_term: string;
+    note?: string;
+  },
+) {
+  return request<GlossaryEntry>(`/glossary/${entryId}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function deleteGlossaryEntry(entryId: number) {
+  const response = await fetch(`${API_BASE_URL}/glossary/${entryId}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error(await parseError(response));
+  }
 }

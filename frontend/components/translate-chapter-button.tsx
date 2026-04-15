@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 
 import { translateChapter } from "@/lib/api-client";
 
@@ -16,19 +16,20 @@ export function TranslateChapterButton({
 }: TranslateChapterButtonProps) {
   const router = useRouter();
   const [message, setMessage] = useState("");
-  const [isPending, startTransition] = useTransition();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleTranslate() {
     setMessage("");
 
     try {
+      setIsSubmitting(true);
       await translateChapter(chapterId);
-      startTransition(() => {
-        router.refresh();
-      });
+      router.refresh();
       setMessage("Translation saved.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Translation failed.");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -36,11 +37,11 @@ export function TranslateChapterButton({
     <div>
       <button
         className={compact ? "button-secondary" : "button"}
-        disabled={isPending}
+        disabled={isSubmitting}
         onClick={handleTranslate}
         type="button"
       >
-        {isPending ? "Translating..." : compact ? "Translate" : "Translate chapter"}
+        {isSubmitting ? "Translating..." : compact ? "Translate" : "Translate chapter"}
       </button>
       {!compact && message ? (
         <p className={`feedback${message.includes("failed") || message.includes("Failed") ? " error" : ""}`}>

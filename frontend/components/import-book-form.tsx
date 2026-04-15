@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 
 import { importBookFile } from "@/lib/api-client";
 
@@ -17,7 +17,7 @@ export function ImportBookForm({ title, description, endpoint, accept }: ImportB
   const [bookTitle, setBookTitle] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
-  const [isPending, startTransition] = useTransition();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -30,6 +30,7 @@ export function ImportBookForm({ title, description, endpoint, accept }: ImportB
     }
 
     try {
+      setIsSubmitting(true);
       const result = await importBookFile({
         bookTitle: bookTitle.trim(),
         endpoint,
@@ -41,12 +42,12 @@ export function ImportBookForm({ title, description, endpoint, accept }: ImportB
       if (fileInput) {
         fileInput.value = "";
       }
-      startTransition(() => {
-        router.refresh();
-      });
+      router.refresh();
       setMessage(`Imported "${result.book_title}" with ${result.chapter_count} chapter(s).`);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Import failed.");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -76,8 +77,8 @@ export function ImportBookForm({ title, description, endpoint, accept }: ImportB
           type="file"
         />
       </div>
-      <button className="button" disabled={isPending} type="submit">
-        {isPending ? "Importing..." : title}
+      <button className="button" disabled={isSubmitting} type="submit">
+        {isSubmitting ? "Importing..." : title}
       </button>
       <p className={`feedback${message && message.toLowerCase().includes("failed") ? " error" : ""}`}>{message}</p>
     </form>

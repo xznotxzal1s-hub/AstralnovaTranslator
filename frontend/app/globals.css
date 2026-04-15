@@ -72,6 +72,11 @@ h3 {
 .topbar {
   max-width: var(--page-width);
   margin: 0 auto 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .brand {
@@ -106,6 +111,19 @@ h3 {
 .brand-copy span {
   color: var(--ink-soft);
   font-size: 0.95rem;
+}
+
+.topnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.topnav a {
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 250, 241, 0.72);
 }
 
 .app-page {
@@ -296,6 +314,12 @@ h3 {
   gap: 20px;
 }
 
+.split-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 380px) minmax(0, 1fr);
+  gap: 20px;
+}
+
 .sidebar-stack {
   display: grid;
   gap: 18px;
@@ -378,6 +402,7 @@ h3 {
 
 @media (max-width: 900px) {
   .hero,
+  .split-layout,
   .reader-layout,
   .text-columns {
     grid-template-columns: 1fr;

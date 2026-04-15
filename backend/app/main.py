@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import books, chapters, imports, settings, translate
+from app.api import books, chapters, glossary, imports, settings, translate
 from app.core.database import Base, engine
 
 
@@ -21,6 +21,7 @@ def create_application() -> FastAPI:
 
     application.include_router(books.router)
     application.include_router(chapters.router)
+    application.include_router(glossary.router)
     application.include_router(imports.router)
     application.include_router(settings.router)
     application.include_router(translate.router)

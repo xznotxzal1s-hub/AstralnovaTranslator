@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 
 import { createBook } from "@/lib/api-client";
 
@@ -9,7 +9,7 @@ export function CreateBookForm() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
-  const [isPending, startTransition] = useTransition();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -21,14 +21,15 @@ export function CreateBookForm() {
     }
 
     try {
+      setIsSubmitting(true);
       await createBook(title.trim());
       setTitle("");
-      startTransition(() => {
-        router.refresh();
-      });
+      router.refresh();
       setMessage("Book created.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Failed to create the book.");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -48,8 +49,8 @@ export function CreateBookForm() {
           onChange={(event) => setTitle(event.target.value)}
         />
       </div>
-      <button className="button" type="submit" disabled={isPending}>
-        {isPending ? "Creating..." : "Create book"}
+      <button className="button" type="submit" disabled={isSubmitting}>
+        {isSubmitting ? "Creating..." : "Create book"}
       </button>
       <p className={`feedback${message && message.includes("Failed") ? " error" : ""}`}>{message}</p>
     </form>
