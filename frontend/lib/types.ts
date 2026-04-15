@@ -27,3 +27,10 @@ export type ChapterCreateInput = {
   title: string;
   source_text: string;
 };
+
+export type ImportResult = {
+  book_id: number;
+  book_title: string;
+  chapter_count: number;
+  chapters: Chapter[];
+};

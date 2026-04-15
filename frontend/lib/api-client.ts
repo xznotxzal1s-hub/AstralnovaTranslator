@@ -1,4 +1,4 @@
-import type { ChapterCreateInput } from "@/lib/types";
+import type { ChapterCreateInput, ImportResult } from "@/lib/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 
@@ -50,4 +50,27 @@ export async function translateChapter(chapterId: number) {
     method: "POST",
     body: JSON.stringify({}),
   });
+}
+
+export async function importBookFile(input: {
+  endpoint: "txt" | "epub";
+  file: File;
+  bookTitle?: string;
+}): Promise<ImportResult> {
+  const formData = new FormData();
+  formData.append("file", input.file);
+  if (input.bookTitle) {
+    formData.append("book_title", input.bookTitle);
+  }
+
+  const response = await fetch(`${API_BASE_URL}/import/${input.endpoint}`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error(await parseError(response));
+  }
+
+  return response.json() as Promise<ImportResult>;
 }

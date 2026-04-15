@@ -152,6 +152,12 @@ h3 {
   gap: 18px;
 }
 
+.import-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+
 .book-card,
 .chapter-card,
 .reader-card,
@@ -258,7 +264,8 @@ h3 {
 
 .field input,
 .field textarea,
-.field select {
+.field select,
+.field input[type="file"] {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 14px;

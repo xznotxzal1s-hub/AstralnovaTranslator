@@ -1,6 +1,7 @@
 import { BookCard } from "@/components/book-card";
 import { CreateBookForm } from "@/components/create-book-form";
 import { EmptyState } from "@/components/empty-state";
+import { ImportBookForm } from "@/components/import-book-form";
 import { fetchBooks } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
@@ -22,6 +23,21 @@ export default async function HomePage() {
         <CreateBookForm />
       </section>
 
+      <section className="import-grid">
+        <ImportBookForm
+          accept=".txt,text/plain"
+          description="Upload a UTF-8 TXT file and import it into a new book."
+          endpoint="txt"
+          title="Import TXT"
+        />
+        <ImportBookForm
+          accept=".epub,application/epub+zip"
+          description="Upload an EPUB file and extract readable chapters into a new book."
+          endpoint="epub"
+          title="Import EPUB"
+        />
+      </section>
+
       <section className="section-header">
         <div>
           <h2>Books</h2>
@@ -32,7 +48,7 @@ export default async function HomePage() {
       {books.length === 0 ? (
         <EmptyState
           title="No books yet"
-          description="Create your first book above. TXT and EPUB import can be added in a later phase."
+          description="Create your first book above, or import a TXT or EPUB file to start reading."
         />
       ) : (
         <section className="book-grid">
