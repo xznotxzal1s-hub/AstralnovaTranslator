@@ -36,7 +36,7 @@ export function CreateBookForm() {
   }
 
   return (
-    <form className="form-card" onSubmit={handleSubmit}>
+    <form className="form-card feature-form" onSubmit={handleSubmit}>
       <div>
         <p className="eyebrow">{t("newBookEyebrow")}</p>
         <h2>{t("createBookTitle")}</h2>
@@ -54,7 +54,7 @@ export function CreateBookForm() {
       <button className="button" type="submit" disabled={isSubmitting}>
         {isSubmitting ? t("creatingLabel") : t("createBookButton")}
       </button>
-      <p className={`feedback${message && message === t("createBookError") ? " error" : ""}`}>{message}</p>
+      <p className={`feedback${message && message === t("createBookError") ? " error" : message ? " success" : ""}`}>{message}</p>
     </form>
   );
 }

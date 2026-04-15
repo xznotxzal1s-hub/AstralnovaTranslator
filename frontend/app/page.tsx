@@ -15,7 +15,7 @@ export default async function HomePage() {
 
   return (
     <main className="app-page">
-      <section className="hero panel">
+      <section className="hero panel bookshelf-hero">
         <div>
           <p className="eyebrow">{messages.bookshelfEyebrow}</p>
           <h1>{messages.bookshelfTitle}</h1>
@@ -24,37 +24,47 @@ export default async function HomePage() {
         <CreateBookForm />
       </section>
 
-      <section className="import-grid">
-        <ImportBookForm
-          accept=".txt,text/plain"
-          description={messages.importTxtDescription}
-          endpoint="txt"
-          title={messages.importTxtTitle}
-        />
-        <ImportBookForm
-          accept=".epub,application/epub+zip"
-          description={messages.importEpubDescription}
-          endpoint="epub"
-          title={messages.importEpubTitle}
-        />
-      </section>
-
-      <section className="section-header">
-        <div>
-          <h2>{messages.booksHeading}</h2>
-          <p>{formatMessage(messages.booksCount, { count: books.length, label: bookLabel })}</p>
+      <section className="panel section-panel">
+        <div className="section-header">
+          <div>
+            <h2>{messages.importEyebrow}</h2>
+            <p>{messages.bookshelfDescription}</p>
+          </div>
+        </div>
+        <div className="import-grid">
+          <ImportBookForm
+            accept=".txt,text/plain"
+            description={messages.importTxtDescription}
+            endpoint="txt"
+            title={messages.importTxtTitle}
+          />
+          <ImportBookForm
+            accept=".epub,application/epub+zip"
+            description={messages.importEpubDescription}
+            endpoint="epub"
+            title={messages.importEpubTitle}
+          />
         </div>
       </section>
 
-      {books.length === 0 ? (
-        <EmptyState title={messages.noBooksTitle} description={messages.noBooksDescription} />
-      ) : (
-        <section className="book-grid">
-          {books.map((book) => (
-            <BookCard key={book.id} book={book} />
-          ))}
-        </section>
-      )}
+      <section className="panel section-panel">
+        <div className="section-header">
+          <div>
+            <h2>{messages.booksHeading}</h2>
+            <p>{formatMessage(messages.booksCount, { count: books.length, label: bookLabel })}</p>
+          </div>
+        </div>
+
+        {books.length === 0 ? (
+          <EmptyState title={messages.noBooksTitle} description={messages.noBooksDescription} />
+        ) : (
+          <section className="book-grid">
+            {books.map((book) => (
+              <BookCard key={book.id} book={book} />
+            ))}
+          </section>
+        )}
+      </section>
     </main>
   );
 }

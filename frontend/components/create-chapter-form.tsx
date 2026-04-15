@@ -45,7 +45,7 @@ export function CreateChapterForm({ bookId }: CreateChapterFormProps) {
   }
 
   return (
-    <form className="form-card" onSubmit={handleSubmit}>
+    <form className="form-card feature-form" onSubmit={handleSubmit}>
       <div>
         <p className="eyebrow">{t("manualPasteEyebrow")}</p>
         <h2>{t("addChapterTitle")}</h2>
@@ -71,7 +71,7 @@ export function CreateChapterForm({ bookId }: CreateChapterFormProps) {
       <button className="button" type="submit" disabled={isSubmitting}>
         {isSubmitting ? t("savingLabel") : t("createChapterButton")}
       </button>
-      <p className={`feedback${message && message === t("createChapterError") ? " error" : ""}`}>{message}</p>
+      <p className={`feedback${message && message === t("createChapterError") ? " error" : message ? " success" : ""}`}>{message}</p>
     </form>
   );
 }

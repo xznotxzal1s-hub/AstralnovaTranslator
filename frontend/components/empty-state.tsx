@@ -6,6 +6,7 @@ type EmptyStateProps = {
 export function EmptyState({ title, description }: EmptyStateProps) {
   return (
     <section className="empty-state">
+      <div className="empty-state-mark">...</div>
       <h2>{title}</h2>
       <p className="muted">{description}</p>
     </section>

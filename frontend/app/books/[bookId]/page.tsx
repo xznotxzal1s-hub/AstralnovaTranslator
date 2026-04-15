@@ -33,39 +33,47 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
 
   return (
     <main className="app-page">
-      <section className="panel hero">
-        <div>
-          <p className="eyebrow">{messages.bookDetailEyebrow}</p>
-          <h1>{book.title}</h1>
-          <p className="lede">{messages.bookDetailDescription}</p>
-          <div className="action-row">
-            <Link className="button-link" href="/">
-              {messages.backToBookshelf}
-            </Link>
-            <Link className="button-link" href={`/books/${book.id}/glossary`}>
-              {messages.manageBookGlossary}
-            </Link>
+      <section className="panel section-panel">
+        <div className="detail-hero">
+          <div className="detail-summary">
+            <p className="eyebrow">{messages.bookDetailEyebrow}</p>
+            <h1>{book.title}</h1>
+            <p className="lede">{messages.bookDetailDescription}</p>
+            <div className="summary-meta">
+              <span className="stat-chip">{formatMessage(messages.chaptersCount, { count: chapters.length, label: chapterLabel })}</span>
+              <span className="stat-chip">{new Date(book.updated_at).toLocaleDateString()}</span>
+            </div>
+            <div className="action-row">
+              <Link className="button-link" href="/">
+                {messages.backToBookshelf}
+              </Link>
+              <Link className="button-link" href={`/books/${book.id}/glossary`}>
+                {messages.manageBookGlossary}
+              </Link>
+            </div>
+          </div>
+          <CreateChapterForm bookId={book.id} />
+        </div>
+      </section>
+
+      <section className="panel section-panel">
+        <div className="section-header">
+          <div>
+            <h2>{messages.chaptersHeading}</h2>
+            <p>{formatMessage(messages.chaptersCount, { count: chapters.length, label: chapterLabel })}</p>
           </div>
         </div>
-        <CreateChapterForm bookId={book.id} />
-      </section>
 
-      <section className="section-header">
-        <div>
-          <h2>{messages.chaptersHeading}</h2>
-          <p>{formatMessage(messages.chaptersCount, { count: chapters.length, label: chapterLabel })}</p>
-        </div>
+        {chapters.length === 0 ? (
+          <EmptyState title={messages.noChaptersTitle} description={messages.noChaptersDescription} />
+        ) : (
+          <section className="list-stack chapter-list">
+            {chapters.map((chapter) => (
+              <ChapterCard key={chapter.id} bookId={book.id} chapter={chapter} />
+            ))}
+          </section>
+        )}
       </section>
-
-      {chapters.length === 0 ? (
-        <EmptyState title={messages.noChaptersTitle} description={messages.noChaptersDescription} />
-      ) : (
-        <section className="list-stack">
-          {chapters.map((chapter) => (
-            <ChapterCard key={chapter.id} bookId={book.id} chapter={chapter} />
-          ))}
-        </section>
-      )}
     </main>
   );
 }

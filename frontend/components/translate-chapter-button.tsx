@@ -36,7 +36,7 @@ export function TranslateChapterButton({
   }
 
   return (
-    <div>
+    <div className={compact ? "translate-button-wrap compact" : "translate-button-wrap"}>
       <button
         className={compact ? "button-secondary" : "button"}
         disabled={isSubmitting}
@@ -46,7 +46,7 @@ export function TranslateChapterButton({
         {isSubmitting ? t("translatingLabel") : compact ? t("translateButton") : t("translateChapterButton")}
       </button>
       {!compact && message ? (
-        <p className={`feedback${message === t("translationFailedMessage") ? " error" : ""}`}>
+        <p className={`feedback${message === t("translationFailedMessage") ? " error" : " success"}`}>
           {message}
         </p>
       ) : null}

@@ -39,62 +39,60 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
     currentIndex >= 0 && currentIndex < chapters.length - 1 ? chapters[currentIndex + 1] : null;
 
   return (
-    <main className="app-page">
-      <section className="reader-layout">
-        <aside className="sidebar-stack">
-          <section className="form-card">
-            <p className="eyebrow">{messages.chapterSidebarEyebrow}</p>
-            <h2>{chapter.title}</h2>
-            <p className="muted">{book.title}</p>
-            <div className="status-row">
-              <span className="pill">
-                {formatMessage(messages.statusLabel, { status: chapter.translation_status })}
-              </span>
-              <span className="pill">{formatMessage(messages.chapterEyebrow, { count: chapter.index_in_book })}</span>
-            </div>
-            <TranslateChapterButton chapterId={chapter.id} />
-          </section>
-
-          <section className="form-card">
-            <h3>{messages.navigationHeading}</h3>
-            <div className="action-row">
-              <Link className="button-link" href={`/books/${book.id}`}>
-                {messages.backToBook}
+    <main className="app-page reader-page">
+      <section className="reader-hero panel">
+        <div className="reader-hero-main">
+          <p className="eyebrow">{messages.readingPageEyebrow}</p>
+          <h1>{chapter.title}</h1>
+          <p className="reader-subtitle">{book.title}</p>
+          <p className="lede">{messages.readingPageDescription}</p>
+          <div className="summary-meta">
+            <span className="stat-chip">{formatMessage(messages.chapterEyebrow, { count: chapter.index_in_book })}</span>
+            <span className="stat-chip">
+              {formatMessage(messages.statusLabel, { status: chapter.translation_status })}
+            </span>
+          </div>
+        </div>
+        <div className="reader-hero-actions">
+          <TranslateChapterButton chapterId={chapter.id} />
+          <div className="reader-jump-links">
+            <Link className="button-link" href={`/books/${book.id}`}>
+              {messages.backToBook}
+            </Link>
+            {previousChapter ? (
+              <Link className="button-link" href={`/books/${book.id}/chapters/${previousChapter.id}`}>
+                {messages.previousChapter}
               </Link>
-              {previousChapter ? (
-                <Link className="button-link" href={`/books/${book.id}/chapters/${previousChapter.id}`}>
-                  {messages.previousChapter}
-                </Link>
-              ) : null}
-              {nextChapter ? (
-                <Link className="button-link" href={`/books/${book.id}/chapters/${nextChapter.id}`}>
-                  {messages.nextChapter}
-                </Link>
-              ) : null}
-            </div>
-          </section>
+            ) : null}
+            {nextChapter ? (
+              <Link className="button-link" href={`/books/${book.id}/chapters/${nextChapter.id}`}>
+                {messages.nextChapter}
+              </Link>
+            ) : null}
+          </div>
+        </div>
+      </section>
 
-          <section className="form-card">
-            <h3>{messages.allChapters}</h3>
-            <div className="list-stack">
+      <section className="reader-layout">
+        <aside className="sidebar-stack reader-sidebar">
+          <section className="form-card reader-nav-card">
+            <h3>{messages.navigationHeading}</h3>
+            <div className="reader-outline">
               {chapters.map((item) => (
-                <Link key={item.id} className="button-link" href={`/books/${book.id}/chapters/${item.id}`}>
-                  {item.index_in_book}. {item.title}
+                <Link
+                  key={item.id}
+                  className={`chapter-nav-link${item.id === chapter.id ? " active" : ""}`}
+                  href={`/books/${book.id}/chapters/${item.id}`}
+                >
+                  <span className="chapter-nav-index">{item.index_in_book}</span>
+                  <span className="chapter-nav-copy">{item.title}</span>
                 </Link>
               ))}
             </div>
           </section>
         </aside>
 
-        <section className="reader-card">
-          <div className="reader-header">
-            <div>
-              <p className="eyebrow">{messages.readingPageEyebrow}</p>
-              <h1>{chapter.title}</h1>
-              <p className="muted">{messages.readingPageDescription}</p>
-            </div>
-          </div>
-
+        <section className="reader-card reading-surface">
           {chapter.source_text ? (
             <ReadModePanel chapter={chapter} />
           ) : (

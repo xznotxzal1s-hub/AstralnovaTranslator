@@ -55,7 +55,7 @@ export function ImportBookForm({ title, description, endpoint, accept }: ImportB
   }
 
   return (
-    <form className="form-card" onSubmit={handleSubmit}>
+    <form className="form-card feature-form" onSubmit={handleSubmit}>
       <div>
         <p className="eyebrow">{t("importEyebrow")}</p>
         <h2>{title}</h2>
@@ -83,7 +83,7 @@ export function ImportBookForm({ title, description, endpoint, accept }: ImportB
       <button className="button" disabled={isSubmitting} type="submit">
         {isSubmitting ? t("importingLabel") : title}
       </button>
-      <p className={`feedback${message && message === t("importFailed") ? " error" : ""}`}>{message}</p>
+      <p className={`feedback${message && message === t("importFailed") ? " error" : message ? " success" : ""}`}>{message}</p>
     </form>
   );
 }

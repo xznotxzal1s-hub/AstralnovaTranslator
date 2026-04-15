@@ -41,7 +41,7 @@ export default async function RootLayout({
                 <LanguageSwitcher />
               </div>
             </header>
-            {children}
+            <div className="site-frame">{children}</div>
           </div>
         </I18nProvider>
       </body>

@@ -17,11 +17,11 @@ export function ChapterCard({ bookId, chapter }: ChapterCardProps) {
 
   return (
     <article className="chapter-card">
-      <div>
+      <div className="card-heading">
         <p className="eyebrow">{formatMessage(t("chapterEyebrow"), { count: chapter.index_in_book })}</p>
         <h3>{chapter.title}</h3>
       </div>
-      <div className="meta-row">
+      <div className="meta-row chapter-meta">
         <span className="pill">{formatMessage(t("statusLabel"), { status: chapter.translation_status })}</span>
         <span>
           {chapter.last_translated_at

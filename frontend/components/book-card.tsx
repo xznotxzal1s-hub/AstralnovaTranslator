@@ -14,11 +14,11 @@ export function BookCard({ book }: BookCardProps) {
 
   return (
     <article className="book-card">
-      <div>
+      <div className="card-heading">
         <p className="eyebrow">{t("bookEyebrow")}</p>
         <h2>{book.title}</h2>
       </div>
-      <div className="meta-row">
+      <div className="meta-row book-meta">
         <span>{new Date(book.updated_at).toLocaleString(locale)}</span>
       </div>
       <div className="action-row">

@@ -19,7 +19,11 @@ export function ReadModePanel({ chapter }: ReadModePanelProps) {
 
   return (
     <>
-      <div className="reader-header">
+      <div className="reader-toolbar">
+        <div>
+          <p className="eyebrow">{t("readingModeLabel")}</p>
+          <p className="reader-mode-note">{hasTranslation ? t("translationPanelTitle") : t("noTranslationSaved")}</p>
+        </div>
         <div className="mode-toggle" role="tablist" aria-label={t("readingModeLabel")}>
           <button
             className={mode === "source-and-translation" ? "active" : ""}
@@ -39,18 +43,18 @@ export function ReadModePanel({ chapter }: ReadModePanelProps) {
       </div>
 
       {mode === "source-and-translation" ? (
-        <div className="text-columns">
-          <section className="text-panel">
+        <div className="text-columns split-reading-columns">
+          <section className="text-panel source-panel">
             <p className="eyebrow">{t("sourcePanelTitle")}</p>
             <pre>{chapter.source_text}</pre>
           </section>
-          <section className="text-panel">
+          <section className="text-panel translation-panel">
             <p className="eyebrow">{t("translationPanelTitle")}</p>
             <pre>{hasTranslation ? chapter.translated_text : t("noTranslationSaved")}</pre>
           </section>
         </div>
       ) : (
-        <section className="text-panel">
+        <section className="text-panel translation-panel translation-only-panel">
           <p className="eyebrow">{t("translationPanelTitle")}</p>
           <pre>{hasTranslation ? chapter.translated_text : t("noTranslationSaved")}</pre>
         </section>
