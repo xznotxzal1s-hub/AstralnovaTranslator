@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app import models  # noqa: F401
 from app.api import books, chapters, glossary, imports, settings, translate
 from app.core.database import Base, engine, ensure_schema
 

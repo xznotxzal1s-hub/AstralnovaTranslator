@@ -1,14 +1,43 @@
 from hashlib import sha256
 
 
-def build_prompt(prompt_template: str, source_text: str, translation_mode: str) -> str:
+def build_prompt(
+    prompt_template: str,
+    source_text: str,
+    translation_mode: str,
+    glossary_guidance: str,
+) -> str:
     try:
         return prompt_template.format(
             source_text=source_text,
             translation_mode=translation_mode,
+            glossary_guidance=glossary_guidance,
         )
     except KeyError:
+        if glossary_guidance:
+            return (
+                f"{prompt_template}\n\nTranslation mode: {translation_mode}\n\n"
+                f"{glossary_guidance}\n\nJapanese text:\n{source_text}"
+            )
         return f"{prompt_template}\n\nTranslation mode: {translation_mode}\n\nJapanese text:\n{source_text}"
+
+
+def build_glossary_guidance(
+    glossary_entries: list[dict[str, str | None]],
+) -> str:
+    if not glossary_entries:
+        return ""
+
+    lines = [
+        "Glossary guidance:",
+        "Use the preferred translations below when the terms appear. Keep wording consistent.",
+    ]
+
+    for entry in glossary_entries:
+        note_suffix = f" (note: {entry['note']})" if entry.get("note") else ""
+        lines.append(f"- {entry['source_term']} => {entry['target_term']}{note_suffix}")
+
+    return "\n".join(lines)
 
 
 def split_text_into_chunks(source_text: str, chunk_size: int) -> list[str]:
@@ -48,3 +77,7 @@ def split_text_into_chunks(source_text: str, chunk_size: int) -> list[str]:
 
 def calculate_source_hash(source_text: str) -> str:
     return sha256(source_text.encode("utf-8")).hexdigest()
+
+
+def calculate_text_hash(text: str) -> str:
+    return sha256(text.encode("utf-8")).hexdigest()
