@@ -113,6 +113,14 @@ h3 {
   font-size: 0.95rem;
 }
 
+.topbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: end;
+  gap: 10px;
+}
+
 .topnav {
   display: flex;
   flex-wrap: wrap;
@@ -124,6 +132,23 @@ h3 {
   border: 1px solid var(--line);
   border-radius: 999px;
   background: rgba(255, 250, 241, 0.72);
+}
+
+.language-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 250, 241, 0.72);
+  color: var(--ink-soft);
+}
+
+.language-switcher select {
+  border: 0;
+  background: transparent;
+  color: inherit;
 }
 
 .app-page {

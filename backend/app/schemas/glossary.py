@@ -19,6 +19,7 @@ class GlossaryEntryUpdate(GlossaryEntryBase):
 
 class GlossaryEntryRead(GlossaryEntryBase):
     id: int
+    book_id: int | None
     created_at: datetime
     updated_at: datetime
 

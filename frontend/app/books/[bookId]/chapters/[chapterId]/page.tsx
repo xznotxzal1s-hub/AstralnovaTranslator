@@ -5,6 +5,8 @@ import { EmptyState } from "@/components/empty-state";
 import { ReadModePanel } from "@/components/read-mode-panel";
 import { TranslateChapterButton } from "@/components/translate-chapter-button";
 import { fetchBook, fetchBookChapters, fetchChapter } from "@/lib/api";
+import { formatMessage } from "@/lib/i18n";
+import { getServerI18n } from "@/lib/i18n-server";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +31,7 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
     fetchChapter(parsedChapterId),
     fetchBookChapters(parsedBookId),
   ]);
+  const { messages } = await getServerI18n();
 
   const currentIndex = chapters.findIndex((item) => item.id === chapter.id);
   const previousChapter = currentIndex > 0 ? chapters[currentIndex - 1] : null;
@@ -40,37 +43,39 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
       <section className="reader-layout">
         <aside className="sidebar-stack">
           <section className="form-card">
-            <p className="eyebrow">Chapter</p>
+            <p className="eyebrow">{messages.chapterSidebarEyebrow}</p>
             <h2>{chapter.title}</h2>
             <p className="muted">{book.title}</p>
             <div className="status-row">
-              <span className="pill">Status: {chapter.translation_status}</span>
-              <span className="pill">Chapter {chapter.index_in_book}</span>
+              <span className="pill">
+                {formatMessage(messages.statusLabel, { status: chapter.translation_status })}
+              </span>
+              <span className="pill">{formatMessage(messages.chapterEyebrow, { count: chapter.index_in_book })}</span>
             </div>
             <TranslateChapterButton chapterId={chapter.id} />
           </section>
 
           <section className="form-card">
-            <h3>Navigation</h3>
+            <h3>{messages.navigationHeading}</h3>
             <div className="action-row">
               <Link className="button-link" href={`/books/${book.id}`}>
-                Back to book
+                {messages.backToBook}
               </Link>
               {previousChapter ? (
                 <Link className="button-link" href={`/books/${book.id}/chapters/${previousChapter.id}`}>
-                  Previous chapter
+                  {messages.previousChapter}
                 </Link>
               ) : null}
               {nextChapter ? (
                 <Link className="button-link" href={`/books/${book.id}/chapters/${nextChapter.id}`}>
-                  Next chapter
+                  {messages.nextChapter}
                 </Link>
               ) : null}
             </div>
           </section>
 
           <section className="form-card">
-            <h3>All chapters</h3>
+            <h3>{messages.allChapters}</h3>
             <div className="list-stack">
               {chapters.map((item) => (
                 <Link key={item.id} className="button-link" href={`/books/${book.id}/chapters/${item.id}`}>
@@ -84,19 +89,16 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
         <section className="reader-card">
           <div className="reader-header">
             <div>
-              <p className="eyebrow">Reading Page</p>
+              <p className="eyebrow">{messages.readingPageEyebrow}</p>
               <h1>{chapter.title}</h1>
-              <p className="muted">Read the original text and the saved translation.</p>
+              <p className="muted">{messages.readingPageDescription}</p>
             </div>
           </div>
 
           {chapter.source_text ? (
             <ReadModePanel chapter={chapter} />
           ) : (
-            <EmptyState
-              title="This chapter has no source text"
-              description="Add source text on the book detail page before reading or translating."
-            />
+            <EmptyState title={messages.noSourceTitle} description={messages.noSourceDescription} />
           )}
         </section>
       </section>

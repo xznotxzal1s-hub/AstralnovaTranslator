@@ -3,22 +3,23 @@ import { CreateBookForm } from "@/components/create-book-form";
 import { EmptyState } from "@/components/empty-state";
 import { ImportBookForm } from "@/components/import-book-form";
 import { fetchBooks } from "@/lib/api";
+import { formatMessage } from "@/lib/i18n";
+import { getServerI18n } from "@/lib/i18n-server";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const books = await fetchBooks();
+  const { messages } = await getServerI18n();
+  const bookLabel = books.length === 1 ? messages.bookSingular : messages.bookPlural;
 
   return (
     <main className="app-page">
       <section className="hero panel">
         <div>
-          <p className="eyebrow">Bookshelf</p>
-          <h1>Your private reading shelf</h1>
-          <p className="lede">
-            Create books, open chapters, and start translation from a simple reading-focused
-            interface.
-          </p>
+          <p className="eyebrow">{messages.bookshelfEyebrow}</p>
+          <h1>{messages.bookshelfTitle}</h1>
+          <p className="lede">{messages.bookshelfDescription}</p>
         </div>
         <CreateBookForm />
       </section>
@@ -26,30 +27,27 @@ export default async function HomePage() {
       <section className="import-grid">
         <ImportBookForm
           accept=".txt,text/plain"
-          description="Upload a UTF-8 TXT file and import it into a new book."
+          description={messages.importTxtDescription}
           endpoint="txt"
-          title="Import TXT"
+          title={messages.importTxtTitle}
         />
         <ImportBookForm
           accept=".epub,application/epub+zip"
-          description="Upload an EPUB file and extract readable chapters into a new book."
+          description={messages.importEpubDescription}
           endpoint="epub"
-          title="Import EPUB"
+          title={messages.importEpubTitle}
         />
       </section>
 
       <section className="section-header">
         <div>
-          <h2>Books</h2>
-          <p>{books.length} book{books.length === 1 ? "" : "s"} stored locally.</p>
+          <h2>{messages.booksHeading}</h2>
+          <p>{formatMessage(messages.booksCount, { count: books.length, label: bookLabel })}</p>
         </div>
       </section>
 
       {books.length === 0 ? (
-        <EmptyState
-          title="No books yet"
-          description="Create your first book above, or import a TXT or EPUB file to start reading."
-        />
+        <EmptyState title={messages.noBooksTitle} description={messages.noBooksDescription} />
       ) : (
         <section className="book-grid">
           {books.map((book) => (

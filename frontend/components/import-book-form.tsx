@@ -3,7 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { useI18n } from "@/components/i18n-provider";
 import { importBookFile } from "@/lib/api-client";
+import { formatMessage } from "@/lib/i18n";
 
 type ImportBookFormProps = {
   title: string;
@@ -14,6 +16,7 @@ type ImportBookFormProps = {
 
 export function ImportBookForm({ title, description, endpoint, accept }: ImportBookFormProps) {
   const router = useRouter();
+  const { t } = useI18n();
   const [bookTitle, setBookTitle] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
@@ -25,7 +28,7 @@ export function ImportBookForm({ title, description, endpoint, accept }: ImportB
     const form = event.currentTarget;
 
     if (!file) {
-      setMessage("Please choose a file first.");
+      setMessage(t("importChooseFileError"));
       return;
     }
 
@@ -43,9 +46,9 @@ export function ImportBookForm({ title, description, endpoint, accept }: ImportB
         fileInput.value = "";
       }
       router.refresh();
-      setMessage(`Imported "${result.book_title}" with ${result.chapter_count} chapter(s).`);
+      setMessage(formatMessage(t("importSuccess"), { title: result.book_title, count: result.chapter_count }));
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Import failed.");
+      setMessage(error instanceof Error ? error.message : t("importFailed"));
     } finally {
       setIsSubmitting(false);
     }
@@ -54,21 +57,21 @@ export function ImportBookForm({ title, description, endpoint, accept }: ImportB
   return (
     <form className="form-card" onSubmit={handleSubmit}>
       <div>
-        <p className="eyebrow">Import</p>
+        <p className="eyebrow">{t("importEyebrow")}</p>
         <h2>{title}</h2>
         <p className="muted">{description}</p>
       </div>
       <div className="field">
-        <label htmlFor={`${endpoint}-book-title`}>Book title override (optional)</label>
+        <label htmlFor={`${endpoint}-book-title`}>{t("importBookTitleOverride")}</label>
         <input
           id={`${endpoint}-book-title`}
-          placeholder="Leave blank to use the file title"
+          placeholder={t("importBookTitlePlaceholder")}
           value={bookTitle}
           onChange={(event) => setBookTitle(event.target.value)}
         />
       </div>
       <div className="field">
-        <label htmlFor={`${endpoint}-file`}>Choose file</label>
+        <label htmlFor={`${endpoint}-file`}>{t("importChooseFile")}</label>
         <input
           accept={accept}
           id={`${endpoint}-file`}
@@ -78,9 +81,9 @@ export function ImportBookForm({ title, description, endpoint, accept }: ImportB
         />
       </div>
       <button className="button" disabled={isSubmitting} type="submit">
-        {isSubmitting ? "Importing..." : title}
+        {isSubmitting ? t("importingLabel") : title}
       </button>
-      <p className={`feedback${message && message.toLowerCase().includes("failed") ? " error" : ""}`}>{message}</p>
+      <p className={`feedback${message && message === t("importFailed") ? " error" : ""}`}>{message}</p>
     </form>
   );
 }

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { useI18n } from "@/components/i18n-provider";
 import { translateChapter } from "@/lib/api-client";
 
 type TranslateChapterButtonProps = {
@@ -15,6 +16,7 @@ export function TranslateChapterButton({
   compact = false,
 }: TranslateChapterButtonProps) {
   const router = useRouter();
+  const { t } = useI18n();
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -25,9 +27,9 @@ export function TranslateChapterButton({
       setIsSubmitting(true);
       await translateChapter(chapterId);
       router.refresh();
-      setMessage("Translation saved.");
+      setMessage(t("translationSavedMessage"));
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Translation failed.");
+      setMessage(error instanceof Error ? error.message : t("translationFailedMessage"));
     } finally {
       setIsSubmitting(false);
     }
@@ -41,10 +43,10 @@ export function TranslateChapterButton({
         onClick={handleTranslate}
         type="button"
       >
-        {isSubmitting ? "Translating..." : compact ? "Translate" : "Translate chapter"}
+        {isSubmitting ? t("translatingLabel") : compact ? t("translateButton") : t("translateChapterButton")}
       </button>
       {!compact && message ? (
-        <p className={`feedback${message.includes("failed") || message.includes("Failed") ? " error" : ""}`}>
+        <p className={`feedback${message === t("translationFailedMessage") ? " error" : ""}`}>
           {message}
         </p>
       ) : null}

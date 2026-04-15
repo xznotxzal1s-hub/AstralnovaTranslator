@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { useI18n } from "@/components/i18n-provider";
 import { createChapter } from "@/lib/api-client";
 
 type CreateChapterFormProps = {
@@ -11,6 +12,7 @@ type CreateChapterFormProps = {
 
 export function CreateChapterForm({ bookId }: CreateChapterFormProps) {
   const router = useRouter();
+  const { t } = useI18n();
   const [title, setTitle] = useState("");
   const [sourceText, setSourceText] = useState("");
   const [message, setMessage] = useState("");
@@ -21,7 +23,7 @@ export function CreateChapterForm({ bookId }: CreateChapterFormProps) {
     setMessage("");
 
     if (!title.trim() || !sourceText.trim()) {
-      setMessage("Please enter a chapter title and Japanese text.");
+      setMessage(t("enterChapterError"));
       return;
     }
 
@@ -34,9 +36,9 @@ export function CreateChapterForm({ bookId }: CreateChapterFormProps) {
       setTitle("");
       setSourceText("");
       router.refresh();
-      setMessage("Chapter created.");
+      setMessage(t("chapterCreatedMessage"));
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Failed to create the chapter.");
+      setMessage(error instanceof Error ? error.message : t("createChapterError"));
     } finally {
       setIsSubmitting(false);
     }
@@ -45,31 +47,31 @@ export function CreateChapterForm({ bookId }: CreateChapterFormProps) {
   return (
     <form className="form-card" onSubmit={handleSubmit}>
       <div>
-        <p className="eyebrow">Manual Paste</p>
-        <h2>Add a chapter</h2>
+        <p className="eyebrow">{t("manualPasteEyebrow")}</p>
+        <h2>{t("addChapterTitle")}</h2>
       </div>
       <div className="field">
-        <label htmlFor="chapter-title">Chapter title</label>
+        <label htmlFor="chapter-title">{t("chapterTitleLabel")}</label>
         <input
           id="chapter-title"
           value={title}
           onChange={(event) => setTitle(event.target.value)}
-          placeholder="Example: Chapter 1"
+          placeholder={t("chapterTitlePlaceholder")}
         />
       </div>
       <div className="field">
-        <label htmlFor="source-text">Japanese text</label>
+        <label htmlFor="source-text">{t("sourceTextLabel")}</label>
         <textarea
           id="source-text"
           value={sourceText}
           onChange={(event) => setSourceText(event.target.value)}
-          placeholder="Paste the Japanese chapter text here."
+          placeholder={t("sourceTextPlaceholder")}
         />
       </div>
       <button className="button" type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Saving..." : "Create chapter"}
+        {isSubmitting ? t("savingLabel") : t("createChapterButton")}
       </button>
-      <p className={`feedback${message && message.includes("Failed") ? " error" : ""}`}>{message}</p>
+      <p className={`feedback${message && message === t("createChapterError") ? " error" : ""}`}>{message}</p>
     </form>
   );
 }

@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 
+import { useI18n } from "@/components/i18n-provider";
 import { createGlossaryEntry, deleteGlossaryEntry, updateGlossaryEntry } from "@/lib/api-client";
 import type { GlossaryEntry } from "@/lib/types";
 
 type GlossaryManagerProps = {
   initialEntries: GlossaryEntry[];
+  scope: "global" | "book";
+  bookId?: number;
 };
 
 type EntryFormState = {
@@ -21,7 +24,8 @@ const emptyForm: EntryFormState = {
   note: "",
 };
 
-export function GlossaryManager({ initialEntries }: GlossaryManagerProps) {
+export function GlossaryManager({ initialEntries, scope, bookId }: GlossaryManagerProps) {
+  const { t } = useI18n();
   const [entries, setEntries] = useState(initialEntries);
   const [formData, setFormData] = useState<EntryFormState>(emptyForm);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -50,18 +54,18 @@ export function GlossaryManager({ initialEntries }: GlossaryManagerProps) {
     try {
       setIsSubmitting(true);
       if (editingId === null) {
-        const created = await createGlossaryEntry(formData);
+        const created = await createGlossaryEntry({ ...formData, bookId });
         setEntries((current) => [created, ...current]);
-        setMessage("Glossary entry created.");
+        setMessage(t("glossaryEntryCreated"));
       } else {
         const updated = await updateGlossaryEntry(editingId, formData);
         setEntries((current) => current.map((entry) => (entry.id === editingId ? updated : entry)));
-        setMessage("Glossary entry updated.");
+        setMessage(t("glossaryEntryUpdated"));
       }
 
       resetForm();
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Failed to save glossary entry.");
+      setMessage(error instanceof Error ? error.message : t("glossarySaveFailed"));
     } finally {
       setIsSubmitting(false);
     }
@@ -76,9 +80,9 @@ export function GlossaryManager({ initialEntries }: GlossaryManagerProps) {
       if (editingId === entryId) {
         resetForm();
       }
-      setMessage("Glossary entry deleted.");
+      setMessage(t("glossaryEntryDeleted"));
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Failed to delete glossary entry.");
+      setMessage(error instanceof Error ? error.message : t("glossaryDeleteFailed"));
     } finally {
       setIsSubmitting(false);
     }
@@ -88,12 +92,13 @@ export function GlossaryManager({ initialEntries }: GlossaryManagerProps) {
     <section className="split-layout">
       <form className="form-card" onSubmit={handleSubmit}>
         <div>
-          <h2>{editingId === null ? "Create entry" : "Edit entry"}</h2>
-          <p className="muted">Keep preferred translations and optional notes in one simple list.</p>
+          <p className="eyebrow">{scope === "global" ? t("glossaryGlobalScope") : t("glossaryBookScope")}</p>
+          <h2>{editingId === null ? t("glossaryCreateTitle") : t("glossaryEditTitle")}</h2>
+          <p className="muted">{t("glossaryFormDescription")}</p>
         </div>
 
         <div className="field">
-          <label htmlFor="source_term">Source term</label>
+          <label htmlFor="source_term">{t("glossarySourceLabel")}</label>
           <input
             id="source_term"
             value={formData.source_term}
@@ -102,7 +107,7 @@ export function GlossaryManager({ initialEntries }: GlossaryManagerProps) {
         </div>
 
         <div className="field">
-          <label htmlFor="target_term">Target term</label>
+          <label htmlFor="target_term">{t("glossaryTargetLabel")}</label>
           <input
             id="target_term"
             value={formData.target_term}
@@ -111,7 +116,7 @@ export function GlossaryManager({ initialEntries }: GlossaryManagerProps) {
         </div>
 
         <div className="field">
-          <label htmlFor="note">Note (optional)</label>
+          <label htmlFor="note">{t("glossaryNoteLabel")}</label>
           <textarea
             id="note"
             value={formData.note}
@@ -121,33 +126,37 @@ export function GlossaryManager({ initialEntries }: GlossaryManagerProps) {
 
         <div className="action-row">
           <button className="button" disabled={isSubmitting} type="submit">
-            {isSubmitting ? "Saving..." : editingId === null ? "Create entry" : "Save changes"}
+            {isSubmitting ? t("savingLabel") : editingId === null ? t("glossaryCreateButton") : t("glossarySaveButton")}
           </button>
           {editingId !== null ? (
             <button className="button-link" onClick={resetForm} type="button">
-              Cancel edit
+              {t("glossaryCancel")}
             </button>
           ) : null}
         </div>
-        <p className={`feedback${message.toLowerCase().includes("fail") ? " error" : ""}`}>{message}</p>
+        <p
+          className={`feedback${message === t("glossarySaveFailed") || message === t("glossaryDeleteFailed") ? " error" : ""}`}
+        >
+          {message}
+        </p>
       </form>
 
       <section className="list-stack">
         {entries.map((entry) => (
           <article className="chapter-card" key={entry.id}>
             <div>
-              <p className="eyebrow">Glossary Entry</p>
+              <p className="eyebrow">{t("glossaryEntryLabel")}</p>
               <h3>
                 {entry.source_term} → {entry.target_term}
               </h3>
             </div>
-            <p className="muted">{entry.note?.trim() ? entry.note : "No note."}</p>
+            <p className="muted">{entry.note?.trim() ? entry.note : t("glossaryNoNote")}</p>
             <div className="action-row">
               <button className="button-secondary" disabled={isSubmitting} onClick={() => beginEdit(entry)} type="button">
-                Edit
+                {t("glossaryEdit")}
               </button>
               <button className="button-link" disabled={isSubmitting} onClick={() => handleDelete(entry.id)} type="button">
-                Delete
+                {t("glossaryDelete")}
               </button>
             </div>
           </article>

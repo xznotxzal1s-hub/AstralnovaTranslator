@@ -94,10 +94,17 @@ export async function createGlossaryEntry(payload: {
   source_term: string;
   target_term: string;
   note?: string;
+  bookId?: number;
 }) {
-  return request<GlossaryEntry>("/glossary", {
+  const path = payload.bookId ? `/books/${payload.bookId}/glossary` : "/glossary";
+
+  return request<GlossaryEntry>(path, {
     method: "POST",
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      source_term: payload.source_term,
+      target_term: payload.target_term,
+      note: payload.note,
+    }),
   });
 }
 

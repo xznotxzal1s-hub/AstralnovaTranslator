@@ -49,6 +49,7 @@ export type TranslationSettings = {
 
 export type GlossaryEntry = {
   id: number;
+  book_id: number | null;
   source_term: string;
   target_term: string;
   note: string | null;

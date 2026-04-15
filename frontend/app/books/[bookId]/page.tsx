@@ -5,6 +5,8 @@ import { ChapterCard } from "@/components/chapter-card";
 import { CreateChapterForm } from "@/components/create-chapter-form";
 import { EmptyState } from "@/components/empty-state";
 import { fetchBook, fetchBookChapters } from "@/lib/api";
+import { formatMessage } from "@/lib/i18n";
+import { getServerI18n } from "@/lib/i18n-server";
 
 export const dynamic = "force-dynamic";
 
@@ -26,19 +28,22 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
     fetchBook(parsedBookId),
     fetchBookChapters(parsedBookId),
   ]);
+  const { messages } = await getServerI18n();
+  const chapterLabel = chapters.length === 1 ? messages.chapterSingular : messages.chapterPlural;
 
   return (
     <main className="app-page">
       <section className="panel hero">
         <div>
-          <p className="eyebrow">Book Detail</p>
+          <p className="eyebrow">{messages.bookDetailEyebrow}</p>
           <h1>{book.title}</h1>
-          <p className="lede">
-            Add a chapter by pasting Japanese text, then open a chapter to read or translate it.
-          </p>
+          <p className="lede">{messages.bookDetailDescription}</p>
           <div className="action-row">
             <Link className="button-link" href="/">
-              Back to bookshelf
+              {messages.backToBookshelf}
+            </Link>
+            <Link className="button-link" href={`/books/${book.id}/glossary`}>
+              {messages.manageBookGlossary}
             </Link>
           </div>
         </div>
@@ -47,16 +52,13 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
 
       <section className="section-header">
         <div>
-          <h2>Chapters</h2>
-          <p>{chapters.length} chapter{chapters.length === 1 ? "" : "s"} in this book.</p>
+          <h2>{messages.chaptersHeading}</h2>
+          <p>{formatMessage(messages.chaptersCount, { count: chapters.length, label: chapterLabel })}</p>
         </div>
       </section>
 
       {chapters.length === 0 ? (
-        <EmptyState
-          title="No chapters yet"
-          description="Paste Japanese text into the chapter form above to create the first chapter."
-        />
+        <EmptyState title={messages.noChaptersTitle} description={messages.noChaptersDescription} />
       ) : (
         <section className="list-stack">
           {chapters.map((chapter) => (

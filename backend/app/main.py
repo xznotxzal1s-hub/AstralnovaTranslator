@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import books, chapters, glossary, imports, settings, translate
-from app.core.database import Base, engine
+from app.core.database import Base, engine, ensure_schema
 
 
 def create_application() -> FastAPI:
@@ -34,4 +34,5 @@ def create_application() -> FastAPI:
 
 
 Base.metadata.create_all(bind=engine)
+ensure_schema()
 app = create_application()

@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, String, Text, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import DateTime, ForeignKey, String, Text, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
 
@@ -10,6 +10,7 @@ class GlossaryEntry(Base):
     __tablename__ = "glossary_entries"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    book_id: Mapped[int | None] = mapped_column(ForeignKey("books.id"), nullable=True, index=True)
     source_term: Mapped[str] = mapped_column(String(255), nullable=False)
     target_term: Mapped[str] = mapped_column(String(255), nullable=False)
     note: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -24,3 +25,5 @@ class GlossaryEntry(Base):
         onupdate=func.now(),
         nullable=False,
     )
+
+    book = relationship("Book")

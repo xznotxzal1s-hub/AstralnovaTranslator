@@ -40,3 +40,7 @@ export async function fetchSettings(): Promise<TranslationSettings> {
 export async function fetchGlossaryEntries(): Promise<GlossaryEntry[]> {
   return request<GlossaryEntry[]>("/glossary");
 }
+
+export async function fetchBookGlossaryEntries(bookId: number): Promise<GlossaryEntry[]> {
+  return request<GlossaryEntry[]>(`/books/${bookId}/glossary`);
+}

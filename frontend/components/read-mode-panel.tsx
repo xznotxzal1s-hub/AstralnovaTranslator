@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { useI18n } from "@/components/i18n-provider";
 import type { Chapter } from "@/lib/types";
 
 type ReadModePanelProps = {
@@ -9,6 +10,7 @@ type ReadModePanelProps = {
 };
 
 export function ReadModePanel({ chapter }: ReadModePanelProps) {
+  const { t } = useI18n();
   const [mode, setMode] = useState<"translation-only" | "source-and-translation">(
     "source-and-translation",
   );
@@ -18,20 +20,20 @@ export function ReadModePanel({ chapter }: ReadModePanelProps) {
   return (
     <>
       <div className="reader-header">
-        <div className="mode-toggle" role="tablist" aria-label="Reading mode">
+        <div className="mode-toggle" role="tablist" aria-label={t("readingModeLabel")}>
           <button
             className={mode === "source-and-translation" ? "active" : ""}
             onClick={() => setMode("source-and-translation")}
             type="button"
           >
-            Source + translation
+            {t("readModeBoth")}
           </button>
           <button
             className={mode === "translation-only" ? "active" : ""}
             onClick={() => setMode("translation-only")}
             type="button"
           >
-            Translation only
+            {t("readModeTranslationOnly")}
           </button>
         </div>
       </div>
@@ -39,18 +41,18 @@ export function ReadModePanel({ chapter }: ReadModePanelProps) {
       {mode === "source-and-translation" ? (
         <div className="text-columns">
           <section className="text-panel">
-            <p className="eyebrow">Source</p>
+            <p className="eyebrow">{t("sourcePanelTitle")}</p>
             <pre>{chapter.source_text}</pre>
           </section>
           <section className="text-panel">
-            <p className="eyebrow">Translation</p>
-            <pre>{hasTranslation ? chapter.translated_text : "No translated text saved yet."}</pre>
+            <p className="eyebrow">{t("translationPanelTitle")}</p>
+            <pre>{hasTranslation ? chapter.translated_text : t("noTranslationSaved")}</pre>
           </section>
         </div>
       ) : (
         <section className="text-panel">
-          <p className="eyebrow">Translation</p>
-          <pre>{hasTranslation ? chapter.translated_text : "No translated text saved yet."}</pre>
+          <p className="eyebrow">{t("translationPanelTitle")}</p>
+          <pre>{hasTranslation ? chapter.translated_text : t("noTranslationSaved")}</pre>
         </section>
       )}
     </>

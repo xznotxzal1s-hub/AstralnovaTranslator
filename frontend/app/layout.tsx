@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+
+import { I18nProvider } from "@/components/i18n-provider";
+import { LanguageSwitcher } from "@/components/language-switcher";
+import { getServerI18n } from "@/lib/i18n-server";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -7,31 +12,38 @@ export const metadata: Metadata = {
   description: "A private reading-focused app for books, chapters, and AI translation.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { locale, messages } = await getServerI18n();
+
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body>
-        <div className="shell">
-          <header className="topbar">
-            <Link className="brand" href="/">
-              <span className="brand-mark">LN</span>
-              <span className="brand-copy">
-                <strong>Private Light Novel Reader</strong>
-                <span>Reading, import, settings, and glossary</span>
-              </span>
-            </Link>
-            <nav className="topnav">
-              <Link href="/">Bookshelf</Link>
-              <Link href="/settings">Settings</Link>
-              <Link href="/glossary">Glossary</Link>
-            </nav>
-          </header>
-          {children}
-        </div>
+        <I18nProvider locale={locale} messages={messages}>
+          <div className="shell">
+            <header className="topbar">
+              <Link className="brand" href="/">
+                <span className="brand-mark">LN</span>
+                <span className="brand-copy">
+                  <strong>{messages.appTitle}</strong>
+                  <span>{messages.appSubtitle}</span>
+                </span>
+              </Link>
+              <div className="topbar-actions">
+                <nav className="topnav">
+                  <Link href="/">{messages.navBookshelf}</Link>
+                  <Link href="/settings">{messages.navSettings}</Link>
+                  <Link href="/glossary">{messages.navGlossary}</Link>
+                </nav>
+                <LanguageSwitcher />
+              </div>
+            </header>
+            {children}
+          </div>
+        </I18nProvider>
       </body>
     </html>
   );
