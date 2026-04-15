@@ -1,0 +1,390 @@
+:root {
+  color-scheme: light;
+  font-family: "Segoe UI", sans-serif;
+  background: #f6f0e6;
+  color: #1f2933;
+  --page-width: 1120px;
+  --paper: rgba(255, 252, 247, 0.94);
+  --paper-strong: #fffaf1;
+  --line: rgba(108, 85, 59, 0.16);
+  --accent: #8a5a2b;
+  --accent-soft: #f2e2cc;
+  --ink-soft: #5c6670;
+  --shadow: 0 22px 60px rgba(79, 61, 38, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(214, 198, 170, 0.45), transparent 40%),
+    linear-gradient(180deg, #f7f3eb 0%, #efe7d8 100%);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+.eyebrow {
+  margin: 0 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+
+h1 {
+  margin: 0 0 16px;
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1.1;
+}
+
+p {
+  margin: 0 0 12px;
+  line-height: 1.6;
+}
+
+h2,
+h3 {
+  margin: 0;
+}
+
+.shell {
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.topbar {
+  max-width: var(--page-width);
+  margin: 0 auto 20px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 250, 241, 0.72);
+  backdrop-filter: blur(8px);
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #8a5a2b, #ba8752);
+  color: #fff9f2;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.brand-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.brand-copy span {
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.app-page {
+  max-width: var(--page-width);
+  margin: 0 auto;
+  display: grid;
+  gap: 20px;
+}
+
+.panel {
+  border: 1px solid var(--line);
+  background: var(--paper);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+}
+
+.hero {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1.3fr) minmax(280px, 360px);
+  padding: 28px;
+}
+
+.lede {
+  max-width: 64ch;
+  color: var(--ink-soft);
+}
+
+.section-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.section-header p,
+.muted {
+  color: var(--ink-soft);
+}
+
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.book-card,
+.chapter-card,
+.reader-card,
+.form-card,
+.empty-state {
+  border: 1px solid var(--line);
+  background: var(--paper);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+}
+
+.book-card,
+.chapter-card {
+  padding: 22px;
+  display: grid;
+  gap: 14px;
+}
+
+.book-card:hover,
+.chapter-card:hover {
+  border-color: rgba(138, 90, 43, 0.32);
+  transform: translateY(-1px);
+}
+
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: var(--accent-soft);
+  color: #6f451a;
+  font-size: 0.9rem;
+}
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.button,
+.button-secondary,
+.button-link {
+  appearance: none;
+  border: 0;
+  border-radius: 14px;
+  padding: 11px 16px;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease, background 0.15s ease;
+}
+
+.button {
+  background: linear-gradient(135deg, #8a5a2b, #b57d46);
+  color: #fffaf4;
+}
+
+.button-secondary {
+  background: #efe1ce;
+  color: #5e3d19;
+}
+
+.button-link {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: #4a3721;
+}
+
+.button:hover,
+.button-secondary:hover,
+.button-link:hover {
+  transform: translateY(-1px);
+}
+
+.button:disabled,
+.button-secondary:disabled,
+.button-link:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.form-card {
+  padding: 20px;
+  display: grid;
+  gap: 14px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field label {
+  font-weight: 600;
+}
+
+.field input,
+.field textarea,
+.field select {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: var(--paper-strong);
+  color: inherit;
+}
+
+.field textarea {
+  min-height: 160px;
+  resize: vertical;
+}
+
+.feedback {
+  min-height: 24px;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.feedback.error {
+  color: #a12f2f;
+}
+
+.reader-layout {
+  display: grid;
+  grid-template-columns: minmax(250px, 300px) minmax(0, 1fr);
+  gap: 20px;
+}
+
+.sidebar-stack {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+
+.list-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.reader-card {
+  padding: 24px;
+  display: grid;
+  gap: 20px;
+}
+
+.reader-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: start;
+}
+
+.text-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.text-panel {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+  background: rgba(255, 250, 241, 0.72);
+}
+
+.text-panel pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.8;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.empty-state {
+  padding: 32px;
+  text-align: center;
+}
+
+.status-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.mode-toggle {
+  display: inline-flex;
+  padding: 4px;
+  gap: 4px;
+  border: 1px solid var(--line);
+  background: #f4e9d8;
+  border-radius: 999px;
+}
+
+.mode-toggle button {
+  border: 0;
+  background: transparent;
+  padding: 10px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.mode-toggle button.active {
+  background: #fff8ef;
+  box-shadow: inset 0 0 0 1px rgba(138, 90, 43, 0.15);
+}
+
+@media (max-width: 900px) {
+  .hero,
+  .reader-layout,
+  .text-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .shell {
+    padding: 14px;
+  }
+
+  .hero,
+  .reader-card,
+  .book-card,
+  .chapter-card,
+  .form-card {
+    padding: 18px;
+  }
+}
