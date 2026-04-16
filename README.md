@@ -18,6 +18,8 @@ The app currently supports:
 - reusing cached translations to avoid repeated identical API calls
 - deleting books and chapters
 - batch translating all untranslated chapters in a book
+- publishing backend/frontend Docker images to GHCR through GitHub Actions
+- deploying on NAS with prebuilt images instead of local source builds
 
 The project is intentionally kept small, beginner-friendly, and focused on private reading assistance.
 
@@ -55,6 +57,14 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - reading-focused UI refresh for chapter reading
 - delete actions with confirmation
 - batch translation action from book detail page
+- active-page navigation highlighting
+- user-friendly localized status labels
+
+### Deployment automation
+- GitHub Actions workflow to build and publish backend image to GHCR on push to `main`
+- GitHub Actions workflow to build and publish frontend image to GHCR on push to `main`
+- separate NAS Docker Compose file that uses prebuilt GHCR images
+- frontend build-time `NEXT_PUBLIC_API_BASE_URL` preserved in automated image builds
 
 ## Current Limitations
 
@@ -67,6 +77,7 @@ This is still a V1-style private tool. A few things are intentionally simple:
 - settings and glossary pages are usable, but less polished than the reading page
 - some backend status values are still shown fairly literally in the UI
 - Docker/NAS deployment files exist, but a fresh full end-to-end Docker verification is still recommended after the latest refinements
+- GHCR publishing depends on GitHub repository/package setup and a correct `NEXT_PUBLIC_API_BASE_URL` repository variable
 
 ## Project Structure
 
@@ -95,6 +106,9 @@ docker-compose.yml
 PROJECT_SPEC.md
 AGENTS.md
 README.md
+.github/workflows/
+docker-compose.nas.yml
+.env.nas.example
 ```
 
 ## Local Development Setup
@@ -171,9 +185,12 @@ You can currently verify all of these manually:
 
 The repository includes:
 - `docker-compose.yml`
+- `docker-compose.nas.yml`
+- `.github/workflows/publish-images.yml`
 - backend Dockerfile
 - frontend Dockerfile
 - `.env.example`
+- `.env.nas.example`
 
 Persistent directories:
 - `./data` for SQLite data
@@ -192,10 +209,111 @@ Expected URLs after startup:
 Important note:
 - Docker/NAS support is part of the project structure and earlier setup work, but the main verification path recently has been local manual testing rather than repeated full Docker retesting after every refinement
 
+## GitHub Actions + GHCR Setup
+
+The project now supports automatic Docker image publishing to GitHub Container Registry (GHCR).
+
+### What gets published
+
+On push to `main`, GitHub Actions builds and pushes:
+- `ghcr.io/YOUR_GITHUB_USERNAME_OR_ORG/astralnova-translator-backend:latest`
+- `ghcr.io/YOUR_GITHUB_USERNAME_OR_ORG/astralnova-translator-frontend:latest`
+
+It also publishes SHA-based tags for rollback/debugging.
+
+### GitHub repository setup
+
+Required:
+1. Push this repository to GitHub
+2. Make sure the default branch is `main`
+3. Open the repository `Settings`
+4. Under `Actions > General`, allow workflows to run
+5. Under `Actions > General`, make sure the workflow has permission to read repository contents and write packages if your organization restricts defaults
+
+### GitHub variable
+
+Set this repository variable:
+
+- Name: `NEXT_PUBLIC_API_BASE_URL`
+- Value: your browser-accessible backend URL, for example `http://YOUR_NAS_IP:8000`
+
+This value is important because the frontend needs it during the Docker build, not only at runtime.
+
+### GitHub secrets
+
+For image publishing itself, no custom repository secret is required if you use the built-in `GITHUB_TOKEN`.
+
+The workflow already uses:
+- `secrets.GITHUB_TOKEN`
+
+You only need extra secrets later if you choose to add automated remote deployment or webhook-based updates.
+
+## GHCR-Based NAS Deployment
+
+### 1. Prepare NAS files
+
+On the NAS, place these files in your deployment folder:
+- `docker-compose.nas.yml`
+- `.env.nas` copied from `.env.nas.example`
+
+Create `.env.nas` from the example and update at least:
+
+```env
+BACKEND_IMAGE=ghcr.io/YOUR_GITHUB_USERNAME_OR_ORG/astralnova-translator-backend:latest
+FRONTEND_IMAGE=ghcr.io/YOUR_GITHUB_USERNAME_OR_ORG/astralnova-translator-frontend:latest
+NEXT_PUBLIC_API_BASE_URL=http://YOUR_NAS_IP_OR_DOMAIN:8000
+INTERNAL_API_BASE_URL=http://backend:8000
+```
+
+### 2. Log in to GHCR on the NAS
+
+If the packages are private, create a GitHub Personal Access Token with package read access and log in:
+
+```powershell
+docker login ghcr.io -u YOUR_GITHUB_USERNAME
+```
+
+When prompted, paste your token.
+
+### 3. Pull and start the stack
+
+From the NAS deployment folder:
+
+```powershell
+docker compose -f docker-compose.nas.yml --env-file .env.nas pull
+docker compose -f docker-compose.nas.yml --env-file .env.nas up -d
+```
+
+Success should look like:
+- backend container starts from the GHCR backend image
+- frontend container starts from the GHCR frontend image
+- the app opens without needing to upload source code to the NAS
+
+### 4. Update later
+
+After a new push to `main` finishes publishing images:
+
+```powershell
+docker compose -f docker-compose.nas.yml --env-file .env.nas pull
+docker compose -f docker-compose.nas.yml --env-file .env.nas up -d
+```
+
+That is the new normal deployment flow.
+
+## Optional Automatic Updates Later
+
+If you later want fully automatic updates, you can add Watchtower as a separate optional layer.
+
+An example file is included:
+- `docker-compose.watchtower.example.yml`
+
+This is intentionally separate so the main deployment stays simple and easy to understand first.
+
 ## Roadmap / Next Steps
 
 Recommended next work:
 - another UI-focused refinement pass for management pages and smaller interaction details
+- optional automatic update flow after GHCR-based deployment is stable
 - final Docker Compose / NAS verification pass after the latest frontend changes
 - polish status labels and confirmation UX
 - complete any remaining V1 cleanup and documentation improvements

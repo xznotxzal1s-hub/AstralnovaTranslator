@@ -18,6 +18,8 @@ The app currently supports:
 - reading chapters in a reading-focused UI
 - deleting books and chapters
 - batch translating all untranslated chapters in a book
+- publishing backend/frontend Docker images to GHCR via GitHub Actions
+- NAS deployment with prebuilt images through a separate Compose file
 
 ## Completed phases
 
@@ -93,6 +95,13 @@ Completed and verified locally:
 - visible batch translation progress and stop-on-error behavior
 - TXT fallback splitting when heading detection fails
 
+### Deployment automation
+Implemented:
+- GitHub Actions workflow for backend image publishing to GHCR
+- GitHub Actions workflow for frontend image publishing to GHCR
+- separate NAS Compose file using image tags instead of local build contexts
+- frontend build-time `NEXT_PUBLIC_API_BASE_URL` wired through automated image builds
+
 ## Verified functionality
 
 Verified working locally at this point:
@@ -136,8 +145,10 @@ Areas still somewhat rough:
 
 ## Current Docker / NAS status
 - `docker-compose.yml`, backend Dockerfile, frontend Dockerfile, and `.env.example` are present
+- `docker-compose.nas.yml`, `.env.nas.example`, and GHCR publishing workflow are present
 - local development has been the main verification path
-- Docker/NAS deployment support exists in structure, but a final end-to-end deployment verification pass is still recommended before calling V1 fully deployment-ready
+- GHCR-based deployment automation is now configured in the repository
+- a final real-world GHCR push/pull validation on the target NAS is still recommended if it has not been exercised yet
 
 ## Git / repository status
 - local git repository initialized
@@ -185,4 +196,4 @@ Typical local run:
 ## Current recommended next phase
 Recommended next direction:
 - a UI-focused follow-up phase to polish management pages and smaller interaction details
-- optionally a deployment/documentation pass to re-verify Docker Compose / NAS readiness end to end
+- optionally a deployment follow-up for automatic updates such as Watchtower or pull-and-restart automation

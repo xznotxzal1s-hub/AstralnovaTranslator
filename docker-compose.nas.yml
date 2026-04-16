@@ -1,0 +1,26 @@
+services:
+  backend:
+    container_name: astralnova-backend
+    image: ${BACKEND_IMAGE:?Set BACKEND_IMAGE in .env.nas}
+    env_file:
+      - .env.nas
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - ./data:${DATA_DIR:-/app/data}
+      - ./uploads:${UPLOADS_DIR:-/app/uploads}
+    restart: unless-stopped
+
+  frontend:
+    container_name: astralnova-frontend
+    image: ${FRONTEND_IMAGE:?Set FRONTEND_IMAGE in .env.nas}
+    env_file:
+      - .env.nas
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+      INTERNAL_API_BASE_URL: ${INTERNAL_API_BASE_URL:-http://backend:8000}
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
