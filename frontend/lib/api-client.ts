@@ -1,4 +1,11 @@
-import type { BookSummary, ChapterCreateInput, GlossaryEntry, ImportResult, TranslationSettings } from "@/lib/types";
+import type {
+  BookSummary,
+  ChapterCreateInput,
+  GlossaryEntry,
+  ImportResult,
+  TranslationPreset,
+  TranslationSettings,
+} from "@/lib/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 
@@ -121,6 +128,58 @@ export async function updateSettings(payload: {
     method: "PUT",
     body: JSON.stringify(payload),
   });
+}
+
+export async function createSettingsPreset(payload: {
+  name: string;
+  provider_type: TranslationSettings["provider_type"];
+  api_base_url: string;
+  api_key: string;
+  model_name: string;
+  prompt_template: string;
+  chunk_size: number;
+  translation_mode: string;
+}) {
+  return request<TranslationPreset>("/settings/presets", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function updateSettingsPreset(
+  presetId: number,
+  payload: {
+    name: string;
+    provider_type: TranslationSettings["provider_type"];
+    api_base_url: string;
+    api_key: string;
+    model_name: string;
+    prompt_template: string;
+    chunk_size: number;
+    translation_mode: string;
+  },
+) {
+  return request<TranslationPreset>(`/settings/presets/${presetId}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function activateSettingsPreset(presetId: number) {
+  return request<TranslationPreset>(`/settings/presets/${presetId}/activate`, {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
+}
+
+export async function deleteSettingsPreset(presetId: number) {
+  const response = await fetch(`${API_BASE_URL}/settings/presets/${presetId}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error(await parseError(response));
+  }
 }
 
 export async function createGlossaryEntry(payload: {

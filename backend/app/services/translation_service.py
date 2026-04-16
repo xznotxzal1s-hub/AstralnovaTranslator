@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.models.chapter import Chapter
 from app.services.glossary_service import get_merged_glossary_entries
 from app.services.providers.factory import get_translation_provider
-from app.services.settings_service import get_or_create_translation_config
+from app.services.settings_service import get_active_translation_config
 from app.services.translation_record_service import find_translation_record, save_translation_record
 from app.utils.translation import (
     build_glossary_guidance,
@@ -26,7 +26,7 @@ class TranslationServiceError(Exception):
 
 
 def translate_chapter(db: Session, chapter: Chapter, force: bool) -> Chapter:
-    config = get_or_create_translation_config(db)
+    config = get_active_translation_config(db)
 
     if not chapter.source_text.strip():
         raise TranslationServiceError("Chapter source text is empty.", status_code=400)

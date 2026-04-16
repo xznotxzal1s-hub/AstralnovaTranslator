@@ -11,7 +11,7 @@ The app currently supports:
 - creating chapters by pasting Japanese text
 - importing TXT files
 - importing EPUB files
-- configuring translation providers and prompts
+- configuring multiple translation presets and switching the active preset
 - translating single chapters
 - reusing cached translations
 - using global and per-book glossary entries
@@ -67,6 +67,13 @@ Completed and verified locally:
 - usable glossary page with CRUD
 - better loading/success/error feedback in forms and translation actions
 
+### Translation preset refinement
+Completed and verified locally:
+- multiple saved translation presets
+- create / edit / delete / activate preset workflow
+- active preset used by translation requests
+- old `/settings` capability preserved as the active preset view
+
 ### Phase 5B1
 Completed and verified locally:
 - basic UI internationalization support
@@ -120,7 +127,7 @@ Verified working locally at this point:
 - chapters can be created manually from UI
 - TXT import works
 - EPUB import works for simple valid files
-- settings can be saved
+- translation presets can be created, edited, deleted, and switched
 - glossary entries can be created, edited, and deleted
 - per-book glossary entries stay scoped to the correct book
 - chapter translation works with configured providers
@@ -141,6 +148,7 @@ Current UI state:
 - bookshelf and book detail pages are cleaner and more usable than earlier phases
 - interaction feedback is clearer through stronger hover, focus, active, and loading states
 - long chapter lists are more manageable because the book detail page now paginates them
+- settings now support a practical preset-based workflow instead of a single flat config form
 - mobile usability is improved, but not fully refined
 - success/error/loading feedback is clearer than before, especially around forms and batch translation
 
@@ -148,6 +156,7 @@ Areas still somewhat rough:
 - settings and glossary pages are usable but visually less polished than the reader pages
 - destructive actions currently use browser confirm dialogs rather than custom modal UI
 - pagination is intentionally simple and does not yet support direct page-number jumping
+- translation presets are global only; there is not yet import/export or per-book preset binding
 
 ## Known issues
 - Codex app on Windows may hang on longer frontend verification commands even when the project itself is fine

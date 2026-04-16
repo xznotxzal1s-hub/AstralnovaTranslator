@@ -1,11 +1,11 @@
 import { SettingsForm } from "@/components/settings-form";
-import { fetchSettings } from "@/lib/api";
+import { fetchSettings, fetchSettingsPresets } from "@/lib/api";
 import { getServerI18n } from "@/lib/i18n-server";
 
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
-  const settings = await fetchSettings();
+  const [settings, presets] = await Promise.all([fetchSettings(), fetchSettingsPresets()]);
   const { messages } = await getServerI18n();
 
   return (
@@ -23,7 +23,7 @@ export default async function SettingsPage() {
         </div>
       </section>
 
-      <SettingsForm initialSettings={settings} />
+      <SettingsForm initialSettings={settings} initialPresets={presets} />
     </main>
   );
 }

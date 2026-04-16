@@ -37,6 +37,8 @@ export type ImportResult = {
 
 export type TranslationSettings = {
   id: number;
+  name: string;
+  is_active: boolean;
   provider_type: "openai_compatible" | "gemini";
   api_base_url: string;
   model_name: string;
@@ -46,6 +48,8 @@ export type TranslationSettings = {
   translation_mode: string;
   updated_at: string;
 };
+
+export type TranslationPreset = TranslationSettings;
 
 export type GlossaryEntry = {
   id: number;

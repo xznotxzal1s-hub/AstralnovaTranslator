@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, Integer, String, Text, func
+from sqlalchemy import Boolean, DateTime, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
@@ -10,6 +10,8 @@ class TranslationConfig(Base):
     __tablename__ = "translation_configs"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False, default="默认预设", server_default="默认预设")
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="0")
     provider_type: Mapped[str] = mapped_column(String(50), nullable=False)
     api_base_url: Mapped[str] = mapped_column(String(500), nullable=False)
     model_name: Mapped[str] = mapped_column(String(255), nullable=False)

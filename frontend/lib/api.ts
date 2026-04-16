@@ -1,4 +1,4 @@
-import { BookDetail, BookSummary, Chapter, GlossaryEntry, TranslationSettings } from "@/lib/types";
+import { BookDetail, BookSummary, Chapter, GlossaryEntry, TranslationPreset, TranslationSettings } from "@/lib/types";
 
 const API_BASE_URL =
   process.env.INTERNAL_API_BASE_URL ??
@@ -35,6 +35,10 @@ export async function fetchChapter(chapterId: number): Promise<Chapter> {
 
 export async function fetchSettings(): Promise<TranslationSettings> {
   return request<TranslationSettings>("/settings");
+}
+
+export async function fetchSettingsPresets(): Promise<TranslationPreset[]> {
+  return request<TranslationPreset[]>("/settings/presets");
 }
 
 export async function fetchGlossaryEntries(): Promise<GlossaryEntry[]> {

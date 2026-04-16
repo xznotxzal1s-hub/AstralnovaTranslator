@@ -11,7 +11,7 @@ The app currently supports:
 - creating chapters manually by pasting Japanese text
 - importing `.txt` files
 - importing `.epub` files
-- translating chapters with user-provided AI provider settings
+- translating chapters with user-provided AI provider settings and saved presets
 - saving source text and translated text locally
 - reading source text and translation in a browser
 - managing a global glossary and per-book glossary
@@ -30,6 +30,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - SQLite persistence
 - `Book`, `Chapter`, `TranslationConfig`, `GlossaryEntry`, and `TranslationRecord` models
 - settings API
+- translation preset API
 - glossary API
 - book/chapter CRUD APIs
 - TXT import API
@@ -50,6 +51,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - book detail page
 - chapter reading page
 - settings page
+- multiple saved translation presets with one active preset
 - glossary page
 - global and per-book glossary management
 - language switching for Simplified Chinese, English, and Japanese
@@ -78,6 +80,7 @@ This is still a V1-style private tool. A few things are intentionally simple:
 - delete confirmation currently uses browser confirm dialogs, not custom modals
 - settings and glossary pages are usable, but less polished than the reading page
 - chapter pagination is intentionally simple and currently uses previous/next paging rather than direct page-number jumping
+- translation presets are global only and do not yet support import/export or per-book assignment
 - Docker/NAS deployment files exist, but a fresh full end-to-end Docker verification is still recommended after the latest refinements
 - GHCR publishing depends on GitHub repository/package setup and a correct `NEXT_PUBLIC_API_BASE_URL` repository variable
 
@@ -173,7 +176,7 @@ You can currently verify all of these manually:
 - create a chapter by pasting Japanese text
 - import a TXT file
 - import an EPUB file
-- configure translation settings
+- create, edit, activate, and delete translation presets
 - create global glossary entries
 - create per-book glossary entries
 - translate a chapter
