@@ -17,10 +17,16 @@ type BookDetailPageProps = {
   params: Promise<{
     bookId: string;
   }>;
+  searchParams?: Promise<{
+    page?: string;
+  }>;
 };
 
-export default async function BookDetailPage({ params }: BookDetailPageProps) {
+const CHAPTERS_PER_PAGE = 12;
+
+export default async function BookDetailPage({ params, searchParams }: BookDetailPageProps) {
   const { bookId } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const parsedBookId = Number(bookId);
 
   if (Number.isNaN(parsedBookId)) {
@@ -33,6 +39,15 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
   ]);
   const { messages } = await getServerI18n();
   const chapterLabel = chapters.length === 1 ? messages.chapterSingular : messages.chapterPlural;
+  const totalPages = Math.max(1, Math.ceil(chapters.length / CHAPTERS_PER_PAGE));
+  const requestedPage = Number(resolvedSearchParams?.page ?? "1");
+  const currentPage = Number.isFinite(requestedPage)
+    ? Math.min(Math.max(1, Math.floor(requestedPage)), totalPages)
+    : 1;
+  const startIndex = (currentPage - 1) * CHAPTERS_PER_PAGE;
+  const pagedChapters = chapters.slice(startIndex, startIndex + CHAPTERS_PER_PAGE);
+  const rangeStart = chapters.length === 0 ? 0 : startIndex + 1;
+  const rangeEnd = chapters.length === 0 ? 0 : startIndex + pagedChapters.length;
 
   return (
     <main className="app-page">
@@ -65,6 +80,15 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
               <div>
                 <h2>{messages.chaptersHeading}</h2>
                 <p>{formatMessage(messages.chaptersCount, { count: chapters.length, label: chapterLabel })}</p>
+                {chapters.length > 0 ? (
+                  <p className="chapter-page-meta">
+                    {formatMessage(messages.chapterPageRange, {
+                      from: rangeStart,
+                      to: rangeEnd,
+                      count: chapters.length,
+                    })}
+                  </p>
+                ) : null}
               </div>
               {chapters.length > 0 ? <BatchTranslateButton chapters={chapters} /> : null}
             </div>
@@ -72,11 +96,43 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
             {chapters.length === 0 ? (
               <EmptyState title={messages.noChaptersTitle} description={messages.noChaptersDescription} />
             ) : (
-              <section className="list-stack chapter-list">
-                {chapters.map((chapter) => (
-                  <ChapterCard key={chapter.id} bookId={book.id} chapter={chapter} />
-                ))}
-              </section>
+              <>
+                <section className="list-stack chapter-list">
+                  {pagedChapters.map((chapter) => (
+                    <ChapterCard key={chapter.id} bookId={book.id} chapter={chapter} />
+                  ))}
+                </section>
+
+                {totalPages > 1 ? (
+                  <nav className="chapter-pagination" aria-label={messages.chapterPaginationLabel}>
+                    <div className="chapter-pagination-copy">
+                      <p className="eyebrow">{messages.chapterPaginationLabel}</p>
+                      <p className="muted">
+                        {formatMessage(messages.chapterPaginationStatus, {
+                          current: currentPage,
+                          total: totalPages,
+                        })}
+                      </p>
+                    </div>
+                    <div className="chapter-pagination-actions">
+                      {currentPage > 1 ? (
+                        <Link className="button-link pagination-link" href={`/books/${book.id}?page=${currentPage - 1}`}>
+                          {messages.previousPage}
+                        </Link>
+                      ) : (
+                        <span className="button-link pagination-link is-disabled">{messages.previousPage}</span>
+                      )}
+                      {currentPage < totalPages ? (
+                        <Link className="button-link pagination-link" href={`/books/${book.id}?page=${currentPage + 1}`}>
+                          {messages.nextPage}
+                        </Link>
+                      ) : (
+                        <span className="button-link pagination-link is-disabled">{messages.nextPage}</span>
+                      )}
+                    </div>
+                  </nav>
+                ) : null}
+              </>
             )}
           </section>
         </div>

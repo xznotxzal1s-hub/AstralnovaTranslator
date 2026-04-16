@@ -60,7 +60,7 @@ export function CreateBookForm({ onSuccess }: CreateBookFormProps) {
           onChange={(event) => setTitle(event.target.value)}
         />
       </div>
-      <button className="button" type="submit" disabled={isSubmitting}>
+      <button className="button" type="submit" disabled={isSubmitting} aria-busy={isSubmitting}>
         {isSubmitting ? t("creatingLabel") : t("createBookButton")}
       </button>
       <p className={`feedback${message && message === t("createBookError") ? " error" : message ? " success" : ""}`}>{message}</p>

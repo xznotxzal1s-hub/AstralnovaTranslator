@@ -29,7 +29,7 @@ export function ChapterCard({ bookId, chapter }: ChapterCardProps) {
           <span className={`pill status-pill ${chapter.translation_status}`}>
             {formatMessage(t("statusLabel"), { status: statusLabel })}
           </span>
-          <span>
+          <span className="chapter-card-time">
             {chapter.last_translated_at
               ? formatMessage(t("translatedAt"), { time: new Date(chapter.last_translated_at).toLocaleString(locale) })
               : t("notTranslatedYet")}

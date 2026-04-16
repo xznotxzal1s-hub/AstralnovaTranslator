@@ -55,7 +55,7 @@ export function BatchTranslateButton({ chapters }: BatchTranslateButtonProps) {
 
   return (
     <div className="batch-translate-panel">
-      <button className="button" disabled={isSubmitting} onClick={handleBatchTranslate} type="button">
+      <button className="button" disabled={isSubmitting} aria-busy={isSubmitting} onClick={handleBatchTranslate} type="button">
         {isSubmitting ? t("batchTranslateRunning") : t("batchTranslateButton")}
       </button>
       {message ? <p className={`feedback${messageType ? ` ${messageType}` : ""}`}>{message}</p> : null}

@@ -40,6 +40,7 @@ export function TranslateChapterButton({
       <button
         className={compact ? "button-secondary" : "button"}
         disabled={isSubmitting}
+        aria-busy={isSubmitting}
         onClick={handleTranslate}
         type="button"
       >

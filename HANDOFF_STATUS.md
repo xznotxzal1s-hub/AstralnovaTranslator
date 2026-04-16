@@ -4,7 +4,7 @@
 AstralnovaTranslator
 
 ## Current status
-The project is now functionally through Phase 6A and has been manually verified locally in slices as the work progressed.
+The project is now functionally through the latest UI refinement pass after Phase 6A and has been manually verified locally in slices as the work progressed.
 
 The app currently supports:
 - creating books
@@ -16,6 +16,7 @@ The app currently supports:
 - reusing cached translations
 - using global and per-book glossary entries
 - reading chapters in a reading-focused UI
+- paginating chapter lists on the book detail page
 - deleting books and chapters
 - batch translating all untranslated chapters in a book
 - publishing backend/frontend Docker images to GHCR via GitHub Actions
@@ -95,6 +96,14 @@ Completed and verified locally:
 - visible batch translation progress and stop-on-error behavior
 - TXT fallback splitting when heading detection fails
 
+### Post-Phase 6A UI refinement
+Completed and verified locally:
+- chapter list pagination on the book detail page
+- tighter, easier-to-scan chapter cards
+- translation-only as the default reader mode
+- stronger hover / active / focus / loading feedback on controls
+- calmer visual density for cards, inputs, and action areas
+
 ### Deployment automation
 Implemented:
 - GitHub Actions workflow for backend image publishing to GHCR
@@ -121,6 +130,8 @@ Verified working locally at this point:
 - books can be deleted
 - chapters can be deleted
 - batch translation works sequentially from the book detail page
+- chapter pagination works on the book detail page
+- reader opens in translation-only mode by default and can still switch to bilingual mode
 
 ## Current UI / UX status
 
@@ -128,13 +139,15 @@ Current UI state:
 - the app is now reading-focused rather than a rough admin-style interface
 - the chapter reading page has the strongest polish and is the best current experience
 - bookshelf and book detail pages are cleaner and more usable than earlier phases
+- interaction feedback is clearer through stronger hover, focus, active, and loading states
+- long chapter lists are more manageable because the book detail page now paginates them
 - mobile usability is improved, but not fully refined
 - success/error/loading feedback is clearer than before, especially around forms and batch translation
 
 Areas still somewhat rough:
 - settings and glossary pages are usable but visually less polished than the reader pages
-- some backend status values are still shown fairly literally
 - destructive actions currently use browser confirm dialogs rather than custom modal UI
+- pagination is intentionally simple and does not yet support direct page-number jumping
 
 ## Known issues
 - Codex app on Windows may hang on longer frontend verification commands even when the project itself is fine
@@ -195,5 +208,5 @@ Typical local run:
 
 ## Current recommended next phase
 Recommended next direction:
-- a UI-focused follow-up phase to polish management pages and smaller interaction details
+- a UI-focused follow-up phase to further polish management pages, confirmations, and higher-density list interactions
 - optionally a deployment follow-up for automatic updates such as Watchtower or pull-and-restart automation

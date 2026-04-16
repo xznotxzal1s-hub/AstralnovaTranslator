@@ -55,6 +55,8 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - language switching for Simplified Chinese, English, and Japanese
 - Simplified Chinese as the default UI language
 - reading-focused UI refresh for chapter reading
+- chapter list pagination on the book detail page
+- translation-only as the default reader mode, with manual bilingual switching still available
 - delete actions with confirmation
 - batch translation action from book detail page
 - active-page navigation highlighting
@@ -75,7 +77,7 @@ This is still a V1-style private tool. A few things are intentionally simple:
 - no OCR, PDF, TTS, cloud sync, or advanced AI analysis features
 - delete confirmation currently uses browser confirm dialogs, not custom modals
 - settings and glossary pages are usable, but less polished than the reading page
-- some backend status values are still shown fairly literally in the UI
+- chapter pagination is intentionally simple and currently uses previous/next paging rather than direct page-number jumping
 - Docker/NAS deployment files exist, but a fresh full end-to-end Docker verification is still recommended after the latest refinements
 - GHCR publishing depends on GitHub repository/package setup and a correct `NEXT_PUBLIC_API_BASE_URL` repository variable
 
@@ -177,9 +179,11 @@ You can currently verify all of these manually:
 - translate a chapter
 - confirm translation cache reuse
 - batch translate all untranslated chapters in a book
+- page through long chapter lists on the book detail page
 - delete a chapter
 - delete a book
-- read chapters in source + translation mode or translation-only mode
+- open a chapter with translation-only as the default reading mode
+- switch manually between translation-only mode and source + translation mode
 
 ## Current Docker / NAS Status
 
@@ -315,7 +319,7 @@ Recommended next work:
 - another UI-focused refinement pass for management pages and smaller interaction details
 - optional automatic update flow after GHCR-based deployment is stable
 - final Docker Compose / NAS verification pass after the latest frontend changes
-- polish status labels and confirmation UX
+- polish confirmation UX and higher-density long-list management flows
 - complete any remaining V1 cleanup and documentation improvements
 
 ## Non-Goals

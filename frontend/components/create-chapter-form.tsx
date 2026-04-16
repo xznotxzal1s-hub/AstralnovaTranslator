@@ -68,7 +68,7 @@ export function CreateChapterForm({ bookId }: CreateChapterFormProps) {
           placeholder={t("sourceTextPlaceholder")}
         />
       </div>
-      <button className="button" type="submit" disabled={isSubmitting}>
+      <button className="button" type="submit" disabled={isSubmitting} aria-busy={isSubmitting}>
         {isSubmitting ? t("savingLabel") : t("createChapterButton")}
       </button>
       <p className={`feedback${message && message === t("createChapterError") ? " error" : message ? " success" : ""}`}>{message}</p>

@@ -70,7 +70,7 @@ export function BookTitleEditor({ bookId, initialTitle }: BookTitleEditorProps) 
             />
           </div>
           <div className="action-row compact-actions">
-            <button className="button" type="submit" disabled={isSaving}>
+            <button className="button" type="submit" disabled={isSaving} aria-busy={isSaving}>
               {isSaving ? t("savingLabel") : t("saveBookTitleButton")}
             </button>
             <button className="button-link" type="button" onClick={handleCancel} disabled={isSaving}>

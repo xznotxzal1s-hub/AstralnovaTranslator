@@ -39,7 +39,13 @@ export function DeleteChapterButton({ chapterId, title }: DeleteChapterButtonPro
 
   return (
     <div className="destructive-action compact">
-      <button className="button-danger button-danger-ghost" disabled={isSubmitting} onClick={handleDelete} type="button">
+      <button
+        className="button-danger button-danger-ghost"
+        disabled={isSubmitting}
+        aria-busy={isSubmitting}
+        onClick={handleDelete}
+        type="button"
+      >
         {t("deleteChapterButton")}
       </button>
       {message ? <p className={`feedback${message === t("deleteChapterError") ? " error" : " success"}`}>{message}</p> : null}

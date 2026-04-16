@@ -12,7 +12,7 @@ type ReadModePanelProps = {
 export function ReadModePanel({ chapter }: ReadModePanelProps) {
   const { t } = useI18n();
   const [mode, setMode] = useState<"translation-only" | "source-and-translation">(
-    "source-and-translation",
+    "translation-only",
   );
 
   const hasTranslation = Boolean(chapter.translated_text?.trim());
