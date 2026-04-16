@@ -1,4 +1,4 @@
-import type { ChapterCreateInput, GlossaryEntry, ImportResult, TranslationSettings } from "@/lib/types";
+import type { BookSummary, ChapterCreateInput, GlossaryEntry, ImportResult, TranslationSettings } from "@/lib/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 
@@ -38,11 +38,37 @@ export async function createBook(title: string) {
   });
 }
 
+export async function fetchBooksClient() {
+  return request<BookSummary[]>("/books", {
+    method: "GET",
+  });
+}
+
+export async function deleteBook(bookId: number) {
+  const response = await fetch(`${API_BASE_URL}/books/${bookId}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error(await parseError(response));
+  }
+}
+
 export async function createChapter(bookId: number, payload: ChapterCreateInput) {
   return request(`/books/${bookId}/chapters`, {
     method: "POST",
     body: JSON.stringify(payload),
   });
+}
+
+export async function deleteChapter(chapterId: number) {
+  const response = await fetch(`${API_BASE_URL}/chapters/${chapterId}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error(await parseError(response));
+  }
 }
 
 export async function translateChapter(chapterId: number) {

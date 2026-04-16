@@ -26,6 +26,7 @@ export function CreateBookForm() {
       setIsSubmitting(true);
       await createBook(title.trim());
       setTitle("");
+      window.dispatchEvent(new Event("bookshelf:refresh"));
       router.refresh();
       setMessage(t("bookCreatedMessage"));
     } catch (error) {

@@ -45,6 +45,7 @@ export function ImportBookForm({ title, description, endpoint, accept }: ImportB
       if (fileInput) {
         fileInput.value = "";
       }
+      window.dispatchEvent(new Event("bookshelf:refresh"));
       router.refresh();
       setMessage(formatMessage(t("importSuccess"), { title: result.book_title, count: result.chapter_count }));
     } catch (error) {

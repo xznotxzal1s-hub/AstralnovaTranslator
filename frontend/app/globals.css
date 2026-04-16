@@ -354,7 +354,8 @@ p {
 
 .button,
 .button-secondary,
-.button-link {
+.button-link,
+.button-danger {
   appearance: none;
   border-radius: 16px;
   padding: 12px 16px;
@@ -382,15 +383,27 @@ p {
   color: #4c3926;
 }
 
+.button-danger {
+  border: 1px solid rgba(162, 61, 61, 0.2);
+  background: rgba(255, 244, 244, 0.92);
+  color: var(--error);
+}
+
+.button-danger-ghost {
+  padding-inline: 14px;
+}
+
 .button:hover,
 .button-secondary:hover,
-.button-link:hover {
+.button-link:hover,
+.button-danger:hover {
   transform: translateY(-1px);
 }
 
 .button:disabled,
 .button-secondary:disabled,
-.button-link:disabled {
+.button-link:disabled,
+.button-danger:disabled {
   opacity: 0.62;
   cursor: not-allowed;
   transform: none;
@@ -467,8 +480,23 @@ p {
   gap: 10px;
 }
 
+.destructive-action {
+  display: grid;
+  gap: 8px;
+}
+
 .translate-button-wrap.compact {
   display: inline-flex;
+}
+
+.destructive-action.compact {
+  display: inline-flex;
+}
+
+.batch-translate-panel {
+  display: grid;
+  gap: 10px;
+  justify-items: end;
 }
 
 .reader-hero {
@@ -716,7 +744,8 @@ p {
   .topnav a,
   .button,
   .button-secondary,
-  .button-link {
+  .button-link,
+  .button-danger {
     justify-content: center;
   }
 
@@ -751,6 +780,11 @@ p {
 
   .reader-toolbar {
     align-items: stretch;
+  }
+
+  .batch-translate-panel {
+    width: 100%;
+    justify-items: stretch;
   }
 
   .mode-toggle {

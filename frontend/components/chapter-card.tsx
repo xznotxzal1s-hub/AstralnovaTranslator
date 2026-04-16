@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { DeleteChapterButton } from "@/components/delete-chapter-button";
 import { useI18n } from "@/components/i18n-provider";
 import { TranslateChapterButton } from "@/components/translate-chapter-button";
 import { formatMessage } from "@/lib/i18n";
@@ -34,6 +35,7 @@ export function ChapterCard({ bookId, chapter }: ChapterCardProps) {
           {t("readChapterButton")}
         </Link>
         <TranslateChapterButton chapterId={chapter.id} compact />
+        <DeleteChapterButton chapterId={chapter.id} title={chapter.title} />
       </div>
     </article>
   );

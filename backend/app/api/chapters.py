@@ -67,6 +67,17 @@ def delete_chapter(chapter_id: int, db: Session = Depends(get_db)) -> Response:
     if chapter is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Chapter not found.")
 
+    book_id = chapter.book_id
+    removed_index = chapter.index_in_book
     db.delete(chapter)
+    remaining_chapters = (
+        db.query(Chapter)
+        .filter(Chapter.book_id == book_id, Chapter.index_in_book > removed_index)
+        .order_by(Chapter.index_in_book.asc())
+        .all()
+    )
+    for item in remaining_chapters:
+        item.index_in_book -= 1
+        db.add(item)
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)

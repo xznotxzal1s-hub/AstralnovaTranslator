@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { DeleteBookButton } from "@/components/delete-book-button";
 import { useI18n } from "@/components/i18n-provider";
 import type { BookSummary } from "@/lib/types";
 
@@ -25,6 +26,7 @@ export function BookCard({ book }: BookCardProps) {
         <Link className="button" href={`/books/${book.id}`}>
           {t("openBookButton")}
         </Link>
+        <DeleteBookButton bookId={book.id} title={book.title} compact />
       </div>
     </article>
   );

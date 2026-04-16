@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { BatchTranslateButton } from "@/components/batch-translate-button";
 import { ChapterCard } from "@/components/chapter-card";
 import { CreateChapterForm } from "@/components/create-chapter-form";
+import { DeleteBookButton } from "@/components/delete-book-button";
 import { EmptyState } from "@/components/empty-state";
 import { fetchBook, fetchBookChapters } from "@/lib/api";
 import { formatMessage } from "@/lib/i18n";
@@ -50,6 +52,7 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
               <Link className="button-link" href={`/books/${book.id}/glossary`}>
                 {messages.manageBookGlossary}
               </Link>
+              <DeleteBookButton bookId={book.id} redirectToBookshelf title={book.title} />
             </div>
           </div>
           <CreateChapterForm bookId={book.id} />
@@ -62,6 +65,7 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
             <h2>{messages.chaptersHeading}</h2>
             <p>{formatMessage(messages.chaptersCount, { count: chapters.length, label: chapterLabel })}</p>
           </div>
+          {chapters.length > 0 ? <BatchTranslateButton chapters={chapters} /> : null}
         </div>
 
         {chapters.length === 0 ? (
