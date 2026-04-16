@@ -42,46 +42,60 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
 
   return (
     <main className="app-page reader-page">
-      <section className="reader-hero panel">
-        <div className="reader-hero-main">
-          <p className="eyebrow">{messages.readingPageEyebrow}</p>
-          <h1>{chapter.title}</h1>
-          <p className="reader-subtitle">{book.title}</p>
-          <p className="lede">{messages.readingPageDescription}</p>
-          <p className="reader-lead">{messages.readingPageLead}</p>
-          <div className="summary-meta">
-            <span className="stat-chip">{formatMessage(messages.chapterEyebrow, { count: chapter.index_in_book })}</span>
-            <span className={`stat-chip status-pill ${chapter.translation_status}`}>
-              {formatMessage(messages.statusLabel, { status: localizedStatus })}
-            </span>
-          </div>
-        </div>
-        <div className="reader-hero-actions">
-          <TranslateChapterButton chapterId={chapter.id} />
-          <div className="reader-jump-links">
-            <Link className="button-link" href={`/books/${book.id}`}>
-              {messages.backToBook}
-            </Link>
-            {previousChapter ? (
-              <Link className="button-link" href={`/books/${book.id}/chapters/${previousChapter.id}`}>
-                {messages.previousChapter}
-              </Link>
-            ) : null}
-            {nextChapter ? (
-              <Link className="button-link" href={`/books/${book.id}/chapters/${nextChapter.id}`}>
-                {messages.nextChapter}
-              </Link>
-            ) : null}
-          </div>
-        </div>
-      </section>
+      <section className="panel section-panel reader-shell">
+        <div className="reader-main-column">
+          <section className="reader-header panel compact-reader-header">
+            <div className="reader-hero-main reader-header-copy">
+              <p className="eyebrow">{messages.readingPageEyebrow}</p>
+              <div className="reader-title-block">
+                <h1>{chapter.title}</h1>
+                <p className="reader-subtitle">{book.title}</p>
+              </div>
+              <p className="reader-lead">{messages.readingPageLead}</p>
+              <div className="summary-meta">
+                <span className="stat-chip">
+                  {formatMessage(messages.chapterEyebrow, { count: chapter.index_in_book })}
+                </span>
+                <span className={`stat-chip status-pill ${chapter.translation_status}`}>
+                  {formatMessage(messages.statusLabel, { status: localizedStatus })}
+                </span>
+              </div>
+            </div>
+            <div className="reader-header-actions">
+              <TranslateChapterButton chapterId={chapter.id} />
+              <div className="reader-jump-links">
+                <Link className="button-link" href={`/books/${book.id}`}>
+                  {messages.backToBook}
+                </Link>
+                {previousChapter ? (
+                  <Link className="button-link" href={`/books/${book.id}/chapters/${previousChapter.id}`}>
+                    {messages.previousChapter}
+                  </Link>
+                ) : null}
+                {nextChapter ? (
+                  <Link className="button-link" href={`/books/${book.id}/chapters/${nextChapter.id}`}>
+                    {messages.nextChapter}
+                  </Link>
+                ) : null}
+              </div>
+            </div>
+          </section>
 
-      <section className="reader-layout">
-        <aside className="sidebar-stack reader-sidebar">
+          <section className="reader-card reading-surface desktop-reading-surface">
+            {chapter.source_text ? (
+              <ReadModePanel chapter={chapter} />
+            ) : (
+              <EmptyState title={messages.noSourceTitle} description={messages.noSourceDescription} />
+            )}
+          </section>
+        </div>
+
+        <aside className="sidebar-stack reader-sidebar desktop-reader-sidebar">
           <section className="form-card reader-nav-card">
             <div className="reader-nav-header">
               <p className="eyebrow">{messages.readingPageOutline}</p>
               <h3>{messages.navigationHeading}</h3>
+              <p className="muted">{messages.readingPageDescription}</p>
             </div>
             <div className="reader-outline">
               {chapters.map((item) => (
@@ -97,14 +111,6 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
             </div>
           </section>
         </aside>
-
-        <section className="reader-card reading-surface">
-          {chapter.source_text ? (
-            <ReadModePanel chapter={chapter} />
-          ) : (
-            <EmptyState title={messages.noSourceTitle} description={messages.noSourceDescription} />
-          )}
-        </section>
       </section>
     </main>
   );

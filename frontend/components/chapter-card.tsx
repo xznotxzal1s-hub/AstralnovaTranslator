@@ -20,19 +20,23 @@ export function ChapterCard({ bookId, chapter }: ChapterCardProps) {
 
   return (
     <article className="chapter-card">
-      <div className="card-heading">
-        <p className="eyebrow">{formatMessage(t("chapterEyebrow"), { count: chapter.index_in_book })}</p>
-        <h3>{chapter.title}</h3>
+      <div className="chapter-card-copy">
+        <div className="card-heading">
+          <p className="eyebrow">{formatMessage(t("chapterEyebrow"), { count: chapter.index_in_book })}</p>
+          <h3>{chapter.title}</h3>
+        </div>
+        <div className="meta-row chapter-meta">
+          <span className={`pill status-pill ${chapter.translation_status}`}>
+            {formatMessage(t("statusLabel"), { status: statusLabel })}
+          </span>
+          <span>
+            {chapter.last_translated_at
+              ? formatMessage(t("translatedAt"), { time: new Date(chapter.last_translated_at).toLocaleString(locale) })
+              : t("notTranslatedYet")}
+          </span>
+        </div>
       </div>
-      <div className="meta-row chapter-meta">
-        <span className={`pill status-pill ${chapter.translation_status}`}>{formatMessage(t("statusLabel"), { status: statusLabel })}</span>
-        <span>
-          {chapter.last_translated_at
-            ? formatMessage(t("translatedAt"), { time: new Date(chapter.last_translated_at).toLocaleString(locale) })
-            : t("notTranslatedYet")}
-        </span>
-      </div>
-      <div className="action-row">
+      <div className="action-row chapter-card-actions">
         <Link className="button" href={`/books/${bookId}/chapters/${chapter.id}`}>
           {t("readChapterButton")}
         </Link>

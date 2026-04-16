@@ -45,17 +45,23 @@ export function ReadModePanel({ chapter }: ReadModePanelProps) {
       {mode === "source-and-translation" ? (
         <div className="text-columns split-reading-columns">
           <section className="text-panel source-panel">
-            <p className="eyebrow">{t("sourcePanelTitle")}</p>
+            <div className="text-panel-header">
+              <p className="eyebrow">{t("sourcePanelTitle")}</p>
+            </div>
             <pre>{chapter.source_text}</pre>
           </section>
           <section className="text-panel translation-panel">
-            <p className="eyebrow">{t("translationPanelTitle")}</p>
+            <div className="text-panel-header">
+              <p className="eyebrow">{t("translationPanelTitle")}</p>
+            </div>
             <pre>{hasTranslation ? chapter.translated_text : t("noTranslationSaved")}</pre>
           </section>
         </div>
       ) : (
         <section className="text-panel translation-panel translation-only-panel">
-          <p className="eyebrow">{t("translationPanelTitle")}</p>
+          <div className="text-panel-header">
+            <p className="eyebrow">{t("translationPanelTitle")}</p>
+          </div>
           <pre>{hasTranslation ? chapter.translated_text : t("noTranslationSaved")}</pre>
         </section>
       )}

@@ -218,6 +218,10 @@ p {
   gap: 18px;
 }
 
+.compact-actions {
+  align-items: center;
+}
+
 .panel,
 .book-card,
 .chapter-card,
@@ -397,9 +401,24 @@ p {
   font-size: 1.15rem;
 }
 
+.book-card-top,
+.book-card-body,
+.chapter-card-copy {
+  display: grid;
+  gap: 10px;
+}
+
+.book-card-date {
+  justify-self: start;
+}
+
 .chapter-card {
   grid-template-columns: minmax(0, 1.1fr) minmax(220px, auto);
   align-items: center;
+}
+
+.chapter-card-actions {
+  justify-content: flex-end;
 }
 
 .book-meta,
@@ -585,17 +604,7 @@ p {
   justify-items: end;
 }
 
-.reader-hero {
-  padding: 26px;
-  display: grid;
-  gap: 20px;
-  grid-template-columns: minmax(0, 1.45fr) minmax(270px, 340px);
-  background:
-    radial-gradient(circle at top right, rgba(238, 223, 199, 0.7), transparent 32%),
-    linear-gradient(180deg, rgba(255, 251, 246, 0.98), rgba(250, 242, 231, 0.92));
-}
-
-.reader-hero-actions {
+.reader-header-actions {
   display: grid;
   align-content: start;
   gap: 14px;
@@ -612,9 +621,41 @@ p {
   gap: 10px;
 }
 
-.reader-layout {
+.reader-shell {
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  align-items: start;
+}
+
+.reader-main-column {
   display: grid;
-  grid-template-columns: minmax(230px, 280px) minmax(0, 1fr);
+  gap: 18px;
+}
+
+.compact-reader-header {
+  padding: 22px 24px;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1.25fr) minmax(250px, 320px);
+  background:
+    linear-gradient(180deg, rgba(255, 252, 248, 0.98), rgba(250, 243, 233, 0.94)),
+    var(--paper);
+}
+
+.reader-title-block {
+  display: grid;
+  gap: 6px;
+}
+
+.reader-title-block h1 {
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  line-height: 1.08;
+}
+
+.reader-layout,
+.reader-shell,
+.book-detail-shell,
+.bookshelf-shell {
+  display: grid;
   gap: 18px;
   align-items: start;
 }
@@ -622,6 +663,10 @@ p {
 .reader-sidebar {
   position: sticky;
   top: 108px;
+}
+
+.desktop-reader-sidebar {
+  width: 100%;
 }
 
 .reader-nav-card {
@@ -689,6 +734,11 @@ p {
     inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
+.desktop-reading-surface {
+  max-width: 920px;
+  justify-self: stretch;
+}
+
 .reader-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -740,6 +790,13 @@ p {
   border-radius: 22px;
   padding: 22px;
   background: linear-gradient(180deg, rgba(255, 252, 248, 0.96), rgba(255, 247, 238, 0.92));
+}
+
+.text-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
 }
 
 .translation-panel {
@@ -795,6 +852,94 @@ p {
   gap: 20px;
 }
 
+.bookshelf-shell {
+  grid-template-columns: minmax(0, 1.4fr) minmax(300px, 360px);
+  padding: 24px;
+  background:
+    radial-gradient(circle at top left, rgba(233, 217, 194, 0.34), transparent 26%),
+    linear-gradient(180deg, rgba(255, 251, 245, 0.98), rgba(247, 239, 229, 0.94));
+}
+
+.bookshelf-main,
+.bookshelf-tools,
+.book-detail-main,
+.book-detail-sidebar {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+
+.bookshelf-header {
+  padding: 10px 6px 2px;
+}
+
+.bookshelf-header h1 {
+  font-size: clamp(2rem, 3.2vw, 2.85rem);
+}
+
+.bookshelf-library-panel {
+  min-height: 420px;
+}
+
+.compact-tools-panel .section-header {
+  align-items: start;
+}
+
+.compact-import-grid {
+  grid-template-columns: 1fr;
+}
+
+.book-detail-shell {
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 380px);
+  padding: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(237, 222, 201, 0.34), transparent 30%),
+    linear-gradient(180deg, rgba(255, 251, 246, 0.98), rgba(247, 240, 231, 0.95));
+}
+
+.book-detail-header {
+  padding: 6px 8px 2px;
+}
+
+.compact-summary {
+  gap: 12px;
+}
+
+.compact-summary h1 {
+  font-size: clamp(1.85rem, 3vw, 2.6rem);
+  line-height: 1.08;
+}
+
+.desktop-primary-panel {
+  min-height: 420px;
+}
+
+.detail-side-card {
+  padding: 22px;
+}
+
+.book-title-editor {
+  display: grid;
+  gap: 10px;
+}
+
+.title-display-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.inline-edit-form {
+  display: grid;
+  gap: 12px;
+}
+
+.reader-nav-card {
+  gap: 14px;
+}
+
 .glossary-layout {
   align-items: start;
 }
@@ -810,12 +955,15 @@ p {
 @media (max-width: 1080px) {
   .hero,
   .detail-hero,
-  .reader-hero,
   .reader-layout,
+  .reader-shell,
   .split-reading-columns,
   .split-layout,
   .page-masthead,
-  .chapter-card {
+  .chapter-card,
+  .book-detail-shell,
+  .bookshelf-shell,
+  .compact-reader-header {
     grid-template-columns: 1fr;
   }
 
@@ -825,6 +973,10 @@ p {
 
   .reading-surface {
     max-width: none;
+  }
+
+  .chapter-card-actions {
+    justify-content: flex-start;
   }
 }
 
@@ -872,9 +1024,11 @@ p {
   .form-card,
   .book-card,
   .chapter-card,
-  .reader-hero,
   .reading-surface,
-  .info-card {
+  .info-card,
+  .bookshelf-shell,
+  .book-detail-shell,
+  .compact-reader-header {
     padding: 18px;
     border-radius: 22px;
   }
@@ -915,5 +1069,9 @@ p {
 
   .chapter-nav-link {
     grid-template-columns: 30px minmax(0, 1fr);
+  }
+
+  .title-display-row {
+    align-items: flex-start;
   }
 }

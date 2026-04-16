@@ -54,46 +54,52 @@ export function BookshelfPageClient({ initialBooks }: BookshelfPageClientProps) 
 
   return (
     <main className="app-page">
-      <section className="hero panel bookshelf-hero">
-        <div className="page-masthead-copy">
-          <p className="eyebrow">{t("bookshelfEyebrow")}</p>
-          <h1>{t("bookshelfTitle")}</h1>
-          <p className="lede">{t("bookshelfDescription")}</p>
-        </div>
-        <CreateBookForm onSuccess={handleBookCreated} />
-      </section>
+      <section className="panel section-panel bookshelf-shell">
+        <div className="bookshelf-main">
+          <section className="bookshelf-header">
+            <div className="page-masthead-copy">
+              <p className="eyebrow">{t("bookshelfEyebrow")}</p>
+              <h1>{t("bookshelfTitle")}</h1>
+              <p className="lede">{t("bookshelfDescription")}</p>
+            </div>
+          </section>
 
-      <section className="panel section-panel collection-panel">
-        <div className="section-header">
-          <div>
-            <h2>{t("importEyebrow")}</h2>
-            <p>{t("bookshelfDescription")}</p>
-          </div>
-        </div>
-        <div className="import-grid">
-          <ImportBookForm
-            accept=".txt,text/plain"
-            description={t("importTxtDescription")}
-            endpoint="txt"
-            onSuccess={handleBookImported}
-            title={t("importTxtTitle")}
-          />
-          <ImportBookForm
-            accept=".epub,application/epub+zip"
-            description={t("importEpubDescription")}
-            endpoint="epub"
-            onSuccess={handleBookImported}
-            title={t("importEpubTitle")}
+          <BookshelfSection
+            books={books}
+            isRefreshing={isRefreshing}
+            onDeleted={handleBookDeleted}
+            refreshError={refreshError}
           />
         </div>
-      </section>
 
-      <BookshelfSection
-        books={books}
-        isRefreshing={isRefreshing}
-        onDeleted={handleBookDeleted}
-        refreshError={refreshError}
-      />
+        <aside className="bookshelf-tools sidebar-stack">
+          <CreateBookForm onSuccess={handleBookCreated} />
+          <section className="panel section-panel collection-panel compact-tools-panel">
+            <div className="section-header">
+              <div>
+                <h2>{t("importEyebrow")}</h2>
+                <p>{t("bookshelfDescription")}</p>
+              </div>
+            </div>
+            <div className="import-grid compact-import-grid">
+              <ImportBookForm
+                accept=".txt,text/plain"
+                description={t("importTxtDescription")}
+                endpoint="txt"
+                onSuccess={handleBookImported}
+                title={t("importTxtTitle")}
+              />
+              <ImportBookForm
+                accept=".epub,application/epub+zip"
+                description={t("importEpubDescription")}
+                endpoint="epub"
+                onSuccess={handleBookImported}
+                title={t("importEpubTitle")}
+              />
+            </div>
+          </section>
+        </aside>
+      </section>
     </main>
   );
 }

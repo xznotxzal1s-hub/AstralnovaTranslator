@@ -439,6 +439,13 @@ Explain how to:
 
 ---
 
+## Documentation Maintenance Rule
+
+After every meaningful implementation task:
+- always update `HANDOFF_STATUS.md` so it reflects the current real project state
+- update `README.md` whenever user-facing features, deployment flow, setup steps, or operational behavior have materially changed
+- do not leave project documentation stale after code changes
+
 ## Behavior expectations for the coding agent
 
 When making decisions:

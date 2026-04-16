@@ -16,12 +16,15 @@ export function BookCard({ book, onDeleted }: BookCardProps) {
 
   return (
     <article className="book-card">
-      <div className="card-heading">
-        <p className="eyebrow">{t("bookEyebrow")}</p>
-        <h2>{book.title}</h2>
+      <div className="book-card-top">
+        <div className="card-heading">
+          <p className="eyebrow">{t("bookEyebrow")}</p>
+          <h2>{book.title}</h2>
+        </div>
+        <span className="pill book-card-date">{new Date(book.updated_at).toLocaleDateString(locale)}</span>
       </div>
-      <div className="meta-row book-meta">
-        <span>{new Date(book.updated_at).toLocaleString(locale)}</span>
+      <div className="book-card-body">
+        <p className="book-meta">{new Date(book.updated_at).toLocaleString(locale)}</p>
       </div>
       <div className="action-row">
         <Link className="button" href={`/books/${book.id}`}>

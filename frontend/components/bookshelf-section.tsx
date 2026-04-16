@@ -21,7 +21,7 @@ export function BookshelfSection({
   const bookLabel = books.length === 1 ? t("bookSingular") : t("bookPlural");
 
   return (
-    <section className="panel section-panel">
+    <section className="panel section-panel bookshelf-library-panel">
       <div className="section-header">
         <div>
           <h2>{t("booksHeading")}</h2>

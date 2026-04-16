@@ -38,6 +38,13 @@ export async function createBook(title: string) {
   });
 }
 
+export async function updateBook(bookId: number, title: string) {
+  return request<BookSummary>(`/books/${bookId}`, {
+    method: "PUT",
+    body: JSON.stringify({ title }),
+  });
+}
+
 export async function fetchBooksClient() {
   return request<BookSummary[]>("/books", {
     method: "GET",

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BatchTranslateButton } from "@/components/batch-translate-button";
+import { BookTitleEditor } from "@/components/book-title-editor";
 import { ChapterCard } from "@/components/chapter-card";
 import { CreateChapterForm } from "@/components/create-chapter-form";
 import { DeleteBookButton } from "@/components/delete-book-button";
@@ -35,48 +36,65 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
 
   return (
     <main className="app-page">
-      <section className="panel section-panel book-page-hero">
-        <div className="detail-hero">
-          <div className="detail-summary">
-            <p className="eyebrow">{messages.bookDetailEyebrow}</p>
-            <h1>{book.title}</h1>
-            <p className="lede">{messages.bookDetailDescription}</p>
-            <div className="summary-meta">
-              <span className="stat-chip">{formatMessage(messages.chaptersCount, { count: chapters.length, label: chapterLabel })}</span>
-              <span className="stat-chip">{new Date(book.updated_at).toLocaleDateString()}</span>
+      <section className="panel section-panel book-detail-shell">
+        <div className="book-detail-main">
+          <section className="book-detail-header">
+            <div className="detail-summary compact-summary">
+              <p className="eyebrow">{messages.bookDetailEyebrow}</p>
+              <BookTitleEditor bookId={book.id} initialTitle={book.title} />
+              <p className="lede">{messages.bookDetailDescription}</p>
+              <div className="summary-meta">
+                <span className="stat-chip">
+                  {formatMessage(messages.chaptersCount, { count: chapters.length, label: chapterLabel })}
+                </span>
+                <span className="stat-chip">{new Date(book.updated_at).toLocaleDateString()}</span>
+              </div>
+              <div className="action-row">
+                <Link className="button-link" href="/">
+                  {messages.backToBookshelf}
+                </Link>
+                <Link className="button-link" href={`/books/${book.id}/glossary`}>
+                  {messages.manageBookGlossary}
+                </Link>
+              </div>
             </div>
+          </section>
+
+          <section className="panel section-panel chapter-management-panel desktop-primary-panel">
+            <div className="section-header">
+              <div>
+                <h2>{messages.chaptersHeading}</h2>
+                <p>{formatMessage(messages.chaptersCount, { count: chapters.length, label: chapterLabel })}</p>
+              </div>
+              {chapters.length > 0 ? <BatchTranslateButton chapters={chapters} /> : null}
+            </div>
+
+            {chapters.length === 0 ? (
+              <EmptyState title={messages.noChaptersTitle} description={messages.noChaptersDescription} />
+            ) : (
+              <section className="list-stack chapter-list">
+                {chapters.map((chapter) => (
+                  <ChapterCard key={chapter.id} bookId={book.id} chapter={chapter} />
+                ))}
+              </section>
+            )}
+          </section>
+        </div>
+
+        <aside className="book-detail-sidebar sidebar-stack">
+          <section className="info-card detail-side-card">
+            <p className="eyebrow">{messages.bookDetailEyebrow}</p>
+            <h3>{messages.manageBookGlossary}</h3>
+            <p className="muted">{messages.bookDetailDescription}</p>
             <div className="action-row">
-              <Link className="button-link" href="/">
-                {messages.backToBookshelf}
-              </Link>
               <Link className="button-link" href={`/books/${book.id}/glossary`}>
                 {messages.manageBookGlossary}
               </Link>
               <DeleteBookButton bookId={book.id} redirectToBookshelf title={book.title} />
             </div>
-          </div>
-          <CreateChapterForm bookId={book.id} />
-        </div>
-      </section>
-
-      <section className="panel section-panel chapter-management-panel">
-        <div className="section-header">
-          <div>
-            <h2>{messages.chaptersHeading}</h2>
-            <p>{formatMessage(messages.chaptersCount, { count: chapters.length, label: chapterLabel })}</p>
-          </div>
-          {chapters.length > 0 ? <BatchTranslateButton chapters={chapters} /> : null}
-        </div>
-
-        {chapters.length === 0 ? (
-          <EmptyState title={messages.noChaptersTitle} description={messages.noChaptersDescription} />
-        ) : (
-          <section className="list-stack chapter-list">
-            {chapters.map((chapter) => (
-              <ChapterCard key={chapter.id} bookId={book.id} chapter={chapter} />
-            ))}
           </section>
-        )}
+          <CreateChapterForm bookId={book.id} />
+        </aside>
       </section>
     </main>
   );
