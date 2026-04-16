@@ -32,7 +32,7 @@ async function request<T>(path: string, options: RequestInit): Promise<T> {
 }
 
 export async function createBook(title: string) {
-  return request("/books", {
+  return request<BookSummary>("/books", {
     method: "POST",
     body: JSON.stringify({ title }),
   });

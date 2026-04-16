@@ -5,8 +5,13 @@ import { useState } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
 import { createBook } from "@/lib/api-client";
+import type { BookSummary } from "@/lib/types";
 
-export function CreateBookForm() {
+type CreateBookFormProps = {
+  onSuccess?: (book: BookSummary) => void | Promise<void>;
+};
+
+export function CreateBookForm({ onSuccess }: CreateBookFormProps) {
   const router = useRouter();
   const { t } = useI18n();
   const [title, setTitle] = useState("");
@@ -24,10 +29,13 @@ export function CreateBookForm() {
 
     try {
       setIsSubmitting(true);
-      await createBook(title.trim());
+      const createdBook = await createBook(title.trim());
       setTitle("");
-      window.dispatchEvent(new Event("bookshelf:refresh"));
-      router.refresh();
+      if (onSuccess) {
+        await onSuccess(createdBook);
+      } else {
+        router.refresh();
+      }
       setMessage(t("bookCreatedMessage"));
     } catch (error) {
       setMessage(error instanceof Error ? error.message : t("createBookError"));

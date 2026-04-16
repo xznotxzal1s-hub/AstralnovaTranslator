@@ -6,15 +6,17 @@ import { useState } from "react";
 import { useI18n } from "@/components/i18n-provider";
 import { importBookFile } from "@/lib/api-client";
 import { formatMessage } from "@/lib/i18n";
+import type { ImportResult } from "@/lib/types";
 
 type ImportBookFormProps = {
   title: string;
   description: string;
   endpoint: "txt" | "epub";
   accept: string;
+  onSuccess?: (result: ImportResult) => void | Promise<void>;
 };
 
-export function ImportBookForm({ title, description, endpoint, accept }: ImportBookFormProps) {
+export function ImportBookForm({ title, description, endpoint, accept, onSuccess }: ImportBookFormProps) {
   const router = useRouter();
   const { t } = useI18n();
   const [bookTitle, setBookTitle] = useState("");
@@ -45,8 +47,11 @@ export function ImportBookForm({ title, description, endpoint, accept }: ImportB
       if (fileInput) {
         fileInput.value = "";
       }
-      window.dispatchEvent(new Event("bookshelf:refresh"));
-      router.refresh();
+      if (onSuccess) {
+        await onSuccess(result);
+      } else {
+        router.refresh();
+      }
       setMessage(formatMessage(t("importSuccess"), { title: result.book_title, count: result.chapter_count }));
     } catch (error) {
       setMessage(error instanceof Error ? error.message : t("importFailed"));

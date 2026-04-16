@@ -12,6 +12,7 @@ type DeleteBookButtonProps = {
   title: string;
   compact?: boolean;
   redirectToBookshelf?: boolean;
+  onDeleted?: (bookId: number) => void | Promise<void>;
 };
 
 export function DeleteBookButton({
@@ -19,6 +20,7 @@ export function DeleteBookButton({
   title,
   compact = false,
   redirectToBookshelf = false,
+  onDeleted,
 }: DeleteBookButtonProps) {
   const router = useRouter();
   const { t } = useI18n();
@@ -36,7 +38,9 @@ export function DeleteBookButton({
       setIsSubmitting(true);
       await deleteBook(bookId);
       setMessage(t("bookDeletedMessage"));
-      window.dispatchEvent(new Event("bookshelf:refresh"));
+      if (onDeleted) {
+        await onDeleted(bookId);
+      }
       if (redirectToBookshelf) {
         router.push("/");
         router.refresh();

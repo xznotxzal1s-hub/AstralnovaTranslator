@@ -8,9 +8,10 @@ import type { BookSummary } from "@/lib/types";
 
 type BookCardProps = {
   book: BookSummary;
+  onDeleted?: (bookId: number) => void | Promise<void>;
 };
 
-export function BookCard({ book }: BookCardProps) {
+export function BookCard({ book, onDeleted }: BookCardProps) {
   const { locale, t } = useI18n();
 
   return (
@@ -26,7 +27,7 @@ export function BookCard({ book }: BookCardProps) {
         <Link className="button" href={`/books/${book.id}`}>
           {t("openBookButton")}
         </Link>
-        <DeleteBookButton bookId={book.id} title={book.title} compact />
+        <DeleteBookButton bookId={book.id} title={book.title} compact onDeleted={onDeleted} />
       </div>
     </article>
   );
