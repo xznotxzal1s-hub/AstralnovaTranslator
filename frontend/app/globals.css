@@ -1066,6 +1066,10 @@ p {
   grid-template-columns: 1fr;
 }
 
+.compact-import-grid .form-card h2 {
+  font-size: 1.1rem;
+}
+
 .book-detail-shell {
   grid-template-columns: minmax(0, 1.35fr) minmax(320px, 380px);
   padding: 24px;

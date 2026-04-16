@@ -4,13 +4,14 @@
 AstralnovaTranslator
 
 ## Current status
-The project is now functionally through the latest UI refinement pass after Phase 6A and has been manually verified locally in slices as the work progressed.
+The project is now functionally through the latest URL import feature pass and has been manually verified locally in slices as the work progressed.
 
 The app currently supports:
 - creating books
 - creating chapters by pasting Japanese text
 - importing TXT files
 - importing EPUB files
+- importing webpage URLs into books/chapters
 - configuring multiple translation presets and switching the active preset
 - translating single chapters
 - reusing cached translations
@@ -60,6 +61,13 @@ Completed and verified locally:
 - EPUB import backend + UI flow
 - manual chapter creation remains supported
 - imported content persists after refresh/restart
+
+### Webpage URL import
+Completed in code:
+- backend URL import endpoint
+- webpage readable-text extraction for typical article / novel pages
+- frontend URL import entry on the bookshelf page
+- imported webpage content reuses existing chapter creation and fallback splitting flow
 
 ### Phase 5A
 Completed and verified locally:
@@ -127,6 +135,7 @@ Verified working locally at this point:
 - chapters can be created manually from UI
 - TXT import works
 - EPUB import works for simple valid files
+- webpage URL import flow is implemented and ready for manual verification
 - translation presets can be created, edited, deleted, and switched
 - glossary entries can be created, edited, and deleted
 - per-book glossary entries stay scoped to the correct book
@@ -149,6 +158,7 @@ Current UI state:
 - interaction feedback is clearer through stronger hover, focus, active, and loading states
 - long chapter lists are more manageable because the book detail page now paginates them
 - settings now support a practical preset-based workflow instead of a single flat config form
+- bookshelf import tools now cover TXT, EPUB, and webpage URL workflows
 - mobile usability is improved, but not fully refined
 - success/error/loading feedback is clearer than before, especially around forms and batch translation
 
@@ -164,6 +174,7 @@ Areas still somewhat rough:
 - PowerShell input can corrupt Japanese text if entered directly; browser forms or Swagger UI are safer for UTF-8 testing
 - frontend CSS may still produce non-blocking autoprefixer warnings for alignment values depending on environment/tooling
 - Docker Compose scaffolding exists, but the full stack has not been repeatedly re-verified after every late-phase refinement
+- webpage import relies on direct backend HTTP fetches, so pages behind login, heavy client-side rendering, or anti-bot protection may fail or import poorly
 
 ## Current Docker / NAS status
 - `docker-compose.yml`, backend Dockerfile, frontend Dockerfile, and `.env.example` are present
@@ -218,4 +229,5 @@ Typical local run:
 ## Current recommended next phase
 Recommended next direction:
 - a UI-focused follow-up phase to further polish management pages, confirmations, and higher-density list interactions
+- manual verification of webpage URL import against a few real article/novel pages
 - optionally a deployment follow-up for automatic updates such as Watchtower or pull-and-restart automation

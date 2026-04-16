@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from uuid import uuid4
 
+import httpx
 from fastapi import UploadFile
 from sqlalchemy.orm import Session
 
@@ -13,6 +14,7 @@ from app.models.chapter import Chapter
 from app.schemas.imports import ImportResponse
 from app.utils.epub import extract_epub_contents
 from app.utils.text_import import decode_txt_bytes, infer_book_title_from_filename, split_txt_into_chapters
+from app.utils.webpage_import import extract_webpage_import_content, fetch_webpage_html
 
 
 @dataclass
@@ -112,3 +114,23 @@ async def import_epub_file(
         raise ImportServiceError(str(exc), status_code=400) from exc
     book_title = (provided_book_title or "").strip() or extracted_book_title
     return _create_book_with_chapters(db, book_title=book_title, chapter_payloads=chapter_payloads)
+
+
+async def import_webpage_url(
+    db: Session,
+    url: str,
+    provided_book_title: str | None,
+) -> ImportResponse:
+    try:
+        html = await fetch_webpage_html(url)
+        imported_content = extract_webpage_import_content(html, url=url, provided_book_title=provided_book_title)
+    except httpx.HTTPError as exc:
+        raise ImportServiceError(f"Failed to fetch the webpage: {exc}") from exc
+    except ValueError as exc:
+        raise ImportServiceError(str(exc), status_code=400) from exc
+
+    return _create_book_with_chapters(
+        db,
+        book_title=imported_content.title,
+        chapter_payloads=imported_content.chapter_payloads,
+    )

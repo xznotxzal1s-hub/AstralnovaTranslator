@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { BookshelfSection } from "@/components/bookshelf-section";
 import { CreateBookForm } from "@/components/create-book-form";
 import { ImportBookForm } from "@/components/import-book-form";
+import { ImportUrlForm } from "@/components/import-url-form";
 import { useI18n } from "@/components/i18n-provider";
 import { fetchBooksClient } from "@/lib/api-client";
 import { formatMessage } from "@/lib/i18n";
@@ -82,6 +83,7 @@ export function BookshelfPageClient({ initialBooks }: BookshelfPageClientProps) 
               </div>
             </div>
             <div className="import-grid compact-import-grid">
+              <ImportUrlForm onSuccess={handleBookImported} />
               <ImportBookForm
                 accept=".txt,text/plain"
                 description={t("importTxtDescription")}

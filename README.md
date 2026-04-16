@@ -11,6 +11,7 @@ The app currently supports:
 - creating chapters manually by pasting Japanese text
 - importing `.txt` files
 - importing `.epub` files
+- importing webpage URLs into books/chapters
 - translating chapters with user-provided AI provider settings and saved presets
 - saving source text and translated text locally
 - reading source text and translation in a browser
@@ -35,6 +36,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - book/chapter CRUD APIs
 - TXT import API
 - EPUB import API
+- webpage URL import API
 - chapter translation API
 - translation caching based on source hash + provider/model + prompt hash
 
@@ -59,6 +61,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - reading-focused UI refresh for chapter reading
 - chapter list pagination on the book detail page
 - translation-only as the default reader mode, with manual bilingual switching still available
+- webpage URL import form on the bookshelf page
 - delete actions with confirmation
 - batch translation action from book detail page
 - active-page navigation highlighting
@@ -74,6 +77,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 
 This is still a V1-style private tool. A few things are intentionally simple:
 - no website crawling or scraping
+- webpage URL import is intentionally simple and works best for direct article / novel pages, not full-site crawling
 - no user accounts or multi-user support
 - no browser extension
 - no OCR, PDF, TTS, cloud sync, or advanced AI analysis features
@@ -176,6 +180,7 @@ You can currently verify all of these manually:
 - create a chapter by pasting Japanese text
 - import a TXT file
 - import an EPUB file
+- import a webpage URL
 - create, edit, activate, and delete translation presets
 - create global glossary entries
 - create per-book glossary entries
@@ -320,6 +325,7 @@ This is intentionally separate so the main deployment stays simple and easy to u
 
 Recommended next work:
 - another UI-focused refinement pass for management pages and smaller interaction details
+- more manual verification against real-world webpage layouts if URL import becomes part of the regular workflow
 - optional automatic update flow after GHCR-based deployment is stable
 - final Docker Compose / NAS verification pass after the latest frontend changes
 - polish confirmation UX and higher-density long-list management flows

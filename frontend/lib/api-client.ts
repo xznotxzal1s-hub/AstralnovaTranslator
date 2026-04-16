@@ -5,6 +5,7 @@ import type {
   ImportResult,
   TranslationPreset,
   TranslationSettings,
+  UrlImportInput,
 } from "@/lib/types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
@@ -113,6 +114,16 @@ export async function importBookFile(input: {
   }
 
   return response.json() as Promise<ImportResult>;
+}
+
+export async function importBookFromUrl(input: UrlImportInput): Promise<ImportResult> {
+  return request<ImportResult>("/import/url", {
+    method: "POST",
+    body: JSON.stringify({
+      url: input.url,
+      book_title: input.bookTitle?.trim() || undefined,
+    }),
+  });
 }
 
 export async function updateSettings(payload: {

@@ -35,6 +35,11 @@ export type ImportResult = {
   chapters: Chapter[];
 };
 
+export type UrlImportInput = {
+  url: string;
+  bookTitle?: string;
+};
+
 export type TranslationSettings = {
   id: number;
   name: string;

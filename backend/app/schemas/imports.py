@@ -1,6 +1,11 @@
-from pydantic import BaseModel
+from pydantic import AnyHttpUrl, BaseModel
 
 from app.schemas.chapter import ChapterRead
+
+
+class UrlImportRequest(BaseModel):
+    url: AnyHttpUrl
+    book_title: str | None = None
 
 
 class ImportResponse(BaseModel):
