@@ -11,11 +11,16 @@ export default async function GlossaryPage() {
 
   return (
     <main className="app-page">
-      <section className="panel hero">
-        <div>
+      <section className="panel section-panel page-masthead">
+        <div className="page-masthead-copy">
           <p className="eyebrow">{messages.glossaryEyebrow}</p>
           <h1>{messages.glossaryTitle}</h1>
           <p className="lede">{messages.glossaryDescription}</p>
+          <p className="page-lead">{messages.glossaryLead}</p>
+        </div>
+        <div className="info-card">
+          <p className="eyebrow">{messages.glossaryListTitle}</p>
+          <p>{messages.glossaryDescription}</p>
         </div>
       </section>
 

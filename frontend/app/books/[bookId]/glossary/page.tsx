@@ -30,11 +30,12 @@ export default async function BookGlossaryPage({ params }: BookGlossaryPageProps
 
   return (
     <main className="app-page">
-      <section className="panel hero">
-        <div>
+      <section className="panel section-panel page-masthead">
+        <div className="page-masthead-copy">
           <p className="eyebrow">{messages.glossaryBookScope}</p>
           <h1>{book.title}</h1>
           <p className="lede">{messages.glossaryBookDescription}</p>
+          <p className="page-lead">{messages.glossaryLead}</p>
           <div className="action-row">
             <Link className="button-link" href={`/books/${book.id}`}>
               {messages.backToBook}
@@ -43,6 +44,10 @@ export default async function BookGlossaryPage({ params }: BookGlossaryPageProps
               {messages.navGlossary}
             </Link>
           </div>
+        </div>
+        <div className="info-card">
+          <p className="eyebrow">{messages.glossaryListTitle}</p>
+          <p>{messages.glossaryBookDescription}</p>
         </div>
       </section>
 

@@ -55,7 +55,7 @@ export function BookshelfPageClient({ initialBooks }: BookshelfPageClientProps) 
   return (
     <main className="app-page">
       <section className="hero panel bookshelf-hero">
-        <div>
+        <div className="page-masthead-copy">
           <p className="eyebrow">{t("bookshelfEyebrow")}</p>
           <h1>{t("bookshelfTitle")}</h1>
           <p className="lede">{t("bookshelfDescription")}</p>
@@ -63,7 +63,7 @@ export function BookshelfPageClient({ initialBooks }: BookshelfPageClientProps) 
         <CreateBookForm onSuccess={handleBookCreated} />
       </section>
 
-      <section className="panel section-panel">
+      <section className="panel section-panel collection-panel">
         <div className="section-header">
           <div>
             <h2>{t("importEyebrow")}</h2>

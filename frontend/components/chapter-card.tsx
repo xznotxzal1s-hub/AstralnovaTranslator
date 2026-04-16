@@ -6,6 +6,7 @@ import { DeleteChapterButton } from "@/components/delete-chapter-button";
 import { useI18n } from "@/components/i18n-provider";
 import { TranslateChapterButton } from "@/components/translate-chapter-button";
 import { formatMessage } from "@/lib/i18n";
+import { getLocalizedStatus } from "@/lib/status-label";
 import type { Chapter } from "@/lib/types";
 
 type ChapterCardProps = {
@@ -14,7 +15,8 @@ type ChapterCardProps = {
 };
 
 export function ChapterCard({ bookId, chapter }: ChapterCardProps) {
-  const { locale, t } = useI18n();
+  const { locale, messages, t } = useI18n();
+  const statusLabel = getLocalizedStatus(chapter.translation_status, messages);
 
   return (
     <article className="chapter-card">
@@ -23,7 +25,7 @@ export function ChapterCard({ bookId, chapter }: ChapterCardProps) {
         <h3>{chapter.title}</h3>
       </div>
       <div className="meta-row chapter-meta">
-        <span className="pill">{formatMessage(t("statusLabel"), { status: chapter.translation_status })}</span>
+        <span className={`pill status-pill ${chapter.translation_status}`}>{formatMessage(t("statusLabel"), { status: statusLabel })}</span>
         <span>
           {chapter.last_translated_at
             ? formatMessage(t("translatedAt"), { time: new Date(chapter.last_translated_at).toLocaleString(locale) })

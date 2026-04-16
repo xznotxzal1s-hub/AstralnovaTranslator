@@ -48,73 +48,75 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
   }
 
   return (
-    <form className="form-card" onSubmit={handleSubmit}>
-      <div>
+    <form className="form-card settings-form-card" onSubmit={handleSubmit}>
+      <div className="form-intro">
         <h2>{t("providerConfigurationTitle")}</h2>
         <p className="muted">{t("providerConfigurationDescription")}</p>
       </div>
 
-      <div className="field">
-        <label htmlFor="provider_type">{t("providerTypeLabel")}</label>
-        <select
-          id="provider_type"
-          value={formData.provider_type}
-          onChange={(event) => updateField("provider_type", event.target.value as TranslationSettings["provider_type"])}
-        >
-          <option value="openai_compatible">{t("providerOpenAiCompatible")}</option>
-          <option value="gemini">{t("providerGemini")}</option>
-        </select>
-      </div>
+      <section className="form-section-grid">
+        <div className="field">
+          <label htmlFor="provider_type">{t("providerTypeLabel")}</label>
+          <select
+            id="provider_type"
+            value={formData.provider_type}
+            onChange={(event) => updateField("provider_type", event.target.value as TranslationSettings["provider_type"])}
+          >
+            <option value="openai_compatible">{t("providerOpenAiCompatible")}</option>
+            <option value="gemini">{t("providerGemini")}</option>
+          </select>
+        </div>
 
-      <div className="field">
-        <label htmlFor="api_base_url">{t("apiBaseUrlLabel")}</label>
-        <input
-          id="api_base_url"
-          value={formData.api_base_url}
-          onChange={(event) => updateField("api_base_url", event.target.value)}
-        />
-      </div>
+        <div className="field">
+          <label htmlFor="model_name">{t("modelNameLabel")}</label>
+          <input
+            id="model_name"
+            value={formData.model_name}
+            onChange={(event) => updateField("model_name", event.target.value)}
+          />
+        </div>
 
-      <div className="field">
-        <label htmlFor="api_key">{t("apiKeyLabel")}</label>
-        <input
-          id="api_key"
-          type="password"
-          value={formData.api_key}
-          onChange={(event) => updateField("api_key", event.target.value)}
-        />
-      </div>
+        <div className="field">
+          <label htmlFor="api_base_url">{t("apiBaseUrlLabel")}</label>
+          <input
+            id="api_base_url"
+            value={formData.api_base_url}
+            onChange={(event) => updateField("api_base_url", event.target.value)}
+          />
+        </div>
 
-      <div className="field">
-        <label htmlFor="model_name">{t("modelNameLabel")}</label>
-        <input
-          id="model_name"
-          value={formData.model_name}
-          onChange={(event) => updateField("model_name", event.target.value)}
-        />
-      </div>
+        <div className="field">
+          <label htmlFor="api_key">{t("apiKeyLabel")}</label>
+          <input
+            id="api_key"
+            type="password"
+            value={formData.api_key}
+            onChange={(event) => updateField("api_key", event.target.value)}
+          />
+        </div>
 
-      <div className="field">
-        <label htmlFor="chunk_size">{t("chunkSizeLabel")}</label>
-        <input
-          id="chunk_size"
-          min={1}
-          type="number"
-          value={formData.chunk_size}
-          onChange={(event) => updateField("chunk_size", Number(event.target.value))}
-        />
-      </div>
+        <div className="field">
+          <label htmlFor="chunk_size">{t("chunkSizeLabel")}</label>
+          <input
+            id="chunk_size"
+            min={1}
+            type="number"
+            value={formData.chunk_size}
+            onChange={(event) => updateField("chunk_size", Number(event.target.value))}
+          />
+        </div>
 
-      <div className="field">
-        <label htmlFor="translation_mode">{t("translationModeLabel")}</label>
-        <input
-          id="translation_mode"
-          value={formData.translation_mode}
-          onChange={(event) => updateField("translation_mode", event.target.value)}
-        />
-      </div>
+        <div className="field">
+          <label htmlFor="translation_mode">{t("translationModeLabel")}</label>
+          <input
+            id="translation_mode"
+            value={formData.translation_mode}
+            onChange={(event) => updateField("translation_mode", event.target.value)}
+          />
+        </div>
+      </section>
 
-      <div className="field">
+      <div className="field prompt-field">
         <label htmlFor="prompt_template">{t("promptTemplateLabel")}</label>
         <textarea
           id="prompt_template"

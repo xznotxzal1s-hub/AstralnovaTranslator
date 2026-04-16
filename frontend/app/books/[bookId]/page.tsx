@@ -35,7 +35,7 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
 
   return (
     <main className="app-page">
-      <section className="panel section-panel">
+      <section className="panel section-panel book-page-hero">
         <div className="detail-hero">
           <div className="detail-summary">
             <p className="eyebrow">{messages.bookDetailEyebrow}</p>
@@ -59,7 +59,7 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
         </div>
       </section>
 
-      <section className="panel section-panel">
+      <section className="panel section-panel chapter-management-panel">
         <div className="section-header">
           <div>
             <h2>{messages.chaptersHeading}</h2>

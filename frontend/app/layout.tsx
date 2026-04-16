@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { I18nProvider } from "@/components/i18n-provider";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { TopNavigation } from "@/components/top-navigation";
 import { getServerI18n } from "@/lib/i18n-server";
 
 import "./globals.css";
@@ -33,11 +34,7 @@ export default async function RootLayout({
                 </span>
               </Link>
               <div className="topbar-actions">
-                <nav className="topnav">
-                  <Link href="/">{messages.navBookshelf}</Link>
-                  <Link href="/settings">{messages.navSettings}</Link>
-                  <Link href="/glossary">{messages.navGlossary}</Link>
-                </nav>
+                <TopNavigation />
                 <LanguageSwitcher />
               </div>
             </header>

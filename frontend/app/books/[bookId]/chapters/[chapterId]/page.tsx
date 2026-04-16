@@ -7,6 +7,7 @@ import { TranslateChapterButton } from "@/components/translate-chapter-button";
 import { fetchBook, fetchBookChapters, fetchChapter } from "@/lib/api";
 import { formatMessage } from "@/lib/i18n";
 import { getServerI18n } from "@/lib/i18n-server";
+import { getLocalizedStatus } from "@/lib/status-label";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +33,7 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
     fetchBookChapters(parsedBookId),
   ]);
   const { messages } = await getServerI18n();
+  const localizedStatus = getLocalizedStatus(chapter.translation_status, messages);
 
   const currentIndex = chapters.findIndex((item) => item.id === chapter.id);
   const previousChapter = currentIndex > 0 ? chapters[currentIndex - 1] : null;
@@ -46,10 +48,11 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
           <h1>{chapter.title}</h1>
           <p className="reader-subtitle">{book.title}</p>
           <p className="lede">{messages.readingPageDescription}</p>
+          <p className="reader-lead">{messages.readingPageLead}</p>
           <div className="summary-meta">
             <span className="stat-chip">{formatMessage(messages.chapterEyebrow, { count: chapter.index_in_book })}</span>
-            <span className="stat-chip">
-              {formatMessage(messages.statusLabel, { status: chapter.translation_status })}
+            <span className={`stat-chip status-pill ${chapter.translation_status}`}>
+              {formatMessage(messages.statusLabel, { status: localizedStatus })}
             </span>
           </div>
         </div>
@@ -76,7 +79,10 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
       <section className="reader-layout">
         <aside className="sidebar-stack reader-sidebar">
           <section className="form-card reader-nav-card">
-            <h3>{messages.navigationHeading}</h3>
+            <div className="reader-nav-header">
+              <p className="eyebrow">{messages.readingPageOutline}</p>
+              <h3>{messages.navigationHeading}</h3>
+            </div>
             <div className="reader-outline">
               {chapters.map((item) => (
                 <Link

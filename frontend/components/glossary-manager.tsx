@@ -89,9 +89,9 @@ export function GlossaryManager({ initialEntries, scope, bookId }: GlossaryManag
   }
 
   return (
-    <section className="split-layout">
-      <form className="form-card" onSubmit={handleSubmit}>
-        <div>
+    <section className="split-layout glossary-layout">
+      <form className="form-card glossary-form-card" onSubmit={handleSubmit}>
+        <div className="form-intro">
           <p className="eyebrow">{scope === "global" ? t("glossaryGlobalScope") : t("glossaryBookScope")}</p>
           <h2>{editingId === null ? t("glossaryCreateTitle") : t("glossaryEditTitle")}</h2>
           <p className="muted">{t("glossaryFormDescription")}</p>
@@ -141,10 +141,16 @@ export function GlossaryManager({ initialEntries, scope, bookId }: GlossaryManag
         </p>
       </form>
 
-      <section className="list-stack">
+      <section className="list-stack glossary-list-section">
+        <div className="section-header">
+          <div>
+            <h2>{t("glossaryListTitle")}</h2>
+            <p>{scope === "global" ? t("glossaryDescription") : t("glossaryBookDescription")}</p>
+          </div>
+        </div>
         {entries.map((entry) => (
-          <article className="chapter-card" key={entry.id}>
-            <div>
+          <article className="chapter-card glossary-entry-card" key={entry.id}>
+            <div className="card-heading">
               <p className="eyebrow">{t("glossaryEntryLabel")}</p>
               <h3>
                 {entry.source_term} → {entry.target_term}

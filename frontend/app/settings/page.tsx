@@ -10,11 +10,16 @@ export default async function SettingsPage() {
 
   return (
     <main className="app-page">
-      <section className="panel hero">
-        <div>
+      <section className="panel section-panel page-masthead">
+        <div className="page-masthead-copy">
           <p className="eyebrow">{messages.settingsEyebrow}</p>
           <h1>{messages.settingsTitle}</h1>
           <p className="lede">{messages.settingsDescription}</p>
+          <p className="page-lead">{messages.settingsLead}</p>
+        </div>
+        <div className="info-card">
+          <p className="eyebrow">{messages.settingsTipsTitle}</p>
+          <p>{messages.settingsTipsBody}</p>
         </div>
       </section>
 
