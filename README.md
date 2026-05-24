@@ -21,6 +21,7 @@ The app currently supports:
 - batch translating all untranslated chapters in a book
 - publishing backend/frontend Docker images to GHCR through GitHub Actions
 - deploying on NAS with prebuilt images instead of local source builds
+- a warmer paper-and-ink UI refinement focused on bookshelf readability, reader comfort, and consistent management pages
 
 The project is intentionally kept small, beginner-friendly, and focused on private reading assistance.
 
@@ -76,6 +77,8 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - active-page navigation highlighting
 - user-friendly localized status labels
 - UI-R1 bookshelf refinement with a consolidated add/import dialog and cover-style book cards
+- UI-R2 visual refinement with a calmer paper-and-ink style across the app shell, bookshelf, reader, settings, and glossary pages
+- Taste-skill homepage refinement with an asymmetric reading-desk first screen and no homepage icon dependency
 
 ### Deployment automation
 - GitHub Actions workflow to build and publish backend image to GHCR on push to `main`
@@ -93,8 +96,8 @@ This is still a V1-style private tool. A few things are intentionally simple:
 - no OCR, PDF, TTS, cloud sync, or advanced AI analysis features
 - API keys are still stored in the local SQLite database in V1; they are masked in API read responses and redacted from provider error messages, but not encrypted at rest
 - delete confirmation currently uses browser confirm dialogs, not custom modals
-- the newer UI-R1 visual language is currently applied first to the bookshelf page; other pages still use the earlier reading-focused visual system
-- settings and glossary pages are usable, but less polished than the reading page
+- UI-R2 improves consistency, but some frontend pieces are still CSS-heavy and could later be extracted into reusable UI primitives
+- settings and glossary pages are usable and more visually consistent, but still need deeper form/table usability polish
 - reader chapter navigation still renders the full chapter outline, so very large books may need a denser or windowed navigation treatment later
 - chapter pagination is intentionally simple and currently uses previous/next paging rather than direct page-number jumping
 - translation presets are global only and do not yet support import/export or per-book assignment
@@ -195,6 +198,7 @@ Useful URLs:
 
 You can currently verify all of these manually:
 - create a book from the bookshelf page
+- use the asymmetric homepage import workspace to create or import books
 - create a chapter by pasting Japanese text
 - import a TXT file
 - import an EPUB file
@@ -351,7 +355,8 @@ This is intentionally separate so the main deployment stays simple and easy to u
 ## Roadmap / Next Steps
 
 Recommended next work:
-- continue UI-R1 gradually into the book detail page, reader page, settings page, and glossary page
+- extract reusable frontend UI primitives so future UI passes are less CSS-heavy
+- replace browser confirm dialogs with calmer in-app confirmation modals
 - optimize reader navigation for very long books with hundreds of chapters
 - more manual verification against real-world webpage layouts if URL import becomes part of the regular workflow
 - optional automatic update flow after GHCR-based deployment is stable

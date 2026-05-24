@@ -21,6 +21,7 @@ export function BookshelfPageClient({ initialBooks, initialRefreshError = "" }: 
   const [refreshError, setRefreshError] = useState(() =>
     initialRefreshError ? formatMessage(t("bookshelfRefreshFailed"), { message: initialRefreshError }) : "",
   );
+  const latestBook = books[0] ?? null;
 
   async function refreshBooks() {
     try {
@@ -51,25 +52,48 @@ export function BookshelfPageClient({ initialBooks, initialRefreshError = "" }: 
   }
 
   return (
-    <main className="app-page">
-      <section className="panel section-panel bookshelf-shell">
-        <div className="bookshelf-main">
-          <section className="bookshelf-header">
-            <div className="page-masthead-copy">
-              <p className="eyebrow">{t("bookshelfEyebrow")}</p>
-              <h1>{t("bookshelfTitle")}</h1>
-              <p className="lede">{t("bookshelfDescription")}</p>
+    <main className="app-page home-page">
+      <section className="bookshelf-shell">
+        <section className="bookshelf-stage">
+          <div className="bookshelf-hero-copy">
+            <p className="eyebrow">{t("bookshelfEyebrow")}</p>
+            <h1>{t("bookshelfTitle")}</h1>
+            <p className="lede">{t("bookshelfDescription")}</p>
+            <div className="home-metrics" aria-label={t("bookshelfOverviewLabel")}>
+              <div className="home-metric-primary">
+                <span>{books.length}</span>
+                <p>{books.length === 1 ? t("bookSingular") : t("bookPlural")}</p>
+              </div>
+              <div className="home-metric-copy">
+                <p className="eyebrow">{t("bookshelfLocalArchiveLabel")}</p>
+                <p>{t("bookshelfLocalArchiveText")}</p>
+              </div>
+            </div>
+          </div>
+
+          <aside className="bookshelf-command-panel">
+            <div className="command-panel-copy">
+              <p className="eyebrow">{t("bookshelfReadingDeskLabel")}</p>
+              <h2>{t("bookshelfReadingDeskTitle")}</h2>
+              <p className="muted">{t("bookshelfReadingDeskBody")}</p>
+            </div>
+            <div className="latest-book-strip">
+              <span className="latest-book-index">01</span>
+              <div>
+                <p className="eyebrow">{t("bookshelfLastUpdatedLabel")}</p>
+                <p>{latestBook ? latestBook.title : t("bookshelfNoRecentBook")}</p>
+              </div>
             </div>
             <ImportWorkspace onChanged={handleBookCreated} />
-          </section>
+          </aside>
+        </section>
 
-          <BookshelfSection
-            books={books}
-            isRefreshing={isRefreshing}
-            onDeleted={handleBookDeleted}
-            refreshError={refreshError}
-          />
-        </div>
+        <BookshelfSection
+          books={books}
+          isRefreshing={isRefreshing}
+          onDeleted={handleBookDeleted}
+          refreshError={refreshError}
+        />
       </section>
     </main>
   );

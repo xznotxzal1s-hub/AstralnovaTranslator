@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, ExternalLink } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 import { DeleteBookButton } from "@/components/delete-book-button";
@@ -14,17 +14,19 @@ type BookCardProps = {
 
 export function BookCard({ book, onDeleted }: BookCardProps) {
   const { locale, t } = useI18n();
-  const coverTone = (book.id % 5) + 1;
-  const coverInitial = book.title.trim().slice(0, 1).toUpperCase() || "A";
   const updatedDate = new Date(book.updated_at);
 
   return (
     <article className="book-card shelf-book-card">
-      <Link className="book-cover-link" href={`/books/${book.id}`}>
-        <div className={`book-cover book-cover-tone-${coverTone}`}>
-          <span className="book-cover-label">{t("bookEyebrow")}</span>
-          <span className="book-cover-initial">{coverInitial}</span>
-          <span className="book-cover-rule" />
+      <Link className="book-cover-link" href={`/books/${book.id}`} aria-label={`${t("openBookButton")}：${book.title}`}>
+        <div className="book-cover">
+          <Image
+            src="/default-book-cover.png"
+            alt={book.title}
+            fill
+            sizes="(max-width: 640px) 45vw, (max-width: 1100px) 28vw, 210px"
+            className="book-cover-image"
+          />
         </div>
       </Link>
 
@@ -33,14 +35,13 @@ export function BookCard({ book, onDeleted }: BookCardProps) {
           <h2>{book.title}</h2>
         </Link>
         <p className="book-meta">
-          <CalendarDays aria-hidden="true" size={15} />
+          <span className="book-meta-dot" aria-hidden="true" />
           {updatedDate.toLocaleDateString(locale)}
         </p>
       </div>
 
       <div className="book-card-actions">
         <Link className="button-link compact-button" href={`/books/${book.id}`}>
-          <ExternalLink aria-hidden="true" size={15} />
           {t("openBookButton")}
         </Link>
         <DeleteBookButton bookId={book.id} title={book.title} compact onDeleted={onDeleted} />

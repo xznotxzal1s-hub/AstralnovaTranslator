@@ -136,6 +136,24 @@ Implemented in the first slice:
 - added Lucide icons plus small utility helpers for class composition
 - kept real backend data as the source of truth; no mock bookshelf data was introduced
 
+### UI-R2 reading polish refinement
+Implemented in code:
+- shifted the visual system toward a warmer paper-and-ink reading app style
+- reduced the bookshelf page's dark admin-dashboard feeling and improved book-card readability
+- widened and softened the reader surface for more comfortable long-form Chinese reading
+- improved reader typography, line height, and page-like depth
+- gave the reader chapter outline a clearer side-panel treatment on desktop
+- made settings and glossary pages visually closer to the rest of the app with clearer card hierarchy
+- kept this pass CSS-focused and incremental, without changing backend behavior or translation logic
+
+### Taste-skill homepage refinement
+Implemented in code:
+- rebuilt the homepage/bookshelf first screen as an asymmetric reading-desk layout
+- added a clearer local-library metric block and recent-book strip without adding backend scope
+- replaced homepage Lucide icon usage with small inline SVG primitives and CSS markers
+- removed the now-unused `lucide-react` frontend dependency from package manifests
+- kept the homepage mobile layout single-column and avoided production build verification inside Codex
+
 ### Translation correctness refinement
 Completed in code and covered by backend regression tests:
 - `/chapters/{id}/translate` still reuses matching `TranslationRecord` cache entries
@@ -209,7 +227,9 @@ Verified working locally at this point:
 
 Current UI state:
 - the app is now reading-focused rather than a rough admin-style interface
-- UI-R1 has started with the bookshelf page: the library area now feels more like a real shelf, and create/import actions are grouped into one cleaner dialog
+- UI-R1 started with the bookshelf page: the library area now feels more like a real shelf, and create/import actions are grouped into one cleaner dialog
+- UI-R2 applies a warmer, more consistent paper-and-ink visual language across the app shell, bookshelf, reader, settings, and glossary surfaces
+- the Taste-skill homepage pass makes the first screen feel more like a reading desk than a utility dashboard
 - the chapter reading page has the strongest polish and is the best current experience
 - bookshelf and book detail pages are cleaner and more usable than earlier phases
 - interaction feedback is clearer through stronger hover, focus, active, and loading states
@@ -220,8 +240,8 @@ Current UI state:
 - success/error/loading feedback is clearer than before, especially around forms and batch translation
 
 Areas still somewhat rough:
-- UI-R1 is incremental; book detail, reader, settings, and glossary have not yet been migrated to the newer visual system
-- settings and glossary pages are usable but visually less polished than the reader pages
+- UI-R2 is still CSS-focused; some components could later be refactored into reusable UI primitives
+- settings and glossary pages are more consistent than before but still need deeper form/table usability polish
 - destructive actions currently use browser confirm dialogs rather than custom modal UI
 - pagination is intentionally simple and does not yet support direct page-number jumping
 - translation presets are global only; there is not yet import/export or per-book preset binding
@@ -288,7 +308,7 @@ Typical local run:
 
 ## Current recommended next phase
 Recommended next direction:
-- a UI-focused follow-up phase to further polish management pages, confirmations, and higher-density list interactions
+- a UI-focused follow-up phase to extract reusable frontend UI primitives and replace browser confirm dialogs
 - optimize very long chapter navigation in the reader so books with hundreds of chapters stay comfortable
 - manual verification of webpage URL import against a few real article/novel pages
 - optionally a deployment follow-up for automatic updates such as Watchtower or pull-and-restart automation
