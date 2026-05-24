@@ -4,6 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from app.core.config import settings
+from app.core.migrations import run_schema_migrations
 
 
 settings.data_dir.mkdir(parents=True, exist_ok=True)
@@ -21,85 +22,7 @@ class Base(DeclarativeBase):
 
 
 def ensure_schema() -> None:
-    if not settings.database_url.startswith("sqlite"):
-        return
-
-    with engine.begin() as connection:
-        chapters_table = connection.exec_driver_sql(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='chapters'",
-        ).first()
-        if chapters_table is not None:
-            chapter_rows = connection.exec_driver_sql(
-                "SELECT id, book_id FROM chapters ORDER BY book_id ASC, index_in_book ASC, created_at ASC, id ASC",
-            ).fetchall()
-            next_indexes: dict[int, int] = {}
-            for chapter_id, book_id in chapter_rows:
-                next_index = next_indexes.get(book_id, 1)
-                connection.exec_driver_sql(
-                    "UPDATE chapters SET index_in_book = ? WHERE id = ?",
-                    (next_index, chapter_id),
-                )
-                next_indexes[book_id] = next_index + 1
-            connection.exec_driver_sql(
-                "CREATE UNIQUE INDEX IF NOT EXISTS uq_chapters_book_index ON chapters (book_id, index_in_book)",
-            )
-
-        translation_records_table = connection.exec_driver_sql(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='translation_records'",
-        ).first()
-        if translation_records_table is not None:
-            connection.exec_driver_sql(
-                """
-                DELETE FROM translation_records
-                WHERE id NOT IN (
-                    SELECT MAX(id)
-                    FROM translation_records
-                    GROUP BY chapter_id, provider_type, model_name, prompt_hash, source_hash
-                )
-                """,
-            )
-            connection.exec_driver_sql(
-                """
-                CREATE UNIQUE INDEX IF NOT EXISTS uq_translation_records_cache_key
-                ON translation_records (chapter_id, provider_type, model_name, prompt_hash, source_hash)
-                """,
-            )
-
-        glossary_table = connection.exec_driver_sql(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='glossary_entries'",
-        ).first()
-        if glossary_table is None:
-            return
-
-        columns = connection.exec_driver_sql("PRAGMA table_info(glossary_entries)").fetchall()
-        column_names = {column[1] for column in columns}
-        if "book_id" not in column_names:
-            connection.exec_driver_sql("ALTER TABLE glossary_entries ADD COLUMN book_id INTEGER")
-
-        translation_table = connection.exec_driver_sql(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='translation_configs'",
-        ).first()
-        if translation_table is None:
-            return
-
-        translation_columns = connection.exec_driver_sql("PRAGMA table_info(translation_configs)").fetchall()
-        translation_column_names = {column[1] for column in translation_columns}
-        if "name" not in translation_column_names:
-            connection.exec_driver_sql(
-                "ALTER TABLE translation_configs ADD COLUMN name VARCHAR(255) NOT NULL DEFAULT '默认预设'",
-            )
-        if "is_active" not in translation_column_names:
-            connection.exec_driver_sql(
-                "ALTER TABLE translation_configs ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT 0",
-            )
-
-        active_count = connection.exec_driver_sql(
-            "SELECT COUNT(*) FROM translation_configs WHERE is_active = 1",
-        ).scalar_one()
-        if active_count == 0:
-            connection.exec_driver_sql(
-                "UPDATE translation_configs SET is_active = 1 WHERE id = (SELECT id FROM translation_configs ORDER BY id ASC LIMIT 1)",
-            )
+    run_schema_migrations(engine)
 
 
 def get_db() -> Generator[Session, None, None]:

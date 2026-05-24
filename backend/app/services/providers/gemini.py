@@ -1,5 +1,7 @@
 import httpx
 
+from app.services.providers.errors import ProviderRequestError, build_provider_error_message
+
 
 class GeminiProvider:
     def translate_text(
@@ -23,9 +25,12 @@ class GeminiProvider:
         }
         params = {"key": api_key}
 
-        with httpx.Client(timeout=120.0) as client:
-            response = client.post(endpoint, json=payload, params=params)
-            response.raise_for_status()
+        try:
+            with httpx.Client(timeout=120.0) as client:
+                response = client.post(endpoint, json=payload, params=params)
+                response.raise_for_status()
+        except httpx.HTTPError as exc:
+            raise ProviderRequestError(build_provider_error_message("Gemini", exc, api_key)) from exc
 
         data = response.json()
         candidates = data.get("candidates", [])

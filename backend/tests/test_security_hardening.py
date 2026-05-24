@@ -15,11 +15,15 @@ os.environ["UPLOADS_DIR"] = str(_TEST_ROOT / "uploads")
 
 from app.core.config import Settings  # noqa: E402
 from app.core.database import Base  # noqa: E402
+from app.models.book import Book  # noqa: E402
+from app.models.chapter import Chapter  # noqa: E402
 from app.models.translation_config import TranslationConfig  # noqa: E402
 from app.schemas.settings import TranslationConfigUpdate  # noqa: E402
 from app.services import import_service  # noqa: E402
 from app.services.import_service import ImportServiceError  # noqa: E402
+from app.services.providers.gemini import GeminiProvider  # noqa: E402
 from app.services.settings_service import build_translation_config_read, save_translation_config  # noqa: E402
+from app.services.translation_service import TranslationServiceError, translate_chapter  # noqa: E402
 from app.utils.webpage_import import validate_webpage_url  # noqa: E402
 
 
@@ -30,6 +34,29 @@ class FakeUpload:
 
     async def read(self, size: int = -1) -> bytes:
         return self._stream.read(size)
+
+
+class LeakyProvider:
+    def translate_text(self, *, prompt: str, api_base_url: str, api_key: str, model_name: str) -> str:
+        raise RuntimeError(f"request failed for {api_base_url}/models/{model_name}:generateContent?key={api_key}")
+
+
+class FakeGeminiHttpClient:
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        pass
+
+    def __enter__(self) -> "FakeGeminiHttpClient":
+        return self
+
+    def __exit__(self, *args: object) -> None:
+        return None
+
+    def post(self, endpoint: str, json: object, params: dict[str, str]) -> object:
+        import httpx
+
+        request = httpx.Request("POST", f"{endpoint}?key={params['key']}")
+        response = httpx.Response(400, request=request)
+        raise httpx.HTTPStatusError("Bad request", request=request, response=response)
 
 
 class SecurityHardeningTests(unittest.TestCase):
@@ -122,6 +149,47 @@ class SecurityHardeningTests(unittest.TestCase):
         self.assertEqual(updated_config.id, config.id)
         self.assertEqual(updated_config.api_key, "sk-test1234abcd")
         self.assertEqual(updated_config.provider_type, "gemini")
+
+    def test_translation_service_error_does_not_expose_api_key_from_provider_exception(self) -> None:
+        secret_api_key = "gemini-secret-key-123"
+        book = Book(title="Safe Errors")
+        chapter = Chapter(book=book, index_in_book=1, title="Chapter", source_text="魔王が笑った。")
+        config = TranslationConfig(
+            name="Leaky Provider",
+            is_active=True,
+            provider_type="gemini",
+            api_base_url="https://generativelanguage.googleapis.com/v1beta",
+            model_name="gemini-test",
+            api_key=secret_api_key,
+            prompt_template="Translate {source_text}",
+            chunk_size=1500,
+            translation_mode="natural",
+        )
+        self.db.add_all([book, chapter, config])
+        self.db.commit()
+        self.db.refresh(chapter)
+
+        with patch("app.services.translation_service.get_translation_provider", return_value=LeakyProvider()):
+            with self.assertRaises(TranslationServiceError) as caught:
+                translate_chapter(self.db, chapter, force=True)
+
+        self.assertNotIn(secret_api_key, caught.exception.message)
+        self.assertIn("[redacted]", caught.exception.message)
+
+    def test_gemini_provider_error_does_not_expose_api_key_from_request_url(self) -> None:
+        secret_api_key = "gemini-secret-key-456"
+
+        with patch("app.services.providers.gemini.httpx.Client", FakeGeminiHttpClient):
+            with self.assertRaises(Exception) as caught:
+                GeminiProvider().translate_text(
+                    prompt="Translate this.",
+                    api_base_url="https://generativelanguage.googleapis.com/v1beta",
+                    api_key=secret_api_key,
+                    model_name="gemini-test",
+                )
+
+        self.assertNotIn(secret_api_key, str(caught.exception))
+        self.assertIn("[redacted]", str(caught.exception))
 
 
 if __name__ == "__main__":

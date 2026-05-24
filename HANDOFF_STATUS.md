@@ -153,6 +153,21 @@ Completed in code and covered by backend regression tests:
 - settings read responses mask API keys and expose `has_api_key`
 - settings updates preserve the existing API key when the submitted key is empty or the masked placeholder
 
+### Provider error safety refinement
+Completed in code and covered by backend regression tests:
+- OpenAI-compatible and Gemini provider HTTP errors are converted into user-safe provider errors
+- provider error messages redact configured API keys before they reach the translation endpoint response
+- Gemini request URL errors redact `key=...` query parameters before being surfaced
+- translation service keeps its existing failed-status behavior while sanitizing unexpected provider exceptions
+
+### Lightweight SQLite migration refinement
+Completed in code and covered by backend regression tests:
+- startup schema maintenance now runs through a small versioned migration runner
+- applied schema migrations are tracked in a `schema_migrations` table
+- legacy SQLite databases can still receive the existing chapter index, translation cache, glossary scope, and preset-field upgrades
+- migrations are idempotent, so repeated app starts do not rerun already-recorded migrations
+- `ensure_schema()` remains as the simple startup entry point but no longer owns all schema upgrade SQL directly
+
 ### Data consistency refinement
 Completed in code and covered by backend regression tests:
 - `TranslationRecord` cache keys are now unique and repeated saves update the existing cache row
@@ -179,6 +194,8 @@ Verified working locally at this point:
 - translation cache prevents repeated identical provider calls
 - retranslation bypasses cached translations instead of returning the old cached text
 - backend regression tests cover the new NAS hardening behavior
+- backend regression tests cover provider error redaction so API keys are not exposed in translation failures
+- backend regression tests cover the lightweight schema migration runner and legacy SQLite schema upgrades
 - backend regression tests cover translation cache de-duplication, chapter index uniqueness, and parent book timestamp updates
 - translated content persists after restart
 - books can be deleted
@@ -217,6 +234,7 @@ Areas still somewhat rough:
 - Docker Compose scaffolding exists, but the full stack has not been repeatedly re-verified after every late-phase refinement
 - webpage import relies on direct backend HTTP fetches, so pages behind login, heavy client-side rendering, or anti-bot protection may fail or import poorly
 - webpage import intentionally blocks local/private network targets for NAS safety, so it cannot import pages hosted on localhost or LAN-only private IPs
+- API keys are masked in read responses and redacted from provider error messages, but they are still stored unencrypted in the local SQLite database for V1 simplicity
 
 ## Current Docker / NAS status
 - `docker-compose.yml`, backend Dockerfile, frontend Dockerfile, and `.env.example` are present
@@ -271,5 +289,6 @@ Typical local run:
 ## Current recommended next phase
 Recommended next direction:
 - a UI-focused follow-up phase to further polish management pages, confirmations, and higher-density list interactions
+- optimize very long chapter navigation in the reader so books with hundreds of chapters stay comfortable
 - manual verification of webpage URL import against a few real article/novel pages
 - optionally a deployment follow-up for automatic updates such as Watchtower or pull-and-restart automation

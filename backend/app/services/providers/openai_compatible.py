@@ -1,5 +1,7 @@
 import httpx
 
+from app.services.providers.errors import ProviderRequestError, build_provider_error_message
+
 
 class OpenAICompatibleProvider:
     def translate_text(
@@ -24,9 +26,12 @@ class OpenAICompatibleProvider:
             "Content-Type": "application/json",
         }
 
-        with httpx.Client(timeout=120.0) as client:
-            response = client.post(endpoint, json=payload, headers=headers)
-            response.raise_for_status()
+        try:
+            with httpx.Client(timeout=120.0) as client:
+                response = client.post(endpoint, json=payload, headers=headers)
+                response.raise_for_status()
+        except httpx.HTTPError as exc:
+            raise ProviderRequestError(build_provider_error_message("OpenAI-compatible", exc, api_key)) from exc
 
         data = response.json()
         choices = data.get("choices", [])

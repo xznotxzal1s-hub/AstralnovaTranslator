@@ -31,6 +31,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - SQLite persistence
 - `Book`, `Chapter`, `TranslationConfig`, `GlossaryEntry`, and `TranslationRecord` models
 - uniqueness safeguards for translation cache keys and per-book chapter order
+- lightweight versioned SQLite schema migrations tracked in a `schema_migrations` table
 - settings API
 - translation preset API
 - glossary API
@@ -54,6 +55,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - sequential chunk translation for long chapters
 - normal translation can reuse matching cached results, while retranslation bypasses the cache and calls the provider again
 - API keys are masked in settings read responses and preserved when the settings form submits an empty or masked key
+- provider request failures redact configured API keys before errors are returned to the frontend
 
 ### Frontend
 - bookshelf page
@@ -89,10 +91,11 @@ This is still a V1-style private tool. A few things are intentionally simple:
 - no user accounts or multi-user support
 - no browser extension
 - no OCR, PDF, TTS, cloud sync, or advanced AI analysis features
-- API keys are still stored in the local SQLite database in V1; they are masked in API read responses but not encrypted at rest
+- API keys are still stored in the local SQLite database in V1; they are masked in API read responses and redacted from provider error messages, but not encrypted at rest
 - delete confirmation currently uses browser confirm dialogs, not custom modals
 - the newer UI-R1 visual language is currently applied first to the bookshelf page; other pages still use the earlier reading-focused visual system
 - settings and glossary pages are usable, but less polished than the reading page
+- reader chapter navigation still renders the full chapter outline, so very large books may need a denser or windowed navigation treatment later
 - chapter pagination is intentionally simple and currently uses previous/next paging rather than direct page-number jumping
 - translation presets are global only and do not yet support import/export or per-book assignment
 - Docker/NAS deployment files exist, but a fresh full end-to-end Docker verification is still recommended after the latest refinements
@@ -204,7 +207,9 @@ You can currently verify all of these manually:
 - confirm translation cache reuse
 - confirm retranslation calls the provider again instead of returning the old cached translation
 - confirm settings reads show a masked API key instead of the full secret
+- confirm failed provider requests do not show the full API key in the frontend error message
 - confirm chapter changes or translation activity move the touched book upward in the bookshelf ordering
+- confirm startup schema migrations are recorded once in `schema_migrations` and remain safe to rerun
 - batch translate all untranslated chapters in a book
 - page through long chapter lists on the book detail page
 - delete a chapter
@@ -347,6 +352,7 @@ This is intentionally separate so the main deployment stays simple and easy to u
 
 Recommended next work:
 - continue UI-R1 gradually into the book detail page, reader page, settings page, and glossary page
+- optimize reader navigation for very long books with hundreds of chapters
 - more manual verification against real-world webpage layouts if URL import becomes part of the regular workflow
 - optional automatic update flow after GHCR-based deployment is stable
 - final Docker Compose / NAS verification pass after the latest frontend changes

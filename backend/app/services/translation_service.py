@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.models.chapter import Chapter
 from app.services.book_service import touch_book
 from app.services.glossary_service import get_merged_glossary_entries
+from app.services.providers.errors import redact_sensitive_text
 from app.services.providers.factory import get_translation_provider
 from app.services.settings_service import get_active_translation_config
 from app.services.translation_record_service import find_translation_record, save_translation_record
@@ -108,7 +109,8 @@ def translate_chapter(db: Session, chapter: Chapter, force: bool) -> Chapter:
         db.add(chapter)
         touch_book(db, chapter.book_id)
         db.commit()
-        raise TranslationServiceError(f"Translation request failed: {exc}", status_code=502) from exc
+        safe_error_message = redact_sensitive_text(str(exc), config.api_key).strip() or "Provider request failed."
+        raise TranslationServiceError(f"Translation request failed: {safe_error_message}", status_code=502) from exc
 
     chapter.translated_text = "\n\n".join(translated_chunks).strip()
     chapter.source_hash = current_source_hash

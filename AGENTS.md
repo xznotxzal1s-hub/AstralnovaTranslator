@@ -203,6 +203,13 @@ At minimum, implement:
 - Prioritize usability over flashy design.
 - Make the app work on desktop and mobile.
 
+### Next.js interactive agent workflow
+- The Next.js app lives in `frontend/`.
+- During interactive agent development, use `npm run dev` from `frontend/` to run the app with Hot Module Replacement (HMR).
+- Do not run `npm run build` inside an interactive agent session unless the user explicitly asks for it. In this repository, production builds can make the `.next` folder contain production assets, disable hot reload, or leave the dev server in an inconsistent state.
+- If a production build is needed, prefer running it outside the interactive agent workflow or ask the user before doing it.
+- When in doubt, restart the frontend dev server instead of running the production build.
+
 ### Required pages
 - bookshelf page
 - book detail page
@@ -387,6 +394,8 @@ Do not try to finish all phases at once unless explicitly asked.
 - Use typed interfaces/types.
 - Avoid unnecessary abstraction.
 - Keep components focused and readable.
+- Prefer `.tsx` / `.ts` for new frontend components and utilities.
+- Co-locate component-specific styles near the component when practical. If using the existing global stylesheet, keep selectors organized and avoid unrelated style churn.
 
 ### Naming
 Use descriptive names.
@@ -400,6 +409,21 @@ Avoid vague names like:
 ## Testing and validation
 
 For each major feature, validate that it actually works.
+
+### Frontend command guidance for agents
+- Use `npm run dev` for local frontend iteration with HMR.
+- Use lightweight checks such as TypeScript or lint commands when practical.
+- Do not use `npm run build` as the default verification command inside Codex or other interactive agent sessions.
+- If frontend dependencies are added or updated, update the matching lockfile, such as `frontend/package-lock.json`, and restart the dev server so Next.js picks up the dependency changes.
+
+Useful frontend commands:
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the Next.js dev server with HMR. |
+| `npm run lint` | Run ESLint checks if the configured Next.js version supports it. |
+| `npm run test` | Execute the frontend test suite if one exists. |
+| `npm run build` | Production build; do not run during interactive agent sessions unless explicitly requested. |
 
 At minimum, verify:
 - API server starts
