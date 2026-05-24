@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextlib import suppress
 from dataclasses import dataclass
 from pathlib import Path
 from uuid import uuid4
@@ -70,10 +71,32 @@ async def _save_upload(upload: UploadFile) -> bytes:
     if not upload.filename:
         raise ImportServiceError("The uploaded file must have a filename.", status_code=400)
 
-    content = await upload.read()
     destination = _build_upload_destination(upload.filename)
-    destination.write_bytes(content)
-    return content
+    content = bytearray()
+    total_bytes = 0
+
+    try:
+        with destination.open("wb") as output_file:
+            while True:
+                chunk = await upload.read(1024 * 1024)
+                if not chunk:
+                    break
+
+                total_bytes += len(chunk)
+                if total_bytes > settings.max_upload_bytes:
+                    raise ImportServiceError(
+                        f"The uploaded file is larger than the {settings.max_upload_mb} MB limit.",
+                        status_code=413,
+                    )
+
+                output_file.write(chunk)
+                content.extend(chunk)
+    except ImportServiceError:
+        with suppress(OSError):
+            destination.unlink(missing_ok=True)
+        raise
+
+    return bytes(content)
 
 
 async def import_txt_file(

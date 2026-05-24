@@ -4,7 +4,7 @@
 AstralnovaTranslator
 
 ## Current status
-The project is now functionally through the latest URL import feature pass and has been manually verified locally in slices as the work progressed.
+The project is now functionally through the latest URL import feature pass and has entered a gradual UI-R1 frontend refinement pass. The first UI-R1 slice focuses on the bookshelf experience without changing backend behavior, translation behavior, or deployment behavior.
 
 The app currently supports:
 - creating books
@@ -22,6 +22,7 @@ The app currently supports:
 - batch translating all untranslated chapters in a book
 - publishing backend/frontend Docker images to GHCR via GitHub Actions
 - NAS deployment with prebuilt images through a separate Compose file
+- UI-R1 bookshelf modernization with a cleaner import workspace and cover-style book cards
 
 ## Completed phases
 
@@ -126,6 +127,40 @@ Implemented:
 - separate NAS Compose file using image tags instead of local build contexts
 - frontend build-time `NEXT_PUBLIC_API_BASE_URL` wired through automated image builds
 
+### UI-R1 bookshelf refinement
+Implemented in the first slice:
+- modernized bookshelf layout while preserving the existing client-side book refresh flow
+- consolidated manual create, URL import, TXT import, and EPUB import into one import workspace dialog
+- replaced plain book list cards with more readable cover-style bookshelf cards
+- added a graceful homepage fallback so a temporary backend fetch failure shows a bookshelf refresh error instead of a Next.js runtime crash
+- added Lucide icons plus small utility helpers for class composition
+- kept real backend data as the source of truth; no mock bookshelf data was introduced
+
+### Translation correctness refinement
+Completed in code and covered by backend regression tests:
+- `/chapters/{id}/translate` still reuses matching `TranslationRecord` cache entries
+- `/chapters/{id}/retranslate` now bypasses matching cache entries and calls the configured provider again
+- newly saved translation records still include provider type, model name, prompt hash, and source hash
+- glossary guidance is appended when a custom prompt template omits `{glossary_guidance}`
+- the default initial prompt template now includes the glossary guidance placeholder
+
+### NAS security hardening refinement
+Completed in code and covered by backend regression tests:
+- CORS origins now come from `ALLOWED_ORIGINS` instead of a wildcard
+- TXT/EPUB uploads are streamed with a configurable `MAX_UPLOAD_MB` limit
+- webpage imports reject non-HTTP(S), localhost, private, link-local, reserved, and redirected unsafe targets
+- webpage imports enforce a configurable `MAX_WEBPAGE_MB` response limit and require HTML content
+- settings read responses mask API keys and expose `has_api_key`
+- settings updates preserve the existing API key when the submitted key is empty or the masked placeholder
+
+### Data consistency refinement
+Completed in code and covered by backend regression tests:
+- `TranslationRecord` cache keys are now unique and repeated saves update the existing cache row
+- chapters now have a uniqueness guarantee for `(book_id, index_in_book)`
+- existing SQLite databases are normalized and given unique indexes during startup schema checks
+- chapter create/update/delete, chapter translation, and per-book glossary changes now touch the parent book `updated_at`
+- TypeScript incremental build cache is ignored and removed from Git tracking
+
 ## Verified functionality
 
 Verified working locally at this point:
@@ -142,17 +177,22 @@ Verified working locally at this point:
 - chapter translation works with configured providers
 - glossary-aware translation prompt logic works
 - translation cache prevents repeated identical provider calls
+- retranslation bypasses cached translations instead of returning the old cached text
+- backend regression tests cover the new NAS hardening behavior
+- backend regression tests cover translation cache de-duplication, chapter index uniqueness, and parent book timestamp updates
 - translated content persists after restart
 - books can be deleted
 - chapters can be deleted
 - batch translation works sequentially from the book detail page
 - chapter pagination works on the book detail page
 - reader opens in translation-only mode by default and can still switch to bilingual mode
+- bookshelf refresh still uses the browser-side API fetch after page load and after create/import/delete actions
 
 ## Current UI / UX status
 
 Current UI state:
 - the app is now reading-focused rather than a rough admin-style interface
+- UI-R1 has started with the bookshelf page: the library area now feels more like a real shelf, and create/import actions are grouped into one cleaner dialog
 - the chapter reading page has the strongest polish and is the best current experience
 - bookshelf and book detail pages are cleaner and more usable than earlier phases
 - interaction feedback is clearer through stronger hover, focus, active, and loading states
@@ -163,6 +203,7 @@ Current UI state:
 - success/error/loading feedback is clearer than before, especially around forms and batch translation
 
 Areas still somewhat rough:
+- UI-R1 is incremental; book detail, reader, settings, and glossary have not yet been migrated to the newer visual system
 - settings and glossary pages are usable but visually less polished than the reader pages
 - destructive actions currently use browser confirm dialogs rather than custom modal UI
 - pagination is intentionally simple and does not yet support direct page-number jumping
@@ -175,6 +216,7 @@ Areas still somewhat rough:
 - frontend CSS may still produce non-blocking autoprefixer warnings for alignment values depending on environment/tooling
 - Docker Compose scaffolding exists, but the full stack has not been repeatedly re-verified after every late-phase refinement
 - webpage import relies on direct backend HTTP fetches, so pages behind login, heavy client-side rendering, or anti-bot protection may fail or import poorly
+- webpage import intentionally blocks local/private network targets for NAS safety, so it cannot import pages hosted on localhost or LAN-only private IPs
 
 ## Current Docker / NAS status
 - `docker-compose.yml`, backend Dockerfile, frontend Dockerfile, and `.env.example` are present

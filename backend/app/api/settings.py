@@ -10,6 +10,7 @@ from app.schemas.settings import (
 )
 from app.services.settings_service import (
     activate_translation_preset,
+    build_translation_config_read,
     create_translation_preset,
     delete_translation_preset,
     get_active_translation_config,
@@ -24,7 +25,7 @@ router = APIRouter(prefix="/settings", tags=["settings"])
 @router.get("", response_model=TranslationConfigRead)
 def get_settings(db: Session = Depends(get_db)) -> TranslationConfigRead:
     config = get_active_translation_config(db)
-    return config
+    return build_translation_config_read(config)
 
 
 @router.put("", response_model=TranslationConfigRead)
@@ -33,12 +34,12 @@ def update_settings(
     db: Session = Depends(get_db),
 ) -> TranslationConfigRead:
     config = save_translation_config(db, payload)
-    return config
+    return build_translation_config_read(config)
 
 
 @router.get("/presets", response_model=list[TranslationConfigRead])
 def list_settings_presets(db: Session = Depends(get_db)) -> list[TranslationConfigRead]:
-    return get_translation_presets(db)
+    return [build_translation_config_read(preset) for preset in get_translation_presets(db)]
 
 
 @router.post("/presets", response_model=TranslationConfigRead, status_code=status.HTTP_201_CREATED)
@@ -46,7 +47,7 @@ def create_settings_preset(
     payload: TranslationPresetCreate,
     db: Session = Depends(get_db),
 ) -> TranslationConfigRead:
-    return create_translation_preset(db, payload)
+    return build_translation_config_read(create_translation_preset(db, payload))
 
 
 @router.put("/presets/{preset_id}", response_model=TranslationConfigRead)
@@ -58,7 +59,7 @@ def update_settings_preset(
     preset = update_translation_preset(db, preset_id, payload)
     if preset is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Translation preset not found.")
-    return preset
+    return build_translation_config_read(preset)
 
 
 @router.post("/presets/{preset_id}/activate", response_model=TranslationConfigRead)
@@ -69,7 +70,7 @@ def activate_settings_preset(
     preset = activate_translation_preset(db, preset_id)
     if preset is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Translation preset not found.")
-    return preset
+    return build_translation_config_read(preset)
 
 
 @router.delete("/presets/{preset_id}", status_code=status.HTTP_204_NO_CONTENT)

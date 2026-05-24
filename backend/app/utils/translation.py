@@ -8,7 +8,7 @@ def build_prompt(
     glossary_guidance: str,
 ) -> str:
     try:
-        return prompt_template.format(
+        prompt = prompt_template.format(
             source_text=source_text,
             translation_mode=translation_mode,
             glossary_guidance=glossary_guidance,
@@ -20,6 +20,11 @@ def build_prompt(
                 f"{glossary_guidance}\n\nJapanese text:\n{source_text}"
             )
         return f"{prompt_template}\n\nTranslation mode: {translation_mode}\n\nJapanese text:\n{source_text}"
+
+    if glossary_guidance and "{glossary_guidance}" not in prompt_template:
+        prompt = f"{prompt}\n\n{glossary_guidance}"
+
+    return prompt
 
 
 def build_glossary_guidance(

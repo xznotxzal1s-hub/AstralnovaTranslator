@@ -2,10 +2,43 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.models.translation_config import TranslationConfig
-from app.schemas.settings import TranslationConfigUpdate, TranslationPresetCreate, TranslationPresetUpdate
+from app.schemas.settings import (
+    TranslationConfigRead,
+    TranslationConfigUpdate,
+    TranslationPresetCreate,
+    TranslationPresetUpdate,
+)
 
 
 DEFAULT_PRESET_NAME = "默认预设"
+
+
+def mask_api_key(api_key: str) -> str:
+    normalized_api_key = api_key.strip()
+    if not normalized_api_key:
+        return ""
+
+    suffix = normalized_api_key[-4:]
+    if normalized_api_key.startswith("sk-"):
+        return f"sk-****{suffix}"
+    return f"****{suffix}"
+
+
+def build_translation_config_read(config: TranslationConfig) -> TranslationConfigRead:
+    return TranslationConfigRead(
+        id=config.id,
+        name=config.name,
+        is_active=config.is_active,
+        provider_type=config.provider_type,  # type: ignore[arg-type]
+        api_base_url=config.api_base_url,
+        model_name=config.model_name,
+        api_key=mask_api_key(config.api_key),
+        has_api_key=bool(config.api_key.strip()),
+        prompt_template=config.prompt_template,
+        chunk_size=config.chunk_size,
+        translation_mode=config.translation_mode,
+        updated_at=config.updated_at,
+    )
 
 
 def _build_default_config() -> TranslationConfig:
@@ -60,6 +93,8 @@ def get_or_create_translation_config(db: Session) -> TranslationConfig:
 def _apply_config_fields(
     config: TranslationConfig,
     payload: TranslationConfigUpdate | TranslationPresetCreate | TranslationPresetUpdate,
+    *,
+    preserve_existing_api_key: bool = True,
 ) -> TranslationConfig:
     if hasattr(payload, "name"):
         config.name = payload.name  # type: ignore[attr-defined]
@@ -67,7 +102,11 @@ def _apply_config_fields(
     config.provider_type = payload.provider_type
     config.api_base_url = payload.api_base_url
     config.model_name = payload.model_name
-    config.api_key = payload.api_key
+    payload_api_key = payload.api_key.strip()
+    if payload_api_key and payload_api_key != mask_api_key(config.api_key):
+        config.api_key = payload.api_key
+    elif not preserve_existing_api_key:
+        config.api_key = ""
     config.prompt_template = payload.prompt_template
     config.chunk_size = payload.chunk_size
     config.translation_mode = payload.translation_mode
@@ -86,7 +125,7 @@ def save_translation_config(db: Session, payload: TranslationConfigUpdate) -> Tr
 def create_translation_preset(db: Session, payload: TranslationPresetCreate) -> TranslationConfig:
     preset = _build_default_config()
     preset.is_active = False
-    _apply_config_fields(preset, payload)
+    _apply_config_fields(preset, payload, preserve_existing_api_key=False)
     db.add(preset)
     db.commit()
     db.refresh(preset)

@@ -16,7 +16,7 @@ type SettingsFormProps = {
   initialPresets: TranslationPreset[];
 };
 
-type FormState = Omit<TranslationPreset, "id" | "updated_at" | "is_active">;
+type FormState = Omit<TranslationPreset, "id" | "updated_at" | "is_active" | "has_api_key">;
 
 function toFormState(preset: TranslationPreset): FormState {
   return {

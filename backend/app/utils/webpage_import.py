@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from urllib.parse import urlparse
+from ipaddress import ip_address
+from socket import getaddrinfo
+from urllib.parse import urljoin, urlparse
 
 import httpx
 from bs4 import BeautifulSoup, Tag
 
+from app.core.config import settings
 from app.utils.text_import import split_txt_into_chapters
 
 CONTENT_SELECTORS = (
@@ -31,7 +34,58 @@ class WebpageImportContent:
     chapter_payloads: list[dict[str, str]]
 
 
+def _is_blocked_ip(value: str) -> bool:
+    parsed_ip = ip_address(value)
+    return (
+        parsed_ip.is_loopback
+        or parsed_ip.is_private
+        or parsed_ip.is_link_local
+        or parsed_ip.is_unspecified
+        or parsed_ip.is_multicast
+        or parsed_ip.is_reserved
+    )
+
+
+def _resolve_hostname(hostname: str) -> set[str]:
+    resolved_addresses: set[str] = set()
+    for result in getaddrinfo(hostname, None):
+        resolved_addresses.add(result[4][0])
+    return resolved_addresses
+
+
+def validate_webpage_url(url: str) -> str:
+    parsed_url = urlparse(url)
+    if parsed_url.scheme not in {"http", "https"}:
+        raise ValueError("Only http and https webpage URLs are supported.")
+
+    hostname = parsed_url.hostname
+    if not hostname:
+        raise ValueError("The webpage URL must include a hostname.")
+
+    normalized_hostname = hostname.strip().lower().rstrip(".")
+    if normalized_hostname == "localhost" or normalized_hostname.endswith(".localhost"):
+        raise ValueError("Localhost URLs are not allowed for webpage import.")
+
+    try:
+        addresses = {str(ip_address(normalized_hostname))}
+    except ValueError:
+        try:
+            addresses = _resolve_hostname(normalized_hostname)
+        except OSError as exc:
+            raise ValueError("The webpage URL hostname could not be resolved.") from exc
+
+    if not addresses:
+        raise ValueError("The webpage URL hostname could not be resolved.")
+
+    for address in addresses:
+        if _is_blocked_ip(address):
+            raise ValueError("Private, local, link-local, and reserved network addresses are not allowed.")
+
+    return url
+
+
 async def fetch_webpage_html(url: str) -> str:
+    current_url = validate_webpage_url(url)
     headers = {
         "User-Agent": (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -40,10 +94,31 @@ async def fetch_webpage_html(url: str) -> str:
     }
     timeout = httpx.Timeout(20.0, connect=10.0)
 
-    async with httpx.AsyncClient(follow_redirects=True, headers=headers, timeout=timeout) as client:
-        response = await client.get(url)
-        response.raise_for_status()
-        return response.text
+    async with httpx.AsyncClient(follow_redirects=False, headers=headers, timeout=timeout) as client:
+        for _ in range(5):
+            async with client.stream("GET", current_url) as response:
+                if response.is_redirect:
+                    location = response.headers.get("location")
+                    if not location:
+                        raise ValueError("The webpage redirected without a Location header.")
+                    current_url = validate_webpage_url(urljoin(str(response.url), location))
+                    continue
+
+                response.raise_for_status()
+                content_type = response.headers.get("content-type", "").lower()
+                if content_type and "text/html" not in content_type and "application/xhtml+xml" not in content_type:
+                    raise ValueError("The webpage did not return HTML content.")
+
+                content = bytearray()
+                async for chunk in response.aiter_bytes():
+                    content.extend(chunk)
+                    if len(content) > settings.max_webpage_bytes:
+                        raise ValueError(f"The webpage is larger than the {settings.max_webpage_mb} MB import limit.")
+
+                encoding = response.encoding or "utf-8"
+                return bytes(content).decode(encoding, errors="replace")
+
+        raise ValueError("The webpage redirected too many times.")
 
 
 def extract_webpage_import_content(html: str, url: str, provided_book_title: str | None = None) -> WebpageImportContent:

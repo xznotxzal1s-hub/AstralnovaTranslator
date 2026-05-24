@@ -6,6 +6,7 @@ from app.core.database import get_db
 from app.models.book import Book
 from app.models.chapter import Chapter
 from app.schemas.chapter import ChapterCreate, ChapterRead, ChapterUpdate
+from app.services.book_service import touch_book
 
 router = APIRouter(tags=["chapters"])
 
@@ -30,6 +31,7 @@ def create_chapter(
         source_text=payload.source_text,
     )
     db.add(chapter)
+    touch_book(db, book_id)
     db.commit()
     db.refresh(chapter)
     return chapter
@@ -56,6 +58,7 @@ def update_chapter(
     chapter.title = payload.title
     chapter.source_text = payload.source_text
     db.add(chapter)
+    touch_book(db, chapter.book_id)
     db.commit()
     db.refresh(chapter)
     return chapter
@@ -79,5 +82,6 @@ def delete_chapter(chapter_id: int, db: Session = Depends(get_db)) -> Response:
     for item in remaining_chapters:
         item.index_in_book -= 1
         db.add(item)
+    touch_book(db, book_id)
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)

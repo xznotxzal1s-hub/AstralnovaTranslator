@@ -48,6 +48,7 @@ export type TranslationSettings = {
   api_base_url: string;
   model_name: string;
   api_key: string;
+  has_api_key: boolean;
   prompt_template: string;
   chunk_size: number;
   translation_mode: string;

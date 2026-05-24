@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 
 from app.models.chapter import Chapter
+from app.services.book_service import touch_book
 from app.services.glossary_service import get_merged_glossary_entries
 from app.services.providers.factory import get_translation_provider
 from app.services.settings_service import get_active_translation_config
@@ -56,20 +57,23 @@ def translate_chapter(db: Session, chapter: Chapter, force: bool) -> Chapter:
     ).strip()
     prompt_hash = calculate_text_hash(prompt_context)
 
-    cached_record = find_translation_record(
-        db,
-        chapter_id=chapter.id,
-        provider_type=config.provider_type,
-        model_name=config.model_name,
-        prompt_hash=prompt_hash,
-        source_hash=current_source_hash,
-    )
+    cached_record = None
+    if not force:
+        cached_record = find_translation_record(
+            db,
+            chapter_id=chapter.id,
+            provider_type=config.provider_type,
+            model_name=config.model_name,
+            prompt_hash=prompt_hash,
+            source_hash=current_source_hash,
+        )
     if cached_record is not None:
         chapter.translated_text = cached_record.translated_text
         chapter.source_hash = current_source_hash
         chapter.translation_status = "translated"
         chapter.last_translated_at = cached_record.created_at
         db.add(chapter)
+        touch_book(db, chapter.book_id)
         db.commit()
         db.refresh(chapter)
         return chapter
@@ -102,6 +106,7 @@ def translate_chapter(db: Session, chapter: Chapter, force: bool) -> Chapter:
     except Exception as exc:
         chapter.translation_status = "failed"
         db.add(chapter)
+        touch_book(db, chapter.book_id)
         db.commit()
         raise TranslationServiceError(f"Translation request failed: {exc}", status_code=502) from exc
 
@@ -110,6 +115,7 @@ def translate_chapter(db: Session, chapter: Chapter, force: bool) -> Chapter:
     chapter.translation_status = "translated"
     chapter.last_translated_at = datetime.now(timezone.utc)
     db.add(chapter)
+    touch_book(db, chapter.book_id)
     db.commit()
     db.refresh(chapter)
     save_translation_record(

@@ -5,6 +5,7 @@ from app.core.database import get_db
 from app.models.book import Book
 from app.models.glossary_entry import GlossaryEntry
 from app.schemas.glossary import GlossaryEntryCreate, GlossaryEntryRead, GlossaryEntryUpdate
+from app.services.book_service import touch_book
 
 router = APIRouter(tags=["glossary"])
 
@@ -49,6 +50,7 @@ def create_glossary_entry(
         note=payload.note,
     )
     db.add(entry)
+    touch_book(db, book_id)
     db.commit()
     db.refresh(entry)
     return entry
@@ -87,6 +89,8 @@ def update_glossary_entry(
     entry.target_term = payload.target_term
     entry.note = payload.note
     db.add(entry)
+    if entry.book_id is not None:
+        touch_book(db, entry.book_id)
     db.commit()
     db.refresh(entry)
     return entry
@@ -98,6 +102,9 @@ def delete_glossary_entry(entry_id: int, db: Session = Depends(get_db)) -> Respo
     if entry is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Glossary entry not found.")
 
+    book_id = entry.book_id
     db.delete(entry)
+    if book_id is not None:
+        touch_book(db, book_id)
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)

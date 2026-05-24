@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     data_dir: Path = Path("/app/data")
     uploads_dir: Path = Path("/app/uploads")
     database_file: str = "app.db"
+    allowed_origins: str = "http://localhost:3000,http://127.0.0.1:3000,http://localhost:13000,http://127.0.0.1:13000"
+    max_upload_mb: int = 50
+    max_webpage_mb: int = 5
     initial_provider_type: str = "openai_compatible"
     initial_api_base_url: str = "https://api.openai.com/v1"
     initial_model_name: str = "gpt-4o-mini"
@@ -18,7 +21,7 @@ class Settings(BaseSettings):
     initial_prompt_template: str = (
         "You are a Japanese light novel translator. Translate the Japanese text into fluent Simplified Chinese. "
         "Preserve tone, honorifics, narrative structure, and paragraph breaks. "
-        "Translation mode: {translation_mode}.\n\nJapanese text:\n{source_text}"
+        "Translation mode: {translation_mode}.\n\n{glossary_guidance}\n\nJapanese text:\n{source_text}"
     )
     initial_chunk_size: int = 1500
     initial_translation_mode: str = "natural"
@@ -29,6 +32,18 @@ class Settings(BaseSettings):
     def database_url(self) -> str:
         database_path = self.data_dir / self.database_file
         return f"sqlite:///{database_path.as_posix()}"
+
+    @property
+    def allowed_origin_list(self) -> list[str]:
+        return [origin.strip() for origin in self.allowed_origins.split(",") if origin.strip()]
+
+    @property
+    def max_upload_bytes(self) -> int:
+        return self.max_upload_mb * 1024 * 1024
+
+    @property
+    def max_webpage_bytes(self) -> int:
+        return self.max_webpage_mb * 1024 * 1024
 
 
 settings = Settings()

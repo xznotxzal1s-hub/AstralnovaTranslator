@@ -35,14 +35,26 @@ def save_translation_record(
     source_hash: str,
     translated_text: str,
 ) -> TranslationRecord:
-    record = TranslationRecord(
+    record = find_translation_record(
+        db,
         chapter_id=chapter.id,
         provider_type=provider_type,
         model_name=model_name,
         prompt_hash=prompt_hash,
         source_hash=source_hash,
-        translated_text=translated_text,
     )
+    if record is None:
+        record = TranslationRecord(
+            chapter_id=chapter.id,
+            provider_type=provider_type,
+            model_name=model_name,
+            prompt_hash=prompt_hash,
+            source_hash=source_hash,
+            translated_text=translated_text,
+        )
+    else:
+        record.translated_text = translated_text
+
     db.add(record)
     db.commit()
     db.refresh(record)

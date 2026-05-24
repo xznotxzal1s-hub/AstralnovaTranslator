@@ -37,6 +37,7 @@ class TranslationConfigRead(TranslationConfigBase):
     id: int
     name: str
     is_active: bool
+    has_api_key: bool = False
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

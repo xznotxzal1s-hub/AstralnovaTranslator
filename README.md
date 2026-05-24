@@ -30,6 +30,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - FastAPI backend
 - SQLite persistence
 - `Book`, `Chapter`, `TranslationConfig`, `GlossaryEntry`, and `TranslationRecord` models
+- uniqueness safeguards for translation cache keys and per-book chapter order
 - settings API
 - translation preset API
 - glossary API
@@ -39,14 +40,20 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - webpage URL import API
 - chapter translation API
 - translation caching based on source hash + provider/model + prompt hash
+- configurable CORS origins through `ALLOWED_ORIGINS`
+- upload and webpage import size limits through `MAX_UPLOAD_MB` and `MAX_WEBPAGE_MB`
+- chapter and translation changes refresh the parent book timestamp so the bookshelf ordering stays current
 
 ### Translation
 - OpenAI-compatible provider support
 - Gemini provider support
 - configurable model, API base URL, API key, translation mode, prompt template, and chunk size
 - glossary-aware prompt assembly
+- glossary guidance is still included when a custom prompt template does not explicitly contain `{glossary_guidance}`
 - per-book glossary entries override global glossary entries
 - sequential chunk translation for long chapters
+- normal translation can reuse matching cached results, while retranslation bypasses the cache and calls the provider again
+- API keys are masked in settings read responses and preserved when the settings form submits an empty or masked key
 
 ### Frontend
 - bookshelf page
@@ -66,6 +73,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - batch translation action from book detail page
 - active-page navigation highlighting
 - user-friendly localized status labels
+- UI-R1 bookshelf refinement with a consolidated add/import dialog and cover-style book cards
 
 ### Deployment automation
 - GitHub Actions workflow to build and publish backend image to GHCR on push to `main`
@@ -81,7 +89,9 @@ This is still a V1-style private tool. A few things are intentionally simple:
 - no user accounts or multi-user support
 - no browser extension
 - no OCR, PDF, TTS, cloud sync, or advanced AI analysis features
+- API keys are still stored in the local SQLite database in V1; they are masked in API read responses but not encrypted at rest
 - delete confirmation currently uses browser confirm dialogs, not custom modals
+- the newer UI-R1 visual language is currently applied first to the bookshelf page; other pages still use the earlier reading-focused visual system
 - settings and glossary pages are usable, but less polished than the reading page
 - chapter pagination is intentionally simple and currently uses previous/next paging rather than direct page-number jumping
 - translation presets are global only and do not yet support import/export or per-book assignment
@@ -135,6 +145,11 @@ Copy-Item .env.example .env
 Success should look like:
 - a new `.env` file appears in the project root
 
+Useful local defaults in `.env.example`:
+- `ALLOWED_ORIGINS` controls which browser origins may call the backend API.
+- `MAX_UPLOAD_MB` limits TXT/EPUB upload size.
+- `MAX_WEBPAGE_MB` limits webpage URL import response size.
+
 ### 2. Start the backend
 
 ```powershell
@@ -181,11 +196,15 @@ You can currently verify all of these manually:
 - import a TXT file
 - import an EPUB file
 - import a webpage URL
+- use the bookshelf add/import dialog to switch between manual create, URL, TXT, and EPUB import flows
 - create, edit, activate, and delete translation presets
 - create global glossary entries
 - create per-book glossary entries
 - translate a chapter
 - confirm translation cache reuse
+- confirm retranslation calls the provider again instead of returning the old cached translation
+- confirm settings reads show a masked API key instead of the full secret
+- confirm chapter changes or translation activity move the touched book upward in the bookshelf ordering
 - batch translate all untranslated chapters in a book
 - page through long chapter lists on the book detail page
 - delete a chapter
@@ -275,6 +294,9 @@ BACKEND_IMAGE=ghcr.io/YOUR_GITHUB_USERNAME_OR_ORG/astralnova-translator-backend:
 FRONTEND_IMAGE=ghcr.io/YOUR_GITHUB_USERNAME_OR_ORG/astralnova-translator-frontend:latest
 NEXT_PUBLIC_API_BASE_URL=http://YOUR_NAS_IP_OR_DOMAIN:8000
 INTERNAL_API_BASE_URL=http://backend:8000
+ALLOWED_ORIGINS=http://YOUR_NAS_IP_OR_DOMAIN:3000
+MAX_UPLOAD_MB=50
+MAX_WEBPAGE_MB=5
 ```
 
 ### 2. Log in to GHCR on the NAS
@@ -324,7 +346,7 @@ This is intentionally separate so the main deployment stays simple and easy to u
 ## Roadmap / Next Steps
 
 Recommended next work:
-- another UI-focused refinement pass for management pages and smaller interaction details
+- continue UI-R1 gradually into the book detail page, reader page, settings page, and glossary page
 - more manual verification against real-world webpage layouts if URL import becomes part of the regular workflow
 - optional automatic update flow after GHCR-based deployment is stable
 - final Docker Compose / NAS verification pass after the latest frontend changes
@@ -350,3 +372,4 @@ Still out of scope for V1:
 - If PowerShell mangles Japanese text input, browser forms or Swagger UI usually work better for UTF-8 testing
 - On Windows, long frontend verification commands inside Codex can sometimes hang even when the project itself is fine
 - Manual verification is preferred when Windows Codex build runs become unreliable
+- TypeScript incremental build cache files such as `frontend/tsconfig.tsbuildinfo` are ignored and should not be committed

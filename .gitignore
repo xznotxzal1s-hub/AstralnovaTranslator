@@ -2,10 +2,13 @@
 backend/.venv/
 __pycache__/
 *.pyc
+backend/tests/.tmp/
 
 # Node
 frontend/node_modules/
 frontend/.next/
+frontend/tsconfig.tsbuildinfo
+*.tsbuildinfo
 
 # Environment
 .env

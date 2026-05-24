@@ -25,6 +25,46 @@ def ensure_schema() -> None:
         return
 
     with engine.begin() as connection:
+        chapters_table = connection.exec_driver_sql(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='chapters'",
+        ).first()
+        if chapters_table is not None:
+            chapter_rows = connection.exec_driver_sql(
+                "SELECT id, book_id FROM chapters ORDER BY book_id ASC, index_in_book ASC, created_at ASC, id ASC",
+            ).fetchall()
+            next_indexes: dict[int, int] = {}
+            for chapter_id, book_id in chapter_rows:
+                next_index = next_indexes.get(book_id, 1)
+                connection.exec_driver_sql(
+                    "UPDATE chapters SET index_in_book = ? WHERE id = ?",
+                    (next_index, chapter_id),
+                )
+                next_indexes[book_id] = next_index + 1
+            connection.exec_driver_sql(
+                "CREATE UNIQUE INDEX IF NOT EXISTS uq_chapters_book_index ON chapters (book_id, index_in_book)",
+            )
+
+        translation_records_table = connection.exec_driver_sql(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='translation_records'",
+        ).first()
+        if translation_records_table is not None:
+            connection.exec_driver_sql(
+                """
+                DELETE FROM translation_records
+                WHERE id NOT IN (
+                    SELECT MAX(id)
+                    FROM translation_records
+                    GROUP BY chapter_id, provider_type, model_name, prompt_hash, source_hash
+                )
+                """,
+            )
+            connection.exec_driver_sql(
+                """
+                CREATE UNIQUE INDEX IF NOT EXISTS uq_translation_records_cache_key
+                ON translation_records (chapter_id, provider_type, model_name, prompt_hash, source_hash)
+                """,
+            )
+
         glossary_table = connection.exec_driver_sql(
             "SELECT name FROM sqlite_master WHERE type='table' AND name='glossary_entries'",
         ).first()

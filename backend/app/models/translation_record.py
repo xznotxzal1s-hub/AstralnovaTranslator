@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, func
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -8,6 +8,16 @@ from app.core.database import Base
 
 class TranslationRecord(Base):
     __tablename__ = "translation_records"
+    __table_args__ = (
+        UniqueConstraint(
+            "chapter_id",
+            "provider_type",
+            "model_name",
+            "prompt_hash",
+            "source_hash",
+            name="uq_translation_records_cache_key",
+        ),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     chapter_id: Mapped[int] = mapped_column(ForeignKey("chapters.id", ondelete="CASCADE"), nullable=False, index=True)
