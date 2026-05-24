@@ -1,10 +1,18 @@
 import { BookshelfPageClient } from "@/components/bookshelf-page-client";
 import { fetchBooks } from "@/lib/api";
+import type { BookSummary } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const books = await fetchBooks();
+  let books: BookSummary[] = [];
+  let initialRefreshError = "";
 
-  return <BookshelfPageClient initialBooks={books} />;
+  try {
+    books = await fetchBooks();
+  } catch (error) {
+    initialRefreshError = error instanceof Error ? error.message : "Request failed.";
+  }
+
+  return <BookshelfPageClient initialBooks={books} initialRefreshError={initialRefreshError} />;
 }

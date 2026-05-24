@@ -56,7 +56,13 @@ export function DeleteBookButton({
 
   return (
     <div className={compact ? "destructive-action compact" : "destructive-action"}>
-      <button className="button-danger" disabled={isSubmitting} onClick={handleDelete} type="button">
+      <button
+        aria-busy={isSubmitting}
+        className={compact ? "button-danger button-danger-ghost compact-button" : "button-danger"}
+        disabled={isSubmitting}
+        onClick={handleDelete}
+        type="button"
+      >
         {t("deleteBookButton")}
       </button>
       {!compact && message ? (

@@ -86,7 +86,7 @@ export function ImportBookForm({ title, description, endpoint, accept, onSuccess
           type="file"
         />
       </div>
-      <button className="button" disabled={isSubmitting} type="submit">
+      <button aria-busy={isSubmitting} className="button" disabled={isSubmitting} type="submit">
         {isSubmitting ? t("importingLabel") : title}
       </button>
       <p className={`feedback${message && message === t("importFailed") ? " error" : message ? " success" : ""}`}>{message}</p>
