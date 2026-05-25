@@ -79,6 +79,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - UI-R1 bookshelf refinement with a consolidated add/import dialog and cover-style book cards
 - UI-R2 visual refinement with a calmer paper-and-ink style across the app shell, bookshelf, reader, settings, and glossary pages
 - Taste-skill homepage refinement with an asymmetric reading-desk first screen and no homepage icon dependency
+- UI-R3 non-homepage refinement with in-app confirmation dialogs, direct chapter page links, focused reader chapter navigation, and denser settings/glossary management surfaces
 
 ### Deployment automation
 - GitHub Actions workflow to build and publish backend image to GHCR on push to `main`
@@ -95,11 +96,11 @@ This is still a V1-style private tool. A few things are intentionally simple:
 - no browser extension
 - no OCR, PDF, TTS, cloud sync, or advanced AI analysis features
 - API keys are still stored in the local SQLite database in V1; they are masked in API read responses and redacted from provider error messages, but not encrypted at rest
-- delete confirmation currently uses browser confirm dialogs, not custom modals
-- UI-R2 improves consistency, but some frontend pieces are still CSS-heavy and could later be extracted into reusable UI primitives
+- delete confirmation now uses a shared in-app confirmation dialog instead of browser-native confirm boxes
+- UI-R3 adds a few reusable frontend primitives, but the stylesheet is still large and could be split further
 - settings and glossary pages are usable and more visually consistent, but still need deeper form/table usability polish
 - reader chapter navigation still renders the full chapter outline, so very large books may need a denser or windowed navigation treatment later
-- chapter pagination is intentionally simple and currently uses previous/next paging rather than direct page-number jumping
+- book detail chapter pagination supports direct page links, while reader-side navigation intentionally shows a focused chapter window for long books
 - translation presets are global only and do not yet support import/export or per-book assignment
 - Docker/NAS deployment files exist, but a fresh full end-to-end Docker verification is still recommended after the latest refinements
 - GHCR publishing depends on GitHub repository/package setup; the frontend browser client is intentionally locked to the same-origin `/api/backend` proxy for NAS stability
@@ -218,8 +219,10 @@ You can currently verify all of these manually:
 - confirm startup schema migrations are recorded once in `schema_migrations` and remain safe to rerun
 - batch translate all untranslated chapters in a book
 - page through long chapter lists on the book detail page
+- jump directly to a chapter-list page number on the book detail page
 - delete a chapter
 - delete a book
+- confirm destructive actions through the in-app confirmation dialog
 - open a chapter with translation-only as the default reading mode
 - switch manually between translation-only mode and source + translation mode
 
@@ -367,9 +370,9 @@ This is intentionally separate so the main deployment stays simple and easy to u
 ## Roadmap / Next Steps
 
 Recommended next work:
-- extract reusable frontend UI primitives so future UI passes are less CSS-heavy
-- replace browser confirm dialogs with calmer in-app confirmation modals
-- optimize reader navigation for very long books with hundreds of chapters
+- split the large global stylesheet into smaller, easier-to-maintain style modules or component sections
+- continue extracting reusable frontend UI primitives so future UI passes are less CSS-heavy
+- refine reader navigation search/jump controls for books with hundreds of chapters
 - more manual verification against real-world webpage layouts if URL import becomes part of the regular workflow
 - optional automatic update flow after GHCR-based deployment is stable
 - final Docker Compose / NAS verification pass after the latest frontend changes

@@ -2,8 +2,12 @@
 
 import { useState } from "react";
 
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import { EmptyState } from "@/components/empty-state";
+import { FeedbackMessage } from "@/components/feedback-message";
 import { useI18n } from "@/components/i18n-provider";
 import { createGlossaryEntry, deleteGlossaryEntry, updateGlossaryEntry } from "@/lib/api-client";
+import { formatMessage } from "@/lib/i18n";
 import type { GlossaryEntry } from "@/lib/types";
 
 type GlossaryManagerProps = {
@@ -30,6 +34,8 @@ export function GlossaryManager({ initialEntries, scope, bookId }: GlossaryManag
   const [formData, setFormData] = useState<EntryFormState>(emptyForm);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState<"success" | "error" | "">("");
+  const [entryToDelete, setEntryToDelete] = useState<GlossaryEntry | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   function beginEdit(entry: GlossaryEntry) {
@@ -40,6 +46,7 @@ export function GlossaryManager({ initialEntries, scope, bookId }: GlossaryManag
       note: entry.note ?? "",
     });
     setMessage("");
+    setMessageType("");
   }
 
   function resetForm() {
@@ -50,6 +57,7 @@ export function GlossaryManager({ initialEntries, scope, bookId }: GlossaryManag
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
+    setMessageType("");
 
     try {
       setIsSubmitting(true);
@@ -57,32 +65,43 @@ export function GlossaryManager({ initialEntries, scope, bookId }: GlossaryManag
         const created = await createGlossaryEntry({ ...formData, bookId });
         setEntries((current) => [created, ...current]);
         setMessage(t("glossaryEntryCreated"));
+        setMessageType("success");
       } else {
         const updated = await updateGlossaryEntry(editingId, formData);
         setEntries((current) => current.map((entry) => (entry.id === editingId ? updated : entry)));
         setMessage(t("glossaryEntryUpdated"));
+        setMessageType("success");
       }
 
       resetForm();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : t("glossarySaveFailed"));
+      setMessageType("error");
     } finally {
       setIsSubmitting(false);
     }
   }
 
-  async function handleDelete(entryId: number) {
+  async function handleDelete() {
+    if (entryToDelete === null) {
+      return;
+    }
+
     setMessage("");
+    setMessageType("");
     try {
       setIsSubmitting(true);
-      await deleteGlossaryEntry(entryId);
-      setEntries((current) => current.filter((entry) => entry.id !== entryId));
-      if (editingId === entryId) {
+      await deleteGlossaryEntry(entryToDelete.id);
+      setEntries((current) => current.filter((entry) => entry.id !== entryToDelete.id));
+      if (editingId === entryToDelete.id) {
         resetForm();
       }
+      setEntryToDelete(null);
       setMessage(t("glossaryEntryDeleted"));
+      setMessageType("success");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : t("glossaryDeleteFailed"));
+      setMessageType("error");
     } finally {
       setIsSubmitting(false);
     }
@@ -134,11 +153,7 @@ export function GlossaryManager({ initialEntries, scope, bookId }: GlossaryManag
             </button>
           ) : null}
         </div>
-        <p
-          className={`feedback${message === t("glossarySaveFailed") || message === t("glossaryDeleteFailed") ? " error" : ""}`}
-        >
-          {message}
-        </p>
+        <FeedbackMessage message={message} type={messageType} />
       </form>
 
       <section className="list-stack glossary-list-section">
@@ -148,26 +163,42 @@ export function GlossaryManager({ initialEntries, scope, bookId }: GlossaryManag
             <p>{scope === "global" ? t("glossaryDescription") : t("glossaryBookDescription")}</p>
           </div>
         </div>
-        {entries.map((entry) => (
-          <article className="chapter-card glossary-entry-card" key={entry.id}>
-            <div className="card-heading">
-              <p className="eyebrow">{t("glossaryEntryLabel")}</p>
-              <h3>
-                {entry.source_term} → {entry.target_term}
-              </h3>
-            </div>
-            <p className="muted">{entry.note?.trim() ? entry.note : t("glossaryNoNote")}</p>
-            <div className="action-row">
-              <button className="button-secondary" disabled={isSubmitting} onClick={() => beginEdit(entry)} type="button">
-                {t("glossaryEdit")}
-              </button>
-              <button className="button-link" disabled={isSubmitting} onClick={() => handleDelete(entry.id)} type="button">
-                {t("glossaryDelete")}
-              </button>
-            </div>
-          </article>
-        ))}
+        {entries.length === 0 ? (
+          <EmptyState title={t("noGlossaryTitle")} description={t("noGlossaryDescription")} />
+        ) : (
+          entries.map((entry) => (
+            <article className="chapter-card glossary-entry-card" key={entry.id}>
+              <div className="card-heading glossary-entry-heading">
+                <p className="eyebrow">{t("glossaryEntryLabel")}</p>
+                <h3>
+                  <span>{entry.source_term}</span>
+                  <span aria-hidden="true">-&gt;</span>
+                  <span>{entry.target_term}</span>
+                </h3>
+              </div>
+              <p className="muted">{entry.note?.trim() ? entry.note : t("glossaryNoNote")}</p>
+              <div className="action-row">
+                <button className="button-secondary" disabled={isSubmitting} onClick={() => beginEdit(entry)} type="button">
+                  {t("glossaryEdit")}
+                </button>
+                <button className="button-link" disabled={isSubmitting} onClick={() => setEntryToDelete(entry)} type="button">
+                  {t("glossaryDelete")}
+                </button>
+              </div>
+            </article>
+          ))
+        )}
       </section>
+      <ConfirmDialog
+        open={entryToDelete !== null}
+        title={t("confirmDialogTitle")}
+        message={formatMessage(t("confirmDeleteGlossaryEntry"), { term: entryToDelete?.source_term ?? "" })}
+        cancelLabel={t("confirmDialogCancel")}
+        confirmLabel={t("confirmDialogConfirm")}
+        isSubmitting={isSubmitting}
+        onCancel={() => setEntryToDelete(null)}
+        onConfirm={handleDelete}
+      />
     </section>
   );
 }

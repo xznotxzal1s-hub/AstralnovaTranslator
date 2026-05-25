@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import { FeedbackMessage } from "@/components/feedback-message";
 import { useI18n } from "@/components/i18n-provider";
 import {
   activateSettingsPreset,
@@ -9,6 +11,7 @@ import {
   deleteSettingsPreset,
   updateSettingsPreset,
 } from "@/lib/api-client";
+import { formatMessage } from "@/lib/i18n";
 import type { TranslationPreset, TranslationSettings } from "@/lib/types";
 
 type SettingsFormProps = {
@@ -41,6 +44,7 @@ export function SettingsForm({ initialSettings, initialPresets }: SettingsFormPr
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isActivating, setIsActivating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   function updateField<Key extends keyof FormState>(field: Key, value: FormState[Key]) {
     setFormData((current) => ({
@@ -145,6 +149,7 @@ export function SettingsForm({ initialSettings, initialPresets }: SettingsFormPr
       if (nextSelectedPreset) {
         selectPreset(nextSelectedPreset);
       }
+      setIsDeleteConfirmOpen(false);
       setMessage(t("presetDeletedMessage"));
       setMessageType("success");
     } catch (error) {
@@ -165,13 +170,14 @@ export function SettingsForm({ initialSettings, initialPresets }: SettingsFormPr
           <p className="muted">{t("presetListDescription")}</p>
         </div>
         <div className="preset-list">
-          {presets.map((preset) => (
+          {presets.map((preset, index) => (
             <button
               key={preset.id}
               className={`preset-list-item${preset.id === selectedPresetId ? " active" : ""}`}
               onClick={() => selectPreset(preset)}
               type="button"
             >
+              <span className="preset-list-index">{String(index + 1).padStart(2, "0")}</span>
               <span className="preset-list-copy">
                 <strong>{preset.name}</strong>
                 <span>{preset.model_name}</span>
@@ -297,7 +303,7 @@ export function SettingsForm({ initialSettings, initialPresets }: SettingsFormPr
               className="button-danger"
               disabled={isDeleting || presets.length <= 1}
               aria-busy={isDeleting}
-              onClick={handleDeletePreset}
+              onClick={() => setIsDeleteConfirmOpen(true)}
               type="button"
             >
               {t("deletePresetButton")}
@@ -305,8 +311,18 @@ export function SettingsForm({ initialSettings, initialPresets }: SettingsFormPr
           </div>
         </div>
 
-        <p className={`feedback${messageType ? ` ${messageType}` : ""}`}>{message}</p>
+        <FeedbackMessage message={message} type={messageType} />
       </form>
+      <ConfirmDialog
+        open={isDeleteConfirmOpen}
+        title={t("confirmDialogTitle")}
+        message={formatMessage(t("confirmDeletePreset"), { name: selectedPreset?.name ?? formData.name })}
+        cancelLabel={t("confirmDialogCancel")}
+        confirmLabel={t("confirmDialogConfirm")}
+        isSubmitting={isDeleting}
+        onCancel={() => setIsDeleteConfirmOpen(false)}
+        onConfirm={handleDeletePreset}
+      />
     </section>
   );
 }

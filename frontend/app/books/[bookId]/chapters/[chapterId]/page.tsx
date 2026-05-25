@@ -39,6 +39,12 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
   const previousChapter = currentIndex > 0 ? chapters[currentIndex - 1] : null;
   const nextChapter =
     currentIndex >= 0 && currentIndex < chapters.length - 1 ? chapters[currentIndex + 1] : null;
+  const safeCurrentIndex = currentIndex >= 0 ? currentIndex : 0;
+  const outlineStartIndex = Math.max(0, safeCurrentIndex - 5);
+  const outlineEndIndex = Math.min(chapters.length, safeCurrentIndex + 6);
+  const outlineChapters = chapters.slice(outlineStartIndex, outlineEndIndex);
+  const firstChapter = chapters[0] ?? null;
+  const lastChapter = chapters[chapters.length - 1] ?? null;
 
   return (
     <main className="app-page reader-page">
@@ -96,9 +102,26 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
               <p className="eyebrow">{messages.readingPageOutline}</p>
               <h3>{messages.navigationHeading}</h3>
               <p className="muted">{messages.readingPageDescription}</p>
+              <p className="reader-outline-window">
+                {formatMessage(messages.chapterPageRange, {
+                  from: outlineStartIndex + 1,
+                  to: outlineEndIndex,
+                  count: chapters.length,
+                })}
+              </p>
             </div>
             <div className="reader-outline">
-              {chapters.map((item) => (
+              {firstChapter && outlineStartIndex > 0 ? (
+                <Link
+                  className="chapter-nav-link chapter-nav-boundary"
+                  href={`/books/${book.id}/chapters/${firstChapter.id}`}
+                >
+                  <span className="chapter-nav-index">{firstChapter.index_in_book}</span>
+                  <span className="chapter-nav-copy">{firstChapter.title}</span>
+                </Link>
+              ) : null}
+              {outlineStartIndex > 1 ? <span className="chapter-nav-gap">...</span> : null}
+              {outlineChapters.map((item) => (
                 <Link
                   key={item.id}
                   className={`chapter-nav-link${item.id === chapter.id ? " active" : ""}`}
@@ -108,6 +131,16 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
                   <span className="chapter-nav-copy">{item.title}</span>
                 </Link>
               ))}
+              {outlineEndIndex < chapters.length - 1 ? <span className="chapter-nav-gap">...</span> : null}
+              {lastChapter && outlineEndIndex < chapters.length ? (
+                <Link
+                  className="chapter-nav-link chapter-nav-boundary"
+                  href={`/books/${book.id}/chapters/${lastChapter.id}`}
+                >
+                  <span className="chapter-nav-index">{lastChapter.index_in_book}</span>
+                  <span className="chapter-nav-copy">{lastChapter.title}</span>
+                </Link>
+              ) : null}
             </div>
           </section>
         </aside>

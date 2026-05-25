@@ -24,6 +24,22 @@ type BookDetailPageProps = {
 
 const CHAPTERS_PER_PAGE = 12;
 
+function getPaginationItems(currentPage: number, totalPages: number): Array<number | "gap-start" | "gap-end"> {
+  const pages = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
+  const normalizedPages = [...pages]
+    .filter((page) => page >= 1 && page <= totalPages)
+    .sort((left, right) => left - right);
+
+  return normalizedPages.flatMap((page, index) => {
+    const previousPage = normalizedPages[index - 1];
+    if (previousPage && page - previousPage > 1) {
+      return [previousPage === 1 ? "gap-start" : "gap-end", page];
+    }
+
+    return [page];
+  });
+}
+
 export default async function BookDetailPage({ params, searchParams }: BookDetailPageProps) {
   const { bookId } = await params;
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
@@ -48,6 +64,7 @@ export default async function BookDetailPage({ params, searchParams }: BookDetai
   const pagedChapters = chapters.slice(startIndex, startIndex + CHAPTERS_PER_PAGE);
   const rangeStart = chapters.length === 0 ? 0 : startIndex + 1;
   const rangeEnd = chapters.length === 0 ? 0 : startIndex + pagedChapters.length;
+  const paginationItems = getPaginationItems(currentPage, totalPages);
 
   return (
     <main className="app-page">
@@ -122,6 +139,33 @@ export default async function BookDetailPage({ params, searchParams }: BookDetai
                       ) : (
                         <span className="button-link pagination-link is-disabled">{messages.previousPage}</span>
                       )}
+                      <div className="chapter-page-number-row">
+                        {paginationItems.map((item) =>
+                          typeof item === "number" ? (
+                            item === currentPage ? (
+                              <span
+                                key={item}
+                                aria-current="page"
+                                className="button-link pagination-link pagination-number is-current"
+                              >
+                                {item}
+                              </span>
+                            ) : (
+                              <Link
+                                key={item}
+                                className="button-link pagination-link pagination-number"
+                                href={`/books/${book.id}?page=${item}`}
+                              >
+                                {item}
+                              </Link>
+                            )
+                          ) : (
+                            <span key={item} className="pagination-gap" aria-hidden="true">
+                              ...
+                            </span>
+                          ),
+                        )}
+                      </div>
                       {currentPage < totalPages ? (
                         <Link className="button-link pagination-link" href={`/books/${book.id}?page=${currentPage + 1}`}>
                           {messages.nextPage}

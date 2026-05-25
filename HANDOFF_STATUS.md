@@ -155,6 +155,15 @@ Implemented in code:
 - removed the now-unused `lucide-react` frontend dependency from package manifests
 - kept the homepage mobile layout single-column and avoided production build verification inside Codex
 
+### UI-R3 non-homepage refinement
+Implemented in code:
+- replaced browser-native destructive confirmations with a reusable in-app confirmation dialog
+- added a small reusable feedback message component for consistent success/error presentation
+- improved book-detail chapter pagination with direct page-number links in addition to previous/next
+- reduced reader sidebar load for long books by showing a focused chapter window around the current chapter plus first/last shortcuts
+- refined settings preset cards, settings form grouping, glossary empty state, and glossary entry density
+- kept the pass frontend-only and did not change backend translation or deployment behavior
+
 ### Translation correctness refinement
 Completed in code and covered by backend regression tests:
 - `/chapters/{id}/translate` still reuses matching `TranslationRecord` cache entries
@@ -231,6 +240,7 @@ Current UI state:
 - UI-R1 started with the bookshelf page: the library area now feels more like a real shelf, and create/import actions are grouped into one cleaner dialog
 - UI-R2 applies a warmer, more consistent paper-and-ink visual language across the app shell, bookshelf, reader, settings, and glossary surfaces
 - the Taste-skill homepage pass makes the first screen feel more like a reading desk than a utility dashboard
+- UI-R3 improves non-homepage management pages and replaces rough browser confirmations with in-app dialogs
 - the chapter reading page has the strongest polish and is the best current experience
 - bookshelf and book detail pages are cleaner and more usable than earlier phases
 - interaction feedback is clearer through stronger hover, focus, active, and loading states
@@ -243,8 +253,8 @@ Current UI state:
 Areas still somewhat rough:
 - UI-R2 is still CSS-focused; some components could later be refactored into reusable UI primitives
 - settings and glossary pages are more consistent than before but still need deeper form/table usability polish
-- destructive actions currently use browser confirm dialogs rather than custom modal UI
-- pagination is intentionally simple and does not yet support direct page-number jumping
+- destructive actions now use a shared in-app confirmation dialog
+- book detail pagination now supports direct page-number jumping, while reader-side chapter navigation intentionally shows a focused window instead of every chapter
 - translation presets are global only; there is not yet import/export or per-book preset binding
 
 ## Known issues
@@ -315,7 +325,8 @@ Typical local run:
 
 ## Current recommended next phase
 Recommended next direction:
-- a UI-focused follow-up phase to extract reusable frontend UI primitives and replace browser confirm dialogs
-- optimize very long chapter navigation in the reader so books with hundreds of chapters stay comfortable
+- split the large frontend stylesheet into smaller, easier-to-maintain sections
+- continue extracting reusable frontend UI primitives from repeated form, button, and feedback patterns
+- consider reader chapter search/jump controls for very large books
 - manual verification of webpage URL import against a few real article/novel pages
 - optionally a deployment follow-up for automatic updates such as Watchtower or pull-and-restart automation
