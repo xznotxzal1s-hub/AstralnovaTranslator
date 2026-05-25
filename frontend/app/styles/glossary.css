@@ -1,0 +1,10 @@
+/* Glossary list and entry refinements. */
+.glossary-list-section {
+  padding: 24px;
+}
+
+.glossary-entry-card {
+  padding: 16px 18px;
+  border-radius: 22px;
+}
+

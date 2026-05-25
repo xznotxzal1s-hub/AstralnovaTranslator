@@ -1,0 +1,434 @@
+/* Responsive breakpoints and mobile app shell refinements. */
+@media (max-width: 1080px) {
+  .hero,
+  .detail-hero,
+  .reader-layout,
+  .reader-shell,
+  .split-reading-columns,
+  .split-layout,
+  .page-masthead,
+  .chapter-card,
+  .book-detail-shell,
+  .bookshelf-shell,
+  .bookshelf-stage,
+  .compact-reader-header {
+    grid-template-columns: 1fr;
+  }
+
+  .reader-sidebar {
+    position: static;
+  }
+
+  .reader-nav-card {
+    max-height: none;
+  }
+
+  .reader-outline {
+    max-height: none;
+  }
+
+  .settings-presets-card,
+  .glossary-form-card {
+    position: static;
+  }
+
+  .reading-surface {
+    max-width: none;
+  }
+
+  .chapter-card-actions {
+    justify-content: flex-start;
+  }
+
+  .chapter-filter-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .chapter-filter-actions {
+    justify-content: flex-start;
+  }
+
+  .reader-chapter-nav {
+    grid-template-columns: 1fr;
+  }
+
+  .reader-step-link.next {
+    text-align: left;
+  }
+
+  .reader-position-chip {
+    width: 100%;
+  }
+
+  .chapter-pagination {
+    align-items: stretch;
+  }
+
+  .bookshelf-stage {
+    min-height: auto;
+  }
+
+  .bookshelf-command-panel,
+  .bookshelf-hero-copy {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .shell {
+    padding: 14px 12px calc(118px + env(safe-area-inset-bottom));
+  }
+
+  .topbar {
+    position: fixed;
+    top: auto;
+    right: 10px;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    left: 10px;
+    z-index: 40;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    max-width: none;
+    margin: 0;
+    padding: 8px;
+    gap: 8px;
+    border-radius: 24px;
+    background: rgba(255, 252, 246, 0.92);
+    box-shadow:
+      0 18px 42px rgba(86, 63, 37, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.68);
+  }
+
+  .brand {
+    width: auto;
+    gap: 0;
+  }
+
+  .topbar-actions {
+    width: auto;
+    min-width: 0;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+
+  .topnav {
+    flex: 1 1 auto;
+    min-width: 0;
+    flex-wrap: nowrap;
+    gap: 5px;
+  }
+
+  .reader-jump-links,
+  .action-row {
+    width: 100%;
+  }
+
+  .topnav a,
+  .button,
+  .button-secondary,
+  .button-link,
+  .button-danger {
+    justify-content: center;
+  }
+
+  .topnav a {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 8px 7px;
+    border-radius: 16px;
+    font-size: 0.84rem;
+    line-height: 1;
+    overflow: hidden;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .brand-mark {
+    width: 38px;
+    height: 38px;
+    border-radius: 14px;
+    font-size: 0.84rem;
+  }
+
+  .brand-copy {
+    display: none;
+  }
+
+  .theme-toggle {
+    min-width: 42px;
+    justify-content: center;
+    padding: 8px;
+  }
+
+  .theme-toggle > span:last-child,
+  .language-switcher > span {
+    display: none;
+  }
+
+  .language-switcher {
+    padding: 8px 9px;
+  }
+
+  .language-switcher select {
+    max-width: 74px;
+    font-size: 0.84rem;
+  }
+
+  :root[data-theme="dark"] .topbar {
+    background: rgba(28, 31, 27, 0.93);
+    box-shadow:
+      0 18px 42px rgba(0, 0, 0, 0.34),
+      inset 0 1px 0 rgba(255, 244, 229, 0.08);
+  }
+
+  .section-panel,
+  .bookshelf-hero,
+  .form-card,
+  .book-card,
+  .chapter-card,
+  .reading-surface,
+  .info-card,
+  .bookshelf-shell,
+  .book-detail-shell,
+  .compact-reader-header {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 8vw, 2.6rem);
+  }
+
+  .bookshelf-shell {
+    gap: 14px;
+  }
+
+  .bookshelf-stage {
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .bookshelf-hero-copy {
+    gap: 10px;
+    padding: 2px 0;
+  }
+
+  .bookshelf-hero-copy::before,
+  .bookshelf-hero-copy .lede,
+  .home-metrics,
+  .latest-book-strip {
+    display: none;
+  }
+
+  .bookshelf-hero-copy h1 {
+    font-size: clamp(1.8rem, 9vw, 2.35rem);
+  }
+
+  .bookshelf-command-panel {
+    gap: 12px;
+    padding: 14px;
+    border-radius: 20px;
+  }
+
+  .command-panel-copy {
+    gap: 5px;
+  }
+
+  .command-panel-copy h2 {
+    max-width: none;
+    font-size: 1.2rem;
+    line-height: 1.18;
+  }
+
+  .command-panel-copy .muted {
+    display: none;
+  }
+
+  .bookshelf-command-panel .import-launch-button {
+    min-height: 44px;
+  }
+
+  .bookshelf-library-panel {
+    padding: 14px;
+  }
+
+  .bookshelf-library-panel .section-header {
+    align-items: start;
+    gap: 4px;
+  }
+
+  .bookshelf-library-panel .section-header h2 {
+    font-size: 1.35rem;
+  }
+
+  .bookshelf-shell .book-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .shelf-book-card {
+    display: grid;
+    grid-template-columns: 74px minmax(0, 1fr);
+    gap: 10px 12px;
+    align-items: center;
+    padding: 10px;
+    border-radius: 18px;
+  }
+
+  .shelf-book-card:hover {
+    transform: none;
+  }
+
+  .book-cover-link {
+    grid-row: 1 / span 2;
+    width: 74px;
+  }
+
+  .book-cover {
+    border-radius: 14px;
+  }
+
+  .book-card-content {
+    gap: 4px;
+    align-self: end;
+  }
+
+  .book-title-link h2 {
+    min-height: auto;
+    font-size: 0.98rem;
+    line-height: 1.32;
+    -webkit-line-clamp: 2;
+  }
+
+  .shelf-book-card .book-meta {
+    font-size: 0.78rem;
+  }
+
+  .book-meta-dot {
+    width: 6px;
+    height: 6px;
+    box-shadow: 0 0 0 3px rgba(66, 105, 91, 0.1);
+  }
+
+  .book-card-actions {
+    align-self: start;
+    gap: 6px;
+  }
+
+  .shelf-book-card .compact-button,
+  .shelf-book-card .button-danger-ghost {
+    min-height: 32px;
+    padding: 7px 9px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+  }
+
+  .text-panel {
+    padding: 18px;
+  }
+
+  .text-panel pre {
+    font-size: 1rem;
+    line-height: 1.92;
+  }
+
+  .reader-toolbar {
+    align-items: stretch;
+  }
+
+  .batch-translate-panel {
+    width: 100%;
+    justify-items: stretch;
+  }
+
+  .form-section-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mode-toggle {
+    width: 100%;
+  }
+
+  .mode-toggle button {
+    flex: 1 1 0;
+  }
+
+  .chapter-nav-link {
+    grid-template-columns: 30px minmax(0, 1fr);
+  }
+
+  .title-display-row {
+    align-items: flex-start;
+  }
+
+  .chapter-pagination-actions,
+  .pagination-link {
+    width: 100%;
+  }
+
+  .chapter-page-number-row {
+    width: 100%;
+  }
+
+  .pagination-number {
+    min-width: 34px;
+    flex: 1 1 0;
+  }
+
+  .confirm-dialog-actions {
+    justify-content: stretch;
+  }
+
+  .confirm-dialog-actions .button-link,
+  .confirm-dialog-actions .button-danger {
+    flex: 1 1 0;
+  }
+
+  .bookshelf-command-panel .import-launch-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 380px) {
+  .topbar {
+    left: 8px;
+    right: 8px;
+    gap: 6px;
+    padding: 7px;
+  }
+
+  .brand-mark {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    font-size: 0.76rem;
+  }
+
+  .topnav a {
+    padding-inline: 5px;
+    font-size: 0.78rem;
+  }
+
+  .theme-toggle {
+    min-width: 36px;
+    padding-inline: 7px;
+  }
+
+  .theme-toggle-track {
+    width: 30px;
+  }
+
+  .theme-toggle[aria-pressed="true"] .theme-toggle-track span {
+    transform: translateX(12px);
+  }
+
+  .language-switcher {
+    padding-inline: 7px;
+  }
+
+  .language-switcher select {
+    max-width: 58px;
+  }
+}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { DeleteChapterButton } from "@/components/delete-chapter-button";
 import { useI18n } from "@/components/i18n-provider";
 import { TranslateChapterButton } from "@/components/translate-chapter-button";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { formatMessage } from "@/lib/i18n";
 import { getLocalizedStatus } from "@/lib/status-label";
 import type { Chapter } from "@/lib/types";
@@ -26,9 +27,9 @@ export function ChapterCard({ bookId, chapter }: ChapterCardProps) {
           <h3>{chapter.title}</h3>
         </div>
         <div className="meta-row chapter-meta">
-          <span className={`pill status-pill ${chapter.translation_status}`}>
+          <StatusBadge status={chapter.translation_status}>
             {formatMessage(t("statusLabel"), { status: statusLabel })}
-          </span>
+          </StatusBadge>
           <span className="chapter-card-time">
             {chapter.last_translated_at
               ? formatMessage(t("translatedAt"), { time: new Date(chapter.last_translated_at).toLocaleString(locale) })

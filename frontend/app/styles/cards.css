@@ -1,0 +1,104 @@
+/* Shared book, chapter, list, and meta card patterns. */
+.book-grid,
+.import-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.book-grid {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.import-grid {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.list-stack,
+.sidebar-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.chapter-list {
+  gap: 14px;
+}
+
+.book-card,
+.chapter-card {
+  padding: 18px;
+  display: grid;
+  gap: 12px;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 248, 0.96), rgba(255, 248, 239, 0.92)),
+    var(--paper);
+}
+
+.card-heading {
+  display: grid;
+  gap: 6px;
+}
+
+.book-card h2,
+.chapter-card h3 {
+  font-size: 1.04rem;
+}
+
+.book-card-top,
+.book-card-body,
+.chapter-card-copy {
+  display: grid;
+  gap: 10px;
+}
+
+.book-card-date {
+  justify-self: start;
+}
+
+.chapter-card {
+  grid-template-columns: minmax(0, 1fr) minmax(210px, auto);
+  align-items: center;
+  border-radius: 22px;
+}
+
+.chapter-card-actions {
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.book-meta,
+.chapter-meta {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.chapter-meta {
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.chapter-card .eyebrow {
+  margin-bottom: 4px;
+}
+
+.chapter-card-time {
+  color: var(--ink-faint);
+}
+
+.chapter-card .button,
+.chapter-card .button-secondary,
+.chapter-card .button-danger {
+  padding: 10px 12px;
+  min-height: 40px;
+  border-radius: 14px;
+}
+
+.chapter-card .button-danger-ghost {
+  padding-inline: 12px;
+}
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+

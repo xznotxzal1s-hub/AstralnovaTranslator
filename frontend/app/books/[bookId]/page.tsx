@@ -7,6 +7,8 @@ import { ChapterCard } from "@/components/chapter-card";
 import { CreateChapterForm } from "@/components/create-chapter-form";
 import { DeleteBookButton } from "@/components/delete-book-button";
 import { EmptyState } from "@/components/empty-state";
+import { FormField } from "@/components/ui/form-field";
+import { PaginationControls } from "@/components/ui/pagination";
 import { fetchBook, fetchBookChapters, fetchReadingProgress } from "@/lib/api";
 import { formatMessage } from "@/lib/i18n";
 import { getServerI18n } from "@/lib/i18n-server";
@@ -30,22 +32,6 @@ type ChapterStatusFilter = (typeof CHAPTER_STATUS_FILTERS)[number];
 
 function getChapterStatusFilter(value: string | undefined): ChapterStatusFilter {
   return CHAPTER_STATUS_FILTERS.includes(value as ChapterStatusFilter) ? (value as ChapterStatusFilter) : "all";
-}
-
-function getPaginationItems(currentPage: number, totalPages: number): Array<number | "gap-start" | "gap-end"> {
-  const pages = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
-  const normalizedPages = [...pages]
-    .filter((page) => page >= 1 && page <= totalPages)
-    .sort((left, right) => left - right);
-
-  return normalizedPages.flatMap((page, index) => {
-    const previousPage = normalizedPages[index - 1];
-    if (previousPage && page - previousPage > 1) {
-      return [previousPage === 1 ? "gap-start" : "gap-end", page];
-    }
-
-    return [page];
-  });
 }
 
 export default async function BookDetailPage({ params, searchParams }: BookDetailPageProps) {
@@ -82,7 +68,6 @@ export default async function BookDetailPage({ params, searchParams }: BookDetai
   const pagedChapters = filteredChapters.slice(startIndex, startIndex + CHAPTERS_PER_PAGE);
   const rangeStart = filteredChapters.length === 0 ? 0 : startIndex + 1;
   const rangeEnd = filteredChapters.length === 0 ? 0 : startIndex + pagedChapters.length;
-  const paginationItems = getPaginationItems(currentPage, totalPages);
   const hasActiveChapterFilters = Boolean(searchQuery) || statusFilter !== "all";
   const continueChapter =
     chapters.find((chapter) => chapter.id === readingProgress.chapter_id) ?? chapters[0] ?? null;
@@ -167,8 +152,11 @@ export default async function BookDetailPage({ params, searchParams }: BookDetai
 
             {chapters.length > 0 ? (
               <form action={`/books/${book.id}`} className="chapter-filter-bar">
-                <div className="field chapter-search-field">
-                  <label htmlFor="chapter-search">{messages.chapterSearchLabel}</label>
+                <FormField
+                  className="chapter-search-field"
+                  htmlFor="chapter-search"
+                  label={messages.chapterSearchLabel}
+                >
                   <input
                     id="chapter-search"
                     name="q"
@@ -176,16 +164,19 @@ export default async function BookDetailPage({ params, searchParams }: BookDetai
                     type="search"
                     defaultValue={searchQuery}
                   />
-                </div>
-                <div className="field chapter-status-field">
-                  <label htmlFor="chapter-status">{messages.chapterStatusFilterLabel}</label>
+                </FormField>
+                <FormField
+                  className="chapter-status-field"
+                  htmlFor="chapter-status"
+                  label={messages.chapterStatusFilterLabel}
+                >
                   <select id="chapter-status" name="status" defaultValue={statusFilter}>
                     <option value="all">{messages.chapterFilterAll}</option>
                     <option value="pending">{messages.chapterFilterPending}</option>
                     <option value="translated">{messages.chapterFilterTranslated}</option>
                     <option value="failed">{messages.chapterFilterFailed}</option>
                   </select>
-                </div>
+                </FormField>
                 <div className="chapter-filter-actions">
                   <button className="button-secondary" type="submit">
                     {messages.chapterFilterApply}
@@ -214,62 +205,19 @@ export default async function BookDetailPage({ params, searchParams }: BookDetai
                   ))}
                 </section>
 
-                {totalPages > 1 ? (
-                  <nav className="chapter-pagination" aria-label={messages.chapterPaginationLabel}>
-                    <div className="chapter-pagination-copy">
-                      <p className="eyebrow">{messages.chapterPaginationLabel}</p>
-                      <p className="muted">
-                        {formatMessage(messages.chapterPaginationStatus, {
-                          current: currentPage,
-                          total: totalPages,
-                        })}
-                      </p>
-                    </div>
-                    <div className="chapter-pagination-actions">
-                      {currentPage > 1 ? (
-                        <Link className="button-link pagination-link" href={getChapterListHref(currentPage - 1)}>
-                          {messages.previousPage}
-                        </Link>
-                      ) : (
-                        <span className="button-link pagination-link is-disabled">{messages.previousPage}</span>
-                      )}
-                      <div className="chapter-page-number-row">
-                        {paginationItems.map((item) =>
-                          typeof item === "number" ? (
-                            item === currentPage ? (
-                              <span
-                                key={item}
-                                aria-current="page"
-                                className="button-link pagination-link pagination-number is-current"
-                              >
-                                {item}
-                              </span>
-                            ) : (
-                              <Link
-                                key={item}
-                                className="button-link pagination-link pagination-number"
-                                href={getChapterListHref(item)}
-                              >
-                                {item}
-                              </Link>
-                            )
-                          ) : (
-                            <span key={item} className="pagination-gap" aria-hidden="true">
-                              ...
-                            </span>
-                          ),
-                        )}
-                      </div>
-                      {currentPage < totalPages ? (
-                        <Link className="button-link pagination-link" href={getChapterListHref(currentPage + 1)}>
-                          {messages.nextPage}
-                        </Link>
-                      ) : (
-                        <span className="button-link pagination-link is-disabled">{messages.nextPage}</span>
-                      )}
-                    </div>
-                  </nav>
-                ) : null}
+                <PaginationControls
+                  ariaLabel={messages.chapterPaginationLabel}
+                  currentPage={currentPage}
+                  getHref={getChapterListHref}
+                  nextLabel={messages.nextPage}
+                  previousLabel={messages.previousPage}
+                  statusText={formatMessage(messages.chapterPaginationStatus, {
+                    current: currentPage,
+                    total: totalPages,
+                  })}
+                  title={messages.chapterPaginationLabel}
+                  totalPages={totalPages}
+                />
               </>
             )}
           </section>

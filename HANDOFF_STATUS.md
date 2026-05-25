@@ -15,6 +15,7 @@ The app is beyond the original V1 baseline and is currently a usable NAS-friendl
 - Batch translation uses simple persisted in-process jobs with visible frontend polling.
 - Reader Experience R2A is implemented: reading progress is stored in SQLite, Continue Reading restores the saved chapter and approximate scroll position, and reader visual preferences are stored in browser `localStorage`.
 - GHCR image publishing and NAS prebuilt-image deployment files exist.
+- Frontend Maintainability R3A is in progress/completed in code: the large global stylesheet has been split into ordered responsibility files, and a few low-risk UI primitives now cover repeated button, form field, pagination, and status badge patterns.
 
 The project should stay small, private, and beginner-friendly. Do not turn it into a public platform or a distributed job system.
 
@@ -148,11 +149,13 @@ Backend:
 
 Frontend:
 - `frontend/app/` - Next.js pages and API proxy
+- `frontend/app/globals.css` - ordered stylesheet entrypoint only
+- `frontend/app/styles/` - split global CSS files, imported in cascade order
 - `frontend/components/` - UI components
+- `frontend/components/ui/` - small local UI primitives
 - `frontend/lib/api.ts` - server-side backend fetch helper
 - `frontend/lib/api-client.ts` - browser-side same-origin API helper
 - `frontend/lib/i18n.ts` - visible UI strings
-- `frontend/app/globals.css` - current large stylesheet
 
 Deployment:
 - `docker-compose.yml` - local build-oriented Compose
@@ -162,6 +165,61 @@ Deployment:
 ## Recommended Next Phase
 
 Best next phase: UI/code maintainability cleanup, not new product scope.
+
+### Frontend Maintainability R3A notes
+
+CSS split files:
+- `frontend/app/styles/base.css`
+- `frontend/app/styles/layout.css`
+- `frontend/app/styles/cards.css`
+- `frontend/app/styles/forms.css`
+- `frontend/app/styles/feedback.css`
+- `frontend/app/styles/reader.css`
+- `frontend/app/styles/bookshelf.css`
+- `frontend/app/styles/book-detail.css`
+- `frontend/app/styles/visual-polish.css`
+- `frontend/app/styles/dark-theme.css`
+- `frontend/app/styles/reader-polish.css`
+- `frontend/app/styles/settings.css`
+- `frontend/app/styles/glossary.css`
+- `frontend/app/styles/dialogs.css`
+- `frontend/app/styles/responsive.css`
+
+UI primitives added:
+- `frontend/components/ui/button.tsx`
+- `frontend/components/ui/form-field.tsx`
+- `frontend/components/ui/pagination.tsx`
+- `frontend/components/ui/status-badge.tsx`
+
+R3A migrated only low-risk surfaces:
+- chapter status badges
+- reader header status badge
+- book detail filter fields
+- book detail pagination controls
+
+R3A verification:
+- `npm exec tsc -- --noEmit --incremental false` passed in `frontend/`
+- no backend tests were required because backend files were not touched
+- local `npm run build` was intentionally skipped because GitHub Actions is the production build source of truth
+- Docker build/up/smoke was intentionally skipped due to Codex constraints
+
+R3B candidates:
+- migrate repeated button/link markup gradually to `Button` / `ButtonLink`
+- migrate more forms to `FormField`
+- split or simplify `visual-polish.css` and `reader-polish.css` after visual browser checks
+- consider component-level CSS only after the current split has proven stable
+
+### Reader R2A manual checklist
+
+Before or during any UI refactor, manually spot-check the reader flow in a browser:
+- Continue Reading opens the saved chapter.
+- Approximate scroll restoration happens after content renders.
+- Initial restore does not immediately overwrite saved progress with `0%`.
+- Reader preferences persist in `localStorage`.
+- Read mode cycles through translation-only, bilingual, and source-only.
+- Keyboard shortcuts do not trigger while typing in inputs, textareas, selects, or contenteditable areas.
+- Mobile bottom reader navigation is present.
+- Chapter search/jump remains lightweight and caps visible matches.
 
 Suggested order:
 1. Manually verify Reader Experience R2A on desktop and mobile with a long book.

@@ -1,0 +1,124 @@
+/* Book detail hierarchy, chapter filtering, pagination, and title editor. */
+.book-detail-shell {
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 380px);
+  padding: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(237, 222, 201, 0.34), transparent 30%),
+    linear-gradient(180deg, rgba(255, 251, 246, 0.98), rgba(247, 240, 231, 0.95));
+}
+
+.book-detail-header {
+  padding: 6px 8px 2px;
+}
+
+.compact-summary {
+  gap: 12px;
+}
+
+.compact-summary h1 {
+  font-size: clamp(1.85rem, 3vw, 2.6rem);
+  line-height: 1.08;
+}
+
+.desktop-primary-panel {
+  min-height: 420px;
+}
+
+.chapter-filter-bar {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(180px, 240px) auto;
+  align-items: end;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(111, 83, 54, 0.11);
+  border-radius: 22px;
+  background: rgba(255, 252, 247, 0.58);
+}
+
+.chapter-filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.chapter-filter-actions .button-secondary,
+.chapter-filter-actions .button-link {
+  min-height: 42px;
+  justify-content: center;
+}
+
+.chapter-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(120, 95, 65, 0.1);
+}
+
+.chapter-pagination-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.chapter-pagination-copy .eyebrow {
+  margin-bottom: 0;
+}
+
+.chapter-pagination-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pagination-link {
+  min-width: 96px;
+  justify-content: center;
+}
+
+.pagination-link.is-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.detail-side-card {
+  padding: 22px;
+}
+
+.book-title-editor {
+  display: grid;
+  gap: 10px;
+}
+
+.title-display-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.inline-edit-form {
+  display: grid;
+  gap: 12px;
+}
+
+.reader-nav-card {
+  gap: 14px;
+}
+
+.glossary-layout {
+  align-items: start;
+}
+
+.glossary-list-section {
+  align-content: start;
+}
+
+.glossary-entry-card {
+  grid-template-columns: minmax(0, 1fr);
+}
+

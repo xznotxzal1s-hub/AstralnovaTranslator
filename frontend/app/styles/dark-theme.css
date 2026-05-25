@@ -1,0 +1,245 @@
+/* Global dark theme overrides. */
+:root[data-theme="dark"] .topbar {
+  border-color: rgba(246, 232, 211, 0.12);
+  background: rgba(28, 31, 27, 0.82);
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 244, 229, 0.08);
+}
+
+:root[data-theme="dark"] .brand-mark {
+  background:
+    radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.22), transparent 22%),
+    linear-gradient(145deg, #6f3d28, #b8794e);
+}
+
+:root[data-theme="dark"] .topnav a,
+:root[data-theme="dark"] .language-switcher,
+:root[data-theme="dark"] .theme-toggle {
+  background: rgba(37, 40, 35, 0.84);
+  color: var(--ink-soft);
+}
+
+:root[data-theme="dark"] .topnav a.active {
+  border-color: rgba(217, 155, 108, 0.3);
+  background: linear-gradient(135deg, rgba(217, 155, 108, 0.18), rgba(37, 40, 35, 0.96));
+  color: var(--accent-strong);
+}
+
+:root[data-theme="dark"] .topnav a:hover,
+:root[data-theme="dark"] .language-switcher:hover,
+:root[data-theme="dark"] .theme-toggle:hover {
+  background: rgba(47, 51, 44, 0.96);
+}
+
+:root[data-theme="dark"] .language-switcher select option {
+  background: #242822;
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .panel,
+:root[data-theme="dark"] .book-card,
+:root[data-theme="dark"] .chapter-card,
+:root[data-theme="dark"] .reader-card,
+:root[data-theme="dark"] .form-card,
+:root[data-theme="dark"] .empty-state,
+:root[data-theme="dark"] .info-card {
+  background:
+    linear-gradient(180deg, rgba(42, 45, 39, 0.86), rgba(31, 34, 29, 0.94)),
+    var(--paper);
+  border-color: var(--line);
+}
+
+:root[data-theme="dark"] .page-lead,
+:root[data-theme="dark"] .lede,
+:root[data-theme="dark"] .muted,
+:root[data-theme="dark"] .section-header p {
+  color: var(--ink-soft);
+}
+
+:root[data-theme="dark"] .bookshelf-shell {
+  border-color: rgba(246, 232, 211, 0.13);
+  background:
+    radial-gradient(circle at 12% 0%, rgba(217, 155, 108, 0.14), transparent 32%),
+    radial-gradient(circle at 92% 10%, rgba(149, 196, 174, 0.11), transparent 28%),
+    linear-gradient(180deg, rgba(34, 37, 32, 0.96), rgba(25, 28, 24, 0.96));
+}
+
+:root[data-theme="dark"] .home-metrics,
+:root[data-theme="dark"] .latest-book-strip,
+:root[data-theme="dark"] .bookshelf-library-panel {
+  border-color: var(--line);
+  background: rgba(36, 39, 34, 0.72);
+}
+
+:root[data-theme="dark"] .home-metric-primary {
+  background: linear-gradient(180deg, rgba(149, 196, 174, 0.14), rgba(36, 39, 34, 0.24));
+}
+
+:root[data-theme="dark"] .bookshelf-command-panel {
+  border-color: rgba(246, 232, 211, 0.14);
+  background:
+    radial-gradient(circle at 86% 0%, rgba(217, 155, 108, 0.15), transparent 36%),
+    linear-gradient(180deg, rgba(42, 45, 39, 0.88), rgba(29, 32, 27, 0.94)),
+    var(--paper);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 244, 229, 0.08);
+}
+
+:root[data-theme="dark"] .latest-book-index {
+  background: rgba(217, 155, 108, 0.14);
+}
+
+:root[data-theme="dark"] .shelf-book-card {
+  border-color: var(--line);
+  background:
+    linear-gradient(180deg, rgba(42, 45, 39, 0.86), rgba(31, 34, 29, 0.94)),
+    var(--paper);
+}
+
+:root[data-theme="dark"] .shelf-book-card:hover {
+  border-color: rgba(217, 155, 108, 0.28);
+  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.28);
+}
+
+:root[data-theme="dark"] .book-title-link h2,
+:root[data-theme="dark"] .bookshelf-library-panel h2 {
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .shelf-book-card .button-link,
+:root[data-theme="dark"] .button-link {
+  border-color: var(--line);
+  background: rgba(37, 40, 35, 0.82);
+  color: var(--ink-soft);
+}
+
+:root[data-theme="dark"] .button-secondary {
+  border-color: rgba(149, 196, 174, 0.18);
+  background: linear-gradient(135deg, rgba(149, 196, 174, 0.12), rgba(37, 40, 35, 0.94));
+  color: var(--tea);
+}
+
+:root[data-theme="dark"] .button-danger {
+  background: rgba(82, 37, 37, 0.36);
+}
+
+:root[data-theme="dark"] .field input,
+:root[data-theme="dark"] .field textarea,
+:root[data-theme="dark"] .field select,
+:root[data-theme="dark"] .field input[type="file"] {
+  border-color: var(--line);
+  background:
+    linear-gradient(180deg, rgba(42, 45, 39, 0.9), rgba(31, 34, 29, 0.96)),
+    var(--paper-strong);
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .field input::placeholder,
+:root[data-theme="dark"] .field textarea::placeholder {
+  color: var(--ink-faint);
+}
+
+:root[data-theme="dark"] .dialog-backdrop {
+  background: rgba(8, 9, 7, 0.62);
+}
+
+:root[data-theme="dark"] .import-dialog {
+  border-color: rgba(246, 232, 211, 0.16);
+  background:
+    radial-gradient(circle at 92% 0%, rgba(217, 155, 108, 0.14), transparent 36%),
+    linear-gradient(180deg, rgba(38, 41, 35, 0.98), rgba(25, 28, 24, 0.98)),
+    var(--paper);
+  box-shadow: 0 34px 100px rgba(0, 0, 0, 0.48);
+}
+
+:root[data-theme="dark"] .import-tabs,
+:root[data-theme="dark"] .import-dialog-body .form-card {
+  border-color: var(--line);
+  background: rgba(37, 40, 35, 0.82);
+}
+
+:root[data-theme="dark"] .import-tab.active {
+  background: rgba(217, 155, 108, 0.16);
+}
+
+:root[data-theme="dark"] .url-preview-card,
+:root[data-theme="dark"] .url-preview-text {
+  border-color: var(--line);
+  background: rgba(25, 28, 24, 0.68);
+}
+
+:root[data-theme="dark"] .url-preview-text {
+  color: var(--ink-soft);
+}
+
+:root[data-theme="dark"] .icon-button {
+  background: rgba(37, 40, 35, 0.82);
+}
+
+:root[data-theme="dark"] .icon-button:hover {
+  background: rgba(47, 51, 44, 0.96);
+}
+
+:root[data-theme="dark"] .reading-surface,
+:root[data-theme="dark"] .compact-reader-header,
+:root[data-theme="dark"] .collection-panel,
+:root[data-theme="dark"] .chapter-management-panel,
+:root[data-theme="dark"] .book-page-hero {
+  background:
+    linear-gradient(90deg, rgba(255, 244, 229, 0.025), transparent 12%, transparent 88%, rgba(255, 244, 229, 0.025)),
+    linear-gradient(180deg, rgba(39, 42, 36, 0.96), rgba(28, 31, 27, 0.98));
+}
+
+:root[data-theme="dark"] .text-panel {
+  border-color: var(--line);
+  background: rgba(22, 24, 21, 0.44);
+}
+
+:root[data-theme="dark"] .text-panel pre,
+:root[data-theme="dark"] .source-panel pre,
+:root[data-theme="dark"] .reader-text,
+:root[data-theme="dark"] .source-panel .reader-text {
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .reader-settings-panel,
+:root[data-theme="dark"] .reader-search-panel,
+:root[data-theme="dark"] .reader-completion-panel {
+  border-color: var(--line);
+  background:
+    linear-gradient(180deg, rgba(42, 45, 39, 0.88), rgba(31, 34, 29, 0.92)),
+    var(--paper);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.24);
+}
+
+:root[data-theme="dark"] .reader-search-control input,
+:root[data-theme="dark"] .reader-preference-grid select,
+:root[data-theme="dark"] .reader-search-shortcuts a,
+:root[data-theme="dark"] .reader-search-results a {
+  border-color: var(--line);
+  background: rgba(255, 244, 229, 0.04);
+  color: var(--ink);
+}
+
+:root[data-theme="dark"] .reader-search-control input:focus {
+  border-color: rgba(217, 155, 108, 0.34);
+  background: rgba(255, 244, 229, 0.075);
+  box-shadow: 0 0 0 4px rgba(217, 155, 108, 0.12);
+}
+
+:root[data-theme="dark"] .reader-search-shortcuts a.active,
+:root[data-theme="dark"] .reader-search-results a.active {
+  border-color: rgba(217, 155, 108, 0.34);
+  background: rgba(217, 155, 108, 0.14);
+}
+
+:root[data-theme="dark"] .reader-step-link,
+:root[data-theme="dark"] .reader-position-chip,
+:root[data-theme="dark"] .reader-floating-link {
+  border-color: var(--line);
+  background: rgba(37, 40, 35, 0.86);
+  color: var(--ink);
+}
+

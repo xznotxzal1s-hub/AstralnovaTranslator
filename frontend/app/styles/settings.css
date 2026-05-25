@@ -1,0 +1,45 @@
+/* Settings and shared management page layout refinements. */
+.book-detail-shell {
+  gap: 24px;
+  border-radius: 34px;
+  background:
+    radial-gradient(circle at top right, rgba(66, 105, 91, 0.12), transparent 30%),
+    linear-gradient(180deg, rgba(255, 253, 248, 0.98), rgba(244, 232, 216, 0.94));
+}
+
+.chapter-management-panel,
+.detail-side-card,
+.settings-presets-card,
+.settings-form-card,
+.glossary-form-card,
+.glossary-list-section {
+  border: 1px solid rgba(111, 83, 54, 0.14);
+  border-radius: 30px;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 248, 0.97), rgba(248, 239, 226, 0.94)),
+    var(--paper);
+  box-shadow: var(--shadow-card);
+}
+
+.settings-layout,
+.glossary-layout {
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  gap: 24px;
+}
+
+.settings-presets-card,
+.glossary-form-card {
+  position: sticky;
+  top: 112px;
+}
+
+.preset-list-item {
+  border-radius: 18px;
+  background: rgba(255, 252, 247, 0.78);
+}
+
+.preset-list-item.active {
+  border-color: rgba(66, 105, 91, 0.28);
+  background: linear-gradient(135deg, rgba(66, 105, 91, 0.14), rgba(255, 252, 247, 0.96));
+}
+

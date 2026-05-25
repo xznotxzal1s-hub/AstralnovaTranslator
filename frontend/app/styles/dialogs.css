@@ -1,0 +1,238 @@
+/* Confirmation dialogs and late management-page interaction polish. */
+/* UI-R3: non-homepage interaction polish and calmer management density. */
+.confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background:
+    radial-gradient(circle at 50% 12%, rgba(255, 252, 246, 0.34), transparent 34%),
+    rgba(44, 35, 25, 0.36);
+  backdrop-filter: blur(16px);
+}
+
+.confirm-dialog {
+  width: min(430px, 100%);
+  display: grid;
+  gap: 16px;
+  padding: 22px;
+  border: 1px solid rgba(111, 83, 54, 0.18);
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 248, 0.98), rgba(247, 238, 225, 0.96)),
+    var(--paper);
+  box-shadow:
+    0 28px 90px rgba(86, 63, 37, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.58);
+  animation: dialogSettle 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.confirm-dialog-mark {
+  width: 46px;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), rgba(66, 105, 91, 0.68));
+}
+
+.confirm-dialog-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.confirm-dialog-copy .eyebrow {
+  margin: 0;
+}
+
+.confirm-dialog-copy p:last-child {
+  color: var(--ink-soft);
+}
+
+.confirm-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.confirm-dialog-actions .button-link,
+.confirm-dialog-actions .button-danger {
+  min-width: 118px;
+  justify-content: center;
+}
+
+.chapter-page-number-row {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 5px;
+  border: 1px solid rgba(111, 83, 54, 0.1);
+  border-radius: 18px;
+  background: rgba(255, 252, 247, 0.58);
+}
+
+.pagination-number {
+  min-width: 38px;
+  padding-inline: 12px;
+}
+
+.pagination-number.is-current {
+  border-color: rgba(150, 83, 54, 0.24);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  pointer-events: none;
+}
+
+.pagination-gap {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  color: var(--ink-faint);
+  font-weight: 700;
+}
+
+.reader-outline-window {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 4px;
+  padding: 6px 9px;
+  border: 1px solid rgba(111, 83, 54, 0.13);
+  border-radius: 999px;
+  color: var(--ink-faint);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.chapter-nav-boundary {
+  opacity: 0.78;
+}
+
+.chapter-nav-gap {
+  display: grid;
+  place-items: center;
+  min-height: 24px;
+  color: var(--ink-faint);
+  letter-spacing: 0.2em;
+}
+
+:root[data-theme="dark"] .reader-outline-window {
+  border-color: rgba(217, 155, 108, 0.2);
+  color: var(--ink-faint);
+}
+
+:root[data-theme="dark"] .chapter-nav-gap {
+  color: var(--ink-faint);
+}
+
+.settings-presets-card {
+  overflow: hidden;
+}
+
+.preset-list {
+  gap: 10px;
+}
+
+.preset-list-item {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  text-align: left;
+}
+
+.preset-list-index {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 14px;
+  background: rgba(66, 105, 91, 0.1);
+  color: var(--tea);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.settings-form-card {
+  gap: 20px;
+}
+
+.settings-form-card .form-section-grid {
+  padding: 16px;
+  border: 1px solid rgba(111, 83, 54, 0.1);
+  border-radius: 24px;
+  background: rgba(255, 252, 247, 0.54);
+}
+
+.prompt-field textarea {
+  min-height: 260px;
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 0.92rem;
+  line-height: 1.75;
+}
+
+.glossary-list-section {
+  align-content: start;
+}
+
+.glossary-entry-card {
+  gap: 12px;
+  border-color: rgba(111, 83, 54, 0.12);
+}
+
+.glossary-entry-card:hover {
+  transform: translateY(-2px);
+}
+
+.glossary-entry-heading h3 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+}
+
+.glossary-entry-heading h3 span:nth-child(2) {
+  color: var(--ink-faint);
+  font-size: 0.88rem;
+}
+
+:root[data-theme="dark"] .confirm-backdrop {
+  background:
+    radial-gradient(circle at 50% 12%, rgba(217, 155, 108, 0.14), transparent 34%),
+    rgba(8, 9, 7, 0.66);
+}
+
+:root[data-theme="dark"] .confirm-dialog,
+:root[data-theme="dark"] .settings-form-card .form-section-grid,
+:root[data-theme="dark"] .settings-backup-card,
+:root[data-theme="dark"] .chapter-filter-bar,
+:root[data-theme="dark"] .chapter-page-number-row {
+  border-color: var(--line);
+  background:
+    linear-gradient(180deg, rgba(42, 45, 39, 0.92), rgba(31, 34, 29, 0.96)),
+    var(--paper);
+}
+
+:root[data-theme="dark"] .pagination-number.is-current {
+  background: rgba(217, 155, 108, 0.16);
+}
+
+:root[data-theme="dark"] .preset-list-index {
+  background: rgba(149, 196, 174, 0.12);
+}
+
+@keyframes dialogSettle {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+

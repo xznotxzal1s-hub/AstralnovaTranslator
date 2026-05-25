@@ -1,0 +1,441 @@
+/* Bookshelf homepage, import workspace, book covers, and shelf cards. */
+.bookshelf-shell {
+  grid-template-columns: 1fr;
+  padding: 18px;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(110, 123, 239, 0.18), transparent 30%),
+    linear-gradient(180deg, #11141d 0%, var(--astral-ground) 100%);
+  border-color: var(--astral-line);
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(12, 14, 20, 0.18);
+}
+
+.bookshelf-main,
+.bookshelf-tools,
+.book-detail-main,
+.book-detail-sidebar {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+
+.bookshelf-header {
+  padding: 8px 4px 2px;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.bookshelf-header h1 {
+  color: var(--astral-text);
+  font-size: clamp(1.9rem, 3vw, 2.65rem);
+}
+
+.bookshelf-header .lede,
+.bookshelf-shell .muted,
+.bookshelf-shell .section-header p {
+  color: var(--astral-muted);
+}
+
+.bookshelf-library-panel {
+  min-height: 420px;
+  border-color: var(--astral-line);
+  background: rgba(255, 255, 255, 0.035);
+  box-shadow: none;
+}
+
+.bookshelf-library-panel h2 {
+  color: var(--astral-text);
+}
+
+.bookshelf-shell .eyebrow {
+  color: #9ca8ff;
+}
+
+.bookshelf-shell .feedback {
+  color: var(--astral-muted);
+}
+
+.bookshelf-shell .feedback.error {
+  color: #ffb4b4;
+  background: rgba(255, 99, 99, 0.1);
+  border-color: rgba(255, 99, 99, 0.18);
+}
+
+.bookshelf-shell .empty-state {
+  border-color: var(--astral-line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--astral-text);
+  box-shadow: none;
+}
+
+.bookshelf-shell .empty-state .muted {
+  color: var(--astral-muted);
+}
+
+.bookshelf-shell .empty-state-mark {
+  background: rgba(110, 123, 239, 0.14);
+  color: #b7bfff;
+}
+
+.bookshelf-shell .book-grid {
+  grid-template-columns: repeat(auto-fill, minmax(178px, 1fr));
+  gap: 16px;
+}
+
+.compact-tools-panel .section-header {
+  align-items: start;
+}
+
+.compact-import-grid {
+  grid-template-columns: 1fr;
+}
+
+.compact-import-grid .form-card h2 {
+  font-size: 1.1rem;
+}
+
+.bookshelf-side-panel {
+  position: sticky;
+  top: 108px;
+  border-color: var(--astral-line);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.035)),
+    var(--astral-panel);
+  color: var(--astral-text);
+  box-shadow: none;
+}
+
+.bookshelf-side-panel h2 {
+  color: var(--astral-text);
+  font-size: 1.18rem;
+}
+
+.import-launch-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid rgba(150, 83, 54, 0.18);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.18), transparent 40%),
+    linear-gradient(135deg, #8f452b, #c27a4c);
+  box-shadow:
+    0 14px 24px rgba(143, 69, 43, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+.bookshelf-header .import-launch-button {
+  white-space: nowrap;
+}
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  background: rgba(45, 35, 24, 0.3);
+  backdrop-filter: blur(18px);
+}
+
+.import-dialog {
+  width: min(760px, 100%);
+  max-height: min(780px, calc(100vh - 44px));
+  overflow: auto;
+  display: grid;
+  gap: 18px;
+  padding: 20px;
+  border: 1px solid rgba(111, 83, 54, 0.16);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 92% 0%, rgba(150, 83, 54, 0.12), transparent 36%),
+    linear-gradient(180deg, rgba(255, 253, 248, 0.98), rgba(246, 237, 224, 0.96)),
+    var(--paper);
+  color: var(--ink);
+  box-shadow: 0 30px 90px rgba(86, 63, 37, 0.24);
+}
+
+.import-dialog-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.import-dialog h2 {
+  color: var(--ink);
+  font-size: 1.45rem;
+}
+
+.import-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  padding: 5px;
+  border: 1px solid rgba(111, 83, 54, 0.14);
+  border-radius: 12px;
+  background: rgba(255, 252, 247, 0.72);
+}
+
+.import-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 9px 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  font-weight: 650;
+}
+
+.import-tab:hover {
+  color: var(--ink);
+  background: rgba(150, 83, 54, 0.08);
+}
+
+.import-tab.active {
+  border-color: rgba(150, 83, 54, 0.22);
+  background: rgba(243, 221, 199, 0.78);
+  color: var(--accent-strong);
+}
+
+.import-dialog-body .form-card {
+  border-color: rgba(111, 83, 54, 0.13);
+  border-radius: 20px;
+  background: rgba(255, 252, 247, 0.78);
+  color: var(--ink);
+  box-shadow: none;
+}
+
+.import-dialog-body .form-card:hover {
+  box-shadow: none;
+}
+
+.import-dialog-body .form-card h2 {
+  color: var(--ink);
+}
+
+.import-dialog-body .field label {
+  color: var(--ink);
+}
+
+.import-dialog-body .field input,
+.import-dialog-body .field textarea,
+.import-dialog-body .field select,
+.import-dialog-body .field input[type="file"] {
+  border-color: rgba(111, 83, 54, 0.15);
+  background: rgba(255, 253, 249, 0.88);
+  color: var(--ink);
+  box-shadow: none;
+}
+
+.import-dialog-body .field input::placeholder,
+.import-dialog-body .field textarea::placeholder {
+  color: var(--ink-faint);
+}
+
+.import-dialog-body .field input:focus,
+.import-dialog-body .field textarea:focus,
+.import-dialog-body .field select:focus,
+.import-dialog-body .field input[type="file"]:focus {
+  border-color: rgba(150, 83, 54, 0.42);
+  box-shadow: 0 0 0 4px rgba(150, 83, 54, 0.1);
+}
+
+.import-dialog-body .button {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.18), transparent 40%),
+    linear-gradient(135deg, #8f452b, #c27a4c);
+}
+
+.import-dialog-body .feedback.success {
+  background: var(--success-soft);
+  color: var(--success);
+  border-color: rgba(47, 122, 77, 0.18);
+}
+
+.import-dialog-body .feedback.error {
+  background: var(--error-soft);
+  color: var(--error);
+  border-color: rgba(162, 61, 61, 0.2);
+}
+
+.url-preview-card {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(111, 83, 54, 0.13);
+  border-radius: 18px;
+  background: rgba(255, 253, 249, 0.72);
+}
+
+.url-preview-card h3 {
+  margin-top: 4px;
+  color: var(--ink);
+  font-size: 1.08rem;
+}
+
+.url-preview-text {
+  max-height: 220px;
+  overflow: auto;
+  white-space: pre-wrap;
+  margin: 0;
+  padding: 13px;
+  border: 1px solid rgba(111, 83, 54, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 252, 247, 0.82);
+  color: var(--ink-muted);
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.75;
+}
+
+.shelf-book-card {
+  padding: 10px;
+  gap: 12px;
+  border-color: var(--astral-line);
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.035)),
+    var(--astral-panel);
+  color: var(--astral-text);
+  box-shadow: none;
+}
+
+.shelf-book-card:hover {
+  border-color: rgba(110, 123, 239, 0.36);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24);
+  transform: translateY(-3px);
+}
+
+.book-cover-link {
+  display: block;
+}
+
+.book-cover {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  display: grid;
+  align-content: space-between;
+  overflow: hidden;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 11px;
+  isolation: isolate;
+}
+
+.book-cover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(255, 255, 255, 0.24), transparent 24%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.12), transparent 40%);
+}
+
+.book-cover-tone-1 {
+  background: linear-gradient(145deg, #1d2742, #111827 58%, #07090f);
+}
+
+.book-cover-tone-2 {
+  background: linear-gradient(145deg, #27331f, #151d17 58%, #080b09);
+}
+
+.book-cover-tone-3 {
+  background: linear-gradient(145deg, #38263b, #191622 58%, #09070c);
+}
+
+.book-cover-tone-4 {
+  background: linear-gradient(145deg, #3b2c1e, #1d1711 58%, #0b0806);
+}
+
+.book-cover-tone-5 {
+  background: linear-gradient(145deg, #21343a, #121d22 58%, #080c0f);
+}
+
+.book-cover-label {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.book-cover-initial {
+  align-self: center;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: clamp(2.9rem, 9vw, 4.6rem);
+  font-weight: 750;
+  line-height: 0.95;
+}
+
+.book-cover-rule {
+  width: 42%;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.book-card-content {
+  display: grid;
+  gap: 8px;
+}
+
+.book-title-link {
+  color: var(--astral-text);
+}
+
+.book-title-link h2 {
+  display: -webkit-box;
+  min-height: 2.5em;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: inherit;
+  font-size: 1rem;
+  line-height: 1.25;
+  text-wrap: pretty;
+}
+
+.shelf-book-card .book-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--astral-muted);
+  font-size: 0.84rem;
+}
+
+.book-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.shelf-book-card .button-link {
+  flex: 1 1 auto;
+  justify-content: center;
+  border-color: var(--astral-line);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--astral-text);
+  box-shadow: none;
+}
+
+.shelf-book-card .button-link:hover {
+  border-color: rgba(110, 123, 239, 0.34);
+  background: rgba(110, 123, 239, 0.12);
+}
+
+.shelf-book-card .button-danger {
+  border-color: rgba(255, 99, 99, 0.16);
+  background: rgba(255, 99, 99, 0.08);
+  color: #ffb4b4;
+}
+

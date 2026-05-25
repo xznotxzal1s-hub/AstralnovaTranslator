@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { EmptyState } from "@/components/empty-state";
 import { ReaderExperience } from "@/components/reader-experience";
 import { TranslateChapterButton } from "@/components/translate-chapter-button";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { fetchBook, fetchBookChapters, fetchChapter, fetchReadingProgress } from "@/lib/api";
 import { formatMessage } from "@/lib/i18n";
 import { getServerI18n } from "@/lib/i18n-server";
@@ -87,9 +88,9 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
                 <span className="stat-chip">
                   {formatMessage(messages.chapterEyebrow, { count: chapter.index_in_book })}
                 </span>
-                <span className={`stat-chip status-pill ${chapter.translation_status}`}>
+                <StatusBadge className="stat-chip" status={chapter.translation_status} withPill={false}>
                   {formatMessage(messages.statusLabel, { status: localizedStatus })}
-                </span>
+                </StatusBadge>
               </div>
             </div>
             <div className="reader-header-actions">

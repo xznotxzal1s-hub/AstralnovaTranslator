@@ -1,0 +1,62 @@
+/* Feedback messages, progress panels, and detail summary metadata. */
+.feedback {
+  min-height: 24px;
+  margin: 0;
+  padding: 0;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.feedback.success,
+.feedback.error {
+  min-height: auto;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+}
+
+.feedback.success {
+  background: var(--success-soft);
+  color: var(--success);
+  border-color: rgba(47, 122, 77, 0.12);
+}
+
+.feedback.error {
+  background: var(--error-soft);
+  color: var(--error);
+  border-color: rgba(162, 61, 61, 0.16);
+}
+
+.translate-button-wrap {
+  display: grid;
+  gap: 10px;
+}
+
+.destructive-action {
+  display: grid;
+  gap: 8px;
+}
+
+.translate-button-wrap.compact {
+  display: inline-flex;
+}
+
+.destructive-action.compact {
+  display: inline-flex;
+}
+
+.batch-translate-panel {
+  display: grid;
+  gap: 10px;
+  justify-items: end;
+}
+
+.batch-translate-note {
+  max-width: 34ch;
+  margin: 0;
+  color: var(--ink-faint);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  text-align: right;
+}
+
