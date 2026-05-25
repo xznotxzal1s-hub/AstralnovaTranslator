@@ -125,6 +125,8 @@ Completed and verified locally:
 Implemented:
 - GitHub Actions workflow for backend image publishing to GHCR
 - GitHub Actions workflow for frontend image publishing to GHCR
+- backend image publishing now waits for the backend unittest suite to pass
+- frontend image publishing now waits for a GitHub Actions `npm run build` check to pass
 - separate NAS Compose file using image tags instead of local build contexts
 - frontend browser API calls now default to the same-origin `/api/backend` proxy, so random NAS tunnel / Tailscale frontend URLs do not require new CORS origins
 - frontend browser API calls are now hard-coded to `/api/backend` to prevent stale GitHub repository variables from baking old absolute backend URLs into GHCR images
@@ -285,6 +287,7 @@ Areas still somewhat rough:
 - this proxy mode avoids CORS for normal app usage when the external NAS URL changes
 - `ALLOWED_ORIGINS` only needs exact external origins when the browser is intentionally configured to call the backend directly
 - GitHub Actions now builds the frontend image with `NEXT_PUBLIC_API_BASE_URL=/api/backend` regardless of any old repository variable value
+- GitHub Actions now runs backend tests and a frontend production build check before publishing matching GHCR images
 - local development has been the main verification path
 - GHCR-based deployment automation is now configured in the repository
 - a final real-world GHCR push/pull validation on the target NAS is still recommended if it has not been exercised yet
@@ -334,6 +337,8 @@ Typical local run:
 
 ## Current recommended next phase
 Recommended next direction:
+- review the GitHub Actions frontend build result, fix any production build issues it reports, then remove the temporary Next.js `ignoreDuringBuilds` and `ignoreBuildErrors` bypasses
+- add a lightweight Docker smoke test script for local/NAS confidence checks
 - split the large frontend stylesheet into smaller, easier-to-maintain sections
 - continue extracting reusable frontend UI primitives from repeated form, button, and feedback patterns
 - consider reader chapter search/jump controls for very large books

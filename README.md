@@ -85,6 +85,8 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 ### Deployment automation
 - GitHub Actions workflow to build and publish backend image to GHCR on push to `main`
 - GitHub Actions workflow to build and publish frontend image to GHCR on push to `main`
+- backend image publishing waits for backend unittest checks to pass
+- frontend image publishing waits for a clean `npm run build` check in GitHub Actions
 - separate NAS Docker Compose file that uses prebuilt GHCR images
 - frontend browser requests use a same-origin `/api/backend` proxy by default, which avoids CORS issues when NAS access URLs change
 
@@ -259,6 +261,12 @@ Important note:
 
 The project now supports automatic Docker image publishing to GitHub Container Registry (GHCR).
 
+Before publishing images, the workflow now runs:
+- backend dependency install plus `python -m unittest discover -s tests -p "test*.py"`
+- frontend dependency install plus `npm run build`
+
+If either quality gate fails, the matching Docker image is not published.
+
 ### What gets published
 
 On push to `main`, GitHub Actions builds and pushes:
@@ -371,6 +379,8 @@ This is intentionally separate so the main deployment stays simple and easy to u
 ## Roadmap / Next Steps
 
 Recommended next work:
+- remove the temporary Next.js build-error bypasses after GitHub Actions exposes and verifies any remaining production build issues
+- add a lightweight Docker smoke test script for local/NAS deployment checks
 - split the large global stylesheet into smaller, easier-to-maintain style modules or component sections
 - continue extracting reusable frontend UI primitives so future UI passes are less CSS-heavy
 - refine reader navigation search/jump controls for books with hundreds of chapters
