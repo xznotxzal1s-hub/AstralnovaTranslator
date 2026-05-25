@@ -127,6 +127,7 @@ Implemented:
 - GitHub Actions workflow for frontend image publishing to GHCR
 - backend image publishing now waits for the backend unittest suite to pass
 - frontend image publishing now waits for a GitHub Actions `npm run build` check to pass
+- Next.js production builds no longer ignore TypeScript or ESLint build-time errors
 - separate NAS Compose file using image tags instead of local build contexts
 - frontend browser API calls now default to the same-origin `/api/backend` proxy, so random NAS tunnel / Tailscale frontend URLs do not require new CORS origins
 - frontend browser API calls are now hard-coded to `/api/backend` to prevent stale GitHub repository variables from baking old absolute backend URLs into GHCR images
@@ -337,7 +338,6 @@ Typical local run:
 
 ## Current recommended next phase
 Recommended next direction:
-- review the GitHub Actions frontend build result, fix any production build issues it reports, then remove the temporary Next.js `ignoreDuringBuilds` and `ignoreBuildErrors` bypasses
 - add a lightweight Docker smoke test script for local/NAS confidence checks
 - split the large frontend stylesheet into smaller, easier-to-maintain sections
 - continue extracting reusable frontend UI primitives from repeated form, button, and feedback patterns

@@ -87,6 +87,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - GitHub Actions workflow to build and publish frontend image to GHCR on push to `main`
 - backend image publishing waits for backend unittest checks to pass
 - frontend image publishing waits for a clean `npm run build` check in GitHub Actions
+- Next.js production builds now use normal TypeScript and ESLint failure behavior instead of ignoring build-time errors
 - separate NAS Docker Compose file that uses prebuilt GHCR images
 - frontend browser requests use a same-origin `/api/backend` proxy by default, which avoids CORS issues when NAS access URLs change
 
@@ -379,7 +380,6 @@ This is intentionally separate so the main deployment stays simple and easy to u
 ## Roadmap / Next Steps
 
 Recommended next work:
-- remove the temporary Next.js build-error bypasses after GitHub Actions exposes and verifies any remaining production build issues
 - add a lightweight Docker smoke test script for local/NAS deployment checks
 - split the large global stylesheet into smaller, easier-to-maintain style modules or component sections
 - continue extracting reusable frontend UI primitives so future UI passes are less CSS-heavy
