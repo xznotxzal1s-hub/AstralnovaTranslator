@@ -1,0 +1,108 @@
+/* Core visual refinement layer kept in the original cascade position. */
+/* UI-R2: warmer reading-app system, focused on hierarchy and long-form readability. */
+.app-page {
+  gap: 26px;
+}
+
+.panel,
+.book-card,
+.chapter-card,
+.reader-card,
+.form-card,
+.info-card,
+.empty-state {
+  border-color: rgba(111, 83, 54, 0.15);
+  border-radius: 30px;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 248, 0.98), rgba(250, 242, 231, 0.94)),
+    var(--paper);
+  box-shadow: var(--shadow-card);
+}
+
+.section-panel {
+  padding: clamp(22px, 2.3vw, 34px);
+}
+
+.page-masthead {
+  position: relative;
+  overflow: hidden;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 360px);
+  align-items: center;
+  border-radius: 34px;
+  background:
+    radial-gradient(circle at 88% 18%, rgba(66, 105, 91, 0.16), transparent 28%),
+    linear-gradient(135deg, rgba(255, 253, 248, 0.99), rgba(244, 232, 216, 0.94));
+}
+
+.page-masthead::after {
+  content: "";
+  position: absolute;
+  right: clamp(18px, 4vw, 52px);
+  bottom: -44px;
+  width: 170px;
+  height: 170px;
+  border: 1px solid rgba(150, 83, 54, 0.14);
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.page-masthead-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.page-masthead h1,
+.bookshelf-header h1 {
+  max-width: 12em;
+  font-size: clamp(2rem, 3.6vw, 3.2rem);
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.lede,
+.page-lead,
+.muted,
+.section-header p {
+  text-wrap: pretty;
+}
+
+.button {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.18), transparent 40%),
+    linear-gradient(135deg, #8f452b, #c27a4c);
+  box-shadow:
+    0 14px 24px rgba(143, 69, 43, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+.button-secondary {
+  border-color: rgba(66, 105, 91, 0.16);
+  background: linear-gradient(135deg, rgba(66, 105, 91, 0.12), rgba(255, 252, 247, 0.94));
+  color: #31574a;
+}
+
+.button-link {
+  border-color: rgba(111, 83, 54, 0.16);
+  background: rgba(255, 252, 247, 0.9);
+}
+
+.button:hover,
+.button-secondary:hover,
+.button-link:hover,
+.button-danger:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 16px 30px rgba(86, 63, 37, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.48);
+}
+
+.field input,
+.field textarea,
+.field select,
+.field input[type="file"] {
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(255, 250, 243, 0.96)),
+    var(--paper-strong);
+}
+

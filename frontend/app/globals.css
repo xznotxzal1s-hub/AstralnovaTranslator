@@ -7,9 +7,13 @@
 @import "./styles/reader.css";
 @import "./styles/bookshelf.css";
 @import "./styles/book-detail.css";
-@import "./styles/visual-polish.css";
+@import "./styles/visual-foundation.css";
+@import "./styles/bookshelf-hero-polish.css";
+@import "./styles/bookshelf-library-polish.css";
 @import "./styles/dark-theme.css";
-@import "./styles/reader-polish.css";
+@import "./styles/reader-surface-polish.css";
+@import "./styles/reader-controls-polish.css";
+@import "./styles/reader-sidebar-polish.css";
 @import "./styles/settings.css";
 @import "./styles/glossary.css";
 @import "./styles/dialogs.css";

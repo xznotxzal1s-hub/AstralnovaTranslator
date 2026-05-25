@@ -15,8 +15,7 @@ The app is beyond the original V1 baseline and is currently a usable NAS-friendl
 - Batch translation uses simple persisted in-process jobs with visible frontend polling.
 - Reader Experience R2A is implemented: reading progress is stored in SQLite, Continue Reading restores the saved chapter and approximate scroll position, and reader visual preferences are stored in browser `localStorage`.
 - GHCR image publishing and NAS prebuilt-image deployment files exist.
-- Frontend Maintainability R3A is in progress/completed in code: the large global stylesheet has been split into ordered responsibility files, and a few low-risk UI primitives now cover repeated button, form field, pagination, and status badge patterns.
-- Frontend Maintainability R3B continued the primitive migration without changing product behavior or visual design.
+- Frontend Maintainability R3A-R3C is complete in code: the large global stylesheet has been split into ordered responsibility files, polish layers were split further by page/reader responsibility, and low-risk UI primitives now cover repeated button, form field, pagination, and status badge patterns.
 
 The project should stay small, private, and beginner-friendly. Do not turn it into a public platform or a distributed job system.
 
@@ -135,7 +134,7 @@ GitHub Actions is the source of truth for frontend production build verification
 - URL import intentionally blocks local/private targets for NAS safety.
 - Batch jobs are in-process and not resumable.
 - Reader scroll restoration is approximate, especially after translated text changes.
-- The global frontend stylesheet is large and should be split later.
+- Frontend styles are now split into ordered files; future cleanup should be small, browser-verified component-level extraction rather than another broad CSS reshuffle.
 - Settings and glossary pages are usable but still have room for form/table polish.
 - Translation presets are global only; no per-book preset binding yet.
 
@@ -178,9 +177,13 @@ CSS split files:
 - `frontend/app/styles/reader.css`
 - `frontend/app/styles/bookshelf.css`
 - `frontend/app/styles/book-detail.css`
-- `frontend/app/styles/visual-polish.css`
+- `frontend/app/styles/visual-foundation.css`
+- `frontend/app/styles/bookshelf-hero-polish.css`
+- `frontend/app/styles/bookshelf-library-polish.css`
 - `frontend/app/styles/dark-theme.css`
-- `frontend/app/styles/reader-polish.css`
+- `frontend/app/styles/reader-surface-polish.css`
+- `frontend/app/styles/reader-controls-polish.css`
+- `frontend/app/styles/reader-sidebar-polish.css`
 - `frontend/app/styles/settings.css`
 - `frontend/app/styles/glossary.css`
 - `frontend/app/styles/dialogs.css`
@@ -207,7 +210,7 @@ R3A verification:
 R3B candidates:
 - continue migrating any newly added direct button/link markup to `Button` / `ButtonLink`
 - continue migrating any newly added simple forms to `FormField`
-- split or simplify `visual-polish.css` and `reader-polish.css` after visual browser checks
+- review remaining style files only after visual browser checks
 - consider component-level CSS only after the current split has proven stable
 
 ### Frontend Maintainability R3B notes
@@ -232,6 +235,24 @@ R3B verification:
 - no backend tests were required because backend files were not touched
 - local `npm run build` was intentionally skipped because GitHub Actions is the production build source of truth
 - Docker build/up/smoke was intentionally skipped due to Codex constraints
+
+### Frontend Maintainability R3C notes
+
+R3C was a mechanical CSS maintainability split only; it did not change selectors, visual rules, route behavior, or API behavior.
+
+Files split:
+- `frontend/app/styles/visual-polish.css` was split into `visual-foundation.css`, `bookshelf-hero-polish.css`, and `bookshelf-library-polish.css`.
+- `frontend/app/styles/reader-polish.css` was split into `reader-surface-polish.css`, `reader-controls-polish.css`, and `reader-sidebar-polish.css`.
+- `frontend/app/globals.css` still remains the single ordered stylesheet entrypoint.
+
+R3C verification:
+- Old `visual-polish.css` content compared against the concatenated new visual files with diff count `0`.
+- Old `reader-polish.css` content compared against the concatenated new reader files with diff count `0`.
+- `npm exec tsc -- --noEmit --incremental false` passed in `frontend/`.
+- `git diff --check` passed.
+- no backend tests were required because backend files were not touched.
+- local `npm run build` was intentionally skipped because GitHub Actions is the production build source of truth.
+- Docker build/up/smoke was intentionally skipped due to Codex constraints.
 
 ### Reader R2A manual checklist
 
