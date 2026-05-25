@@ -1,182 +1,97 @@
-# Private Light Novel AI Translator Reader
+# AstralnovaTranslator
 
-A small private web app for reading and translating Japanese light novel content with your own AI API credentials.
+A private, self-hosted light novel translation reader for one user.
 
-This project is designed for single-user self-hosting. The main target is a NAS or local machine running Docker Compose, with access from a desktop or mobile browser.
+AstralnovaTranslator helps you import Japanese novel text, translate chapters with your own AI API credentials, save everything locally, and read in a browser on desktop or mobile. It is designed for a NAS or local machine running Docker Compose.
 
-## Project Overview
-
-The app currently supports:
-- creating books
-- creating chapters manually by pasting Japanese text
-- importing `.txt` files
-- importing `.epub` files
-- previewing and importing webpage URLs into books/chapters
-- translating chapters with user-provided AI provider settings and saved presets
-- saving source text and translated text locally
-- reading source text and translation in a browser
-- moving between previous and next chapters from the reader page
-- managing a global glossary and per-book glossary
-- reusing cached translations to avoid repeated identical API calls
-- deleting books and chapters
-- batch translating all untranslated chapters in a book
-- filtering chapter lists by status and searching chapter titles
-- exporting a local backup zip from the settings page
-- publishing backend/frontend Docker images to GHCR through GitHub Actions
-- deploying on NAS with prebuilt images instead of local source builds
-- a warmer paper-and-ink UI refinement focused on bookshelf readability, reader comfort, and consistent management pages
-
-The project is intentionally kept small, beginner-friendly, and focused on private reading assistance.
+This project is for personal reading assistance only. It is not a public sharing or distribution platform.
 
 ## Current Features
 
-### Backend
-- FastAPI backend
-- SQLite persistence
-- `Book`, `Chapter`, `TranslationConfig`, `GlossaryEntry`, and `TranslationRecord` models
-- uniqueness safeguards for translation cache keys and per-book chapter order
-- lightweight versioned SQLite schema migrations tracked in a `schema_migrations` table
-- settings API
-- translation preset API
-- prompt template validation API
-- glossary API
-- book/chapter CRUD APIs
-- TXT import API
-- EPUB import API
-- webpage URL import API
-- webpage URL preview API
-- chapter translation API
-- persisted translation job API for batch translation progress
-- backup export API
-- translation caching based on source hash + provider/model + prompt hash
-- configurable CORS origins through `ALLOWED_ORIGINS`
-- upload and webpage import size limits through `MAX_UPLOAD_MB` and `MAX_WEBPAGE_MB`
-- chapter and translation changes refresh the parent book timestamp so the bookshelf ordering stays current
+### Reading and library
+- Create, rename, and delete books.
+- Create, delete, and read chapters.
+- Import TXT and EPUB files.
+- Preview and import a single webpage URL into the existing book/chapter workflow.
+- View books on a bookshelf page and manage chapters from a book detail page.
+- Paginate, filter, and search long chapter lists.
+- Continue Reading opens the saved chapter and restores the approximate scroll position.
+- Reading progress is stored in SQLite, so it can follow you across browsers/devices that use the same NAS.
+- Reader preferences are stored in browser `localStorage`, so font/theme choices are per browser/device.
+- Reader modes: translation-only, source + translation, and source-only.
+- Reader controls: font size, line height, content width, paragraph spacing, and paper/sepia/dark reader themes.
+- Keyboard shortcuts in the reader: Left/Right arrows move chapters, `T` cycles read mode.
 
 ### Translation
-- OpenAI-compatible provider support
-- Gemini provider support
-- configurable model, API base URL, API key, translation mode, prompt template, and chunk size
-- prompt templates are validated before settings/presets are saved
-- glossary-aware prompt assembly
-- glossary guidance is still included when a custom prompt template does not explicitly contain `{glossary_guidance}`
-- per-book glossary entries override global glossary entries
-- Japanese-aware chunk splitting for long chapters, preferring paragraphs, sentence endings, dialogue closings, and ellipses before hard length fallback
-- normal translation can reuse matching cached results, while retranslation bypasses the cache and calls the provider again
-- backend batch translation jobs are stored in SQLite and processed sequentially in-process for single-user NAS use
-- duplicate active batch translation jobs for the same book are rejected with HTTP 409
-- pending/running batch jobs left behind by an app restart are marked failed with a clear interrupted message on next startup
-- batch cancellation is cooperative and may take effect only after the current chapter or provider request finishes
-- API keys are masked in settings read responses and preserved when the settings form submits an empty or masked key
-- provider request failures redact configured API keys before errors are returned to the frontend
+- Configure OpenAI-compatible and Gemini providers.
+- Save multiple translation presets and choose one active preset.
+- Configure API base URL, API key, model name, prompt template, chunk size, and translation mode.
+- Validate prompt templates before saving.
+- Translate a single chapter.
+- Retranslate a chapter while bypassing the existing translation cache.
+- Batch translate untranslated chapters from the book detail page through a simple persisted job.
+- Cache translations using source hash + provider/model + prompt hash to avoid repeated identical API calls.
+- Inject global and per-book glossary entries into translation prompts, with per-book glossary entries taking priority.
+- Split long Japanese text with paragraph/sentence-aware chunking.
 
-### Frontend
-- bookshelf page
-- book detail page
-- chapter reading page
-- settings page
-- multiple saved translation presets with one active preset
-- settings page validates prompt templates before saving presets
-- glossary page
-- global and per-book glossary management
-- language switching for Simplified Chinese, English, and Japanese
-- Simplified Chinese as the default UI language
-- reading-focused UI refresh for chapter reading
-- Continue Reading opens the saved chapter and restores the approximate scroll position
-- reading progress is stored in SQLite so the saved position follows you across desktop and mobile browsers
-- reader visual preferences are stored per browser/device in `localStorage`
-- chapter list pagination on the book detail page
-- chapter list status filtering and title search on the book detail page
-- translation-only as the default reader mode, with manual bilingual and source-only switching still available
-- reader display controls for font size, line height, content width, paragraph spacing, and paper/sepia/dark reader themes
-- reader keyboard shortcuts: Left/Right arrows move between chapters, and `T` cycles the read mode
-- compact reader chapter search/jump panel with first/current/last shortcuts and capped search results for large books
-- clear previous/current/next chapter navigation above and below the reader surface
-- small desktop floating previous/next reader controls
-- sticky mobile reader navigation for previous/book/next
-- theme-aware, denser reader chapter outline for large books
-- webpage URL import form on the bookshelf page
-- webpage URL import previews detected title, chapter count, and extracted text before saving
-- delete actions with confirmation
-- batch translation action from book detail page using persisted backend jobs and visible polling progress
-- settings page backup export button
-- active-page navigation highlighting
-- user-friendly localized status labels
-- UI-R1 bookshelf refinement with a consolidated add/import dialog and cover-style book cards
-- UI-R2 visual refinement with a calmer paper-and-ink style across the app shell, bookshelf, reader, settings, and glossary pages
-- Taste-skill homepage refinement with an asymmetric reading-desk first screen and no homepage icon dependency
-- UI-R3 non-homepage refinement with in-app confirmation dialogs, direct chapter page links, focused reader chapter navigation, and denser settings/glossary management surfaces
-- mobile bookshelf refinement with fixed bottom navigation and compact book rows
-
-### Deployment automation
-- GitHub Actions workflow to build and publish backend image to GHCR on push to `main`
-- GitHub Actions workflow to build and publish frontend image to GHCR on push to `main`
-- backend image publishing waits for backend unittest checks to pass
-- frontend image publishing waits for a clean `npm run build` check in GitHub Actions
-- Next.js production builds now use normal TypeScript and ESLint failure behavior instead of ignoring build-time errors
-- local Docker smoke test script for checking Compose startup, backend health, frontend availability, and the same-origin API proxy
-- separate NAS Docker Compose file that uses prebuilt GHCR images
-- frontend browser requests use a same-origin `/api/backend` proxy by default, which avoids CORS issues when NAS access URLs change
+### Safety and operations
+- SQLite database and uploads are stored in mounted local directories.
+- Upload and webpage import size limits are configurable.
+- URL import blocks unsafe local/private network targets.
+- API keys are masked in read responses and redacted from provider errors.
+- Backup export creates a zip with a SQLite snapshot, uploads, and metadata.
+- Backend tests and frontend production build checks run in GitHub Actions before GHCR images are published.
+- Frontend browser requests use the same-origin `/api/backend` proxy by default, which avoids CORS issues when NAS access URLs change.
 
 ## Current Limitations
 
-This is still a V1-style private tool. A few things are intentionally simple:
-- no website crawling or scraping
-- webpage URL import is intentionally simple and works best for direct article / novel pages, not full-site crawling
-- webpage URL import now asks you to preview extracted content before saving, but extraction quality still depends on the page structure
-- no user accounts or multi-user support
-- no browser extension
-- no OCR, PDF, TTS, cloud sync, or advanced AI analysis features
-- API keys are still stored in the local SQLite database in V1; they are masked in API read responses and redacted from provider error messages, but not encrypted at rest
-- backup export uses a SQLite snapshot before zipping the database, but exported zip files still include the SQLite database and may contain saved API keys, so store them privately
-- delete confirmation now uses a shared in-app confirmation dialog instead of browser-native confirm boxes
-- UI-R3 adds a few reusable frontend primitives, but the stylesheet is still large and could be split further
-- settings and glossary pages are usable and more visually consistent, but still need deeper form/table usability polish
-- book detail chapter pagination supports direct page links, while reader-side navigation intentionally shows a focused chapter window for long books
-- reader scroll progress is approximate; if translated content changes later, the restored position may be close rather than exact
-- reader visual preferences are intentionally stored in browser `localStorage`, so each browser/device can have its own font, width, theme, and read-mode choices
-- mobile bookshelf browsing is denser than before, but some non-bookshelf management pages may still need additional small-screen polish
-- translation presets are global only and do not yet support import/export or per-book assignment
-- Docker/NAS deployment files exist, but a fresh full end-to-end Docker verification is still recommended after the latest refinements
-- GHCR publishing depends on GitHub repository/package setup; the frontend browser client is intentionally locked to the same-origin `/api/backend` proxy for NAS stability
+- Single-user only. There is no login, account system, role system, or multi-user permission model.
+- No website crawling or bulk scraping. URL import is for one page at a time.
+- URL import works best with normal article/novel pages. Pages behind login, heavy client-side rendering, or anti-bot protection may fail.
+- No browser extension, OCR, PDF import, TTS, cloud sync, public sharing, or social features.
+- API keys are stored in local SQLite for V1 simplicity. They are masked/redacted in API responses, but not encrypted at rest.
+- Backup zip files may contain saved API keys because they include a SQLite database snapshot. Store backups privately.
+- Batch translation jobs are simple in-process jobs. If the backend restarts, pending/running jobs are marked failed and should be restarted manually.
+- Batch cancellation is cooperative and may take effect only after the current chapter/provider request finishes.
+- Reader scroll restoration is approximate, especially if translation text changes after progress was saved.
+- The global stylesheet is still large and should eventually be split into smaller style modules.
 
 ## Project Structure
 
 ```text
 backend/
   app/
-    api/
-    core/
-    models/
-    schemas/
-    services/
-    utils/
-    main.py
+    api/          FastAPI route modules
+    core/         config, database, lightweight schema migrations
+    models/       SQLAlchemy models
+    schemas/      Pydantic schemas
+    services/     business logic
+    utils/        import, text, and translation helpers
+    main.py       FastAPI app entrypoint
+  tests/          backend unittest suite
+  Dockerfile
   requirements.txt
-  Dockerfile
+
 frontend/
-  app/
-  components/
-  lib/
-  package.json
+  app/            Next.js App Router pages and API proxy
+  components/     UI components
+  lib/            API helpers, i18n, shared types
   Dockerfile
-data/
-uploads/
+  package.json
+
+data/             local SQLite data volume, ignored by git
+uploads/          local upload volume, ignored by git
 docker-compose.yml
-.env.example
-PROJECT_SPEC.md
-AGENTS.md
-README.md
-.github/workflows/
 docker-compose.nas.yml
+.env.example
 .env.nas.example
 ```
 
 ## Local Development Setup
 
-These steps assume Windows PowerShell.
+These commands are for Windows PowerShell.
 
-### 1. Prepare the environment file
+### 1. Prepare environment files
 
 From the project root:
 
@@ -184,318 +99,181 @@ From the project root:
 Copy-Item .env.example .env
 ```
 
-Success should look like:
-- a new `.env` file appears in the project root
-
-Useful local defaults in `.env.example`:
-- `ALLOWED_ORIGINS` controls which browser origins may call the backend API.
-- `NEXT_PUBLIC_API_BASE_URL=/api/backend` makes the browser call the Next.js frontend first, then the frontend proxies to the backend.
-- `INTERNAL_API_BASE_URL=http://backend:8000` is used by Docker containers for frontend-to-backend server-side requests.
-- `MAX_UPLOAD_MB` limits TXT/EPUB upload size.
-- `MAX_WEBPAGE_MB` limits webpage URL import response size.
+Edit `.env` if you want different ports, upload limits, or initial provider defaults.
 
 ### 2. Start the backend
 
 ```powershell
-cd D:\AstralnovaTranslator\backend
-py -3 -m venv .venv
+cd backend
+python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
 pip install -r requirements.txt
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Success should look like:
-- the virtual environment activates
-- dependencies install without errors
-- the backend starts on `http://localhost:8000`
-- Swagger docs open at `http://localhost:8000/docs`
+Success looks like:
+- the terminal says Uvicorn is running
+- `http://localhost:8000/health` returns `{"status":"ok"}`
+- `http://localhost:8000/docs` opens Swagger UI
 
 ### 3. Start the frontend
 
-Open a new PowerShell window:
+Open a second PowerShell window:
 
 ```powershell
-cd D:\AstralnovaTranslator\frontend
+cd frontend
 npm install
 npm run dev
 ```
 
-Success should look like:
-- dependencies install without errors
-- the frontend starts on `http://localhost:3000`
+Success looks like:
+- Next.js starts on port `3000`
+- `http://localhost:3000` opens the bookshelf page
 
-### 4. Open the app
+### 4. Basic local verification
 
-Useful URLs:
-- frontend: `http://localhost:3000`
-- backend docs: `http://localhost:8000/docs`
-- backend health: `http://localhost:8000/health`
+In the browser:
+- Create a book.
+- Open the book detail page.
+- Create a chapter by pasting Japanese text.
+- Configure a translation preset in Settings.
+- Translate the chapter.
+- Read the translated chapter.
+- Scroll in the reader, leave the page, then use Continue Reading to confirm progress is restored.
+- Try TXT, EPUB, or webpage URL import if needed.
 
-## What You Can Verify Locally Right Now
+## Verification Commands
 
-You can currently verify all of these manually:
-- create a book from the bookshelf page
-- use the asymmetric homepage import workspace to create or import books
-- create a chapter by pasting Japanese text
-- import a TXT file
-- import an EPUB file
-- preview and import a webpage URL
-- use the bookshelf add/import dialog to switch between manual create, URL preview/import, TXT, and EPUB import flows
-- create, edit, activate, and delete translation presets
-- create global glossary entries
-- create per-book glossary entries
-- translate a chapter
-- confirm translation cache reuse
-- confirm retranslation calls the provider again instead of returning the old cached translation
-- confirm settings reads show a masked API key instead of the full secret
-- confirm failed provider requests do not show the full API key in the frontend error message
-- confirm chapter changes or translation activity move the touched book upward in the bookshelf ordering
-- confirm startup schema migrations are recorded once in `schema_migrations` and remain safe to rerun
-- batch translate all untranslated chapters in a book
-- confirm a second batch translation request for the same book is rejected while the first job is pending/running
-- export a backup zip from the settings page
-- page through long chapter lists on the book detail page
-- jump directly to a chapter-list page number on the book detail page
-- filter chapters by translation status and search chapter titles on the book detail page
-- delete a chapter
-- delete a book
-- confirm destructive actions through the in-app confirmation dialog
-- open a chapter with translation-only as the default reading mode
-- switch manually between translation-only, source + translation, and source-only modes
-- use Continue Reading from the book detail page to reopen the saved chapter and approximate scroll position
-- adjust reader font size, line height, content width, paragraph spacing, and reader theme from the reading page
-- use Left/Right arrow keys for previous/next chapter and `T` to cycle reader modes when not typing in a form field
-- search chapter titles from the reader jump panel and use first/current/last chapter shortcuts
-- use previous/next chapter controls at the top and bottom of the reader page
-- switch day/night mode on the reader page and confirm the chapter outline follows the active theme
-
-Backend regression tests can be run from `backend/`:
+Backend tests from `backend/`:
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest discover -s tests -p "test*.py"
 ```
 
-For the Integration Hardening R1 checks specifically:
-
-```powershell
-.\.venv\Scripts\python.exe -m unittest tests.test_translation_jobs tests.test_backup_export tests.test_route_registration
-```
-
-For the Reader Experience R2A checks specifically:
+Reader Experience R2A targeted tests:
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest tests.test_reading_progress tests.test_schema_migrations tests.test_route_registration
 ```
 
-## Current Docker / NAS Status
+Lightweight frontend TypeScript check from `frontend/`:
 
-The repository includes:
-- `docker-compose.yml`
-- `docker-compose.nas.yml`
-- `.github/workflows/publish-images.yml`
-- backend Dockerfile
-- frontend Dockerfile
-- `.env.example`
-- `.env.nas.example`
+```powershell
+npm exec tsc -- --noEmit --incremental false
+```
 
-Persistent directories:
-- `./data` for SQLite data
-- `./uploads` for imported/uploaded files
+Important for Codex/agent sessions:
+- Do not run local `npm run build` in Codex unless explicitly allowed.
+- Do not run Docker build/up/smoke tests in Codex unless explicitly allowed.
+- GitHub Actions is the source of truth for frontend production build verification.
 
-Basic Docker command:
+## Docker and NAS Deployment
+
+### Local Docker Compose
+
+For a normal local Docker run:
 
 ```powershell
 docker compose up --build
 ```
 
-Expected URLs after startup:
+The default local mapping is:
 - frontend: `http://localhost:3000`
-- backend docs: `http://localhost:8000/docs`
+- backend: `http://localhost:8000`
 
-Important note:
-- Docker/NAS support is part of the project structure and earlier setup work, but the main verification path recently has been local manual testing rather than repeated full Docker retesting after every refinement
+### GHCR-based NAS deployment
 
-### Optional Docker smoke test
+NAS deployment should use prebuilt GHCR images instead of uploading source code manually.
 
-For a quick local confidence check, use the PowerShell smoke script from the project root:
+1. Copy these files to a folder on the NAS:
+   - `docker-compose.nas.yml`
+   - `.env.nas.example`
 
-```powershell
-Copy-Item .env.example .env
-.\scripts\smoke-docker.ps1
-```
+2. Rename `.env.nas.example` to `.env.nas`.
 
-The script will:
-- build the Docker images with `docker compose build`
-- start the stack with `docker compose up -d`
-- check `http://localhost:18000/health`
-- check `http://localhost:13000`
-- check the frontend same-origin proxy at `http://localhost:13000/api/backend/health`
-- stop the stack with `docker compose down`
-
-If the images are already built and you only want a faster startup check:
-
-```powershell
-.\scripts\smoke-docker.ps1 -SkipBuild
-```
-
-Success should end with:
-
-```text
-[ok] Docker smoke test completed successfully.
-```
-
-## GitHub Actions + GHCR Setup
-
-The project now supports automatic Docker image publishing to GitHub Container Registry (GHCR).
-
-Before publishing images, the workflow now runs:
-- backend dependency install plus `python -m unittest discover -s tests -p "test*.py"`
-- frontend dependency install plus `npm run build`
-
-If either quality gate fails, the matching Docker image is not published.
-
-### What gets published
-
-On push to `main`, GitHub Actions builds and pushes:
-- `ghcr.io/YOUR_GITHUB_USERNAME_OR_ORG/astralnova-translator-backend:latest`
-- `ghcr.io/YOUR_GITHUB_USERNAME_OR_ORG/astralnova-translator-frontend:latest`
-
-It also publishes SHA-based tags for rollback/debugging.
-
-### GitHub repository setup
-
-Required:
-1. Push this repository to GitHub
-2. Make sure the default branch is `main`
-3. Open the repository `Settings`
-4. Under `Actions > General`, allow workflows to run
-5. Under `Actions > General`, make sure the workflow has permission to read repository contents and write packages if your organization restricts defaults
-
-### GitHub variable
-
-The frontend browser client is locked to the same-origin proxy path:
-
-- Name: `NEXT_PUBLIC_API_BASE_URL`
-- Value: `/api/backend`
-
-You may also delete this repository variable; the workflow now builds with `/api/backend` directly.
-
-Do not set this variable to an absolute NAS backend URL such as `http://192.168.178.54:18000`. The browser-side frontend no longer needs that value, and using same-origin proxying avoids CORS problems when Tailscale or tunnel URLs change.
-
-### GitHub secrets
-
-For image publishing itself, no custom repository secret is required if you use the built-in `GITHUB_TOKEN`.
-
-The workflow already uses:
-- `secrets.GITHUB_TOKEN`
-
-You only need extra secrets later if you choose to add automated remote deployment or webhook-based updates.
-
-## GHCR-Based NAS Deployment
-
-### 1. Prepare NAS files
-
-On the NAS, place these files in your deployment folder:
-- `docker-compose.nas.yml`
-- `.env.nas` copied from `.env.nas.example`
-
-Create `.env.nas` from the example and update at least:
+3. Set image names and ports in `.env.nas`, for example:
 
 ```env
-BACKEND_IMAGE=ghcr.io/YOUR_GITHUB_USERNAME_OR_ORG/astralnova-translator-backend:latest
-FRONTEND_IMAGE=ghcr.io/YOUR_GITHUB_USERNAME_OR_ORG/astralnova-translator-frontend:latest
+BACKEND_IMAGE=ghcr.io/xznotxzal1s-hub/astralnova-translator-backend:latest
+FRONTEND_IMAGE=ghcr.io/xznotxzal1s-hub/astralnova-translator-frontend:latest
 BACKEND_PORT=18000
 FRONTEND_PORT=13000
 NEXT_PUBLIC_API_BASE_URL=/api/backend
 INTERNAL_API_BASE_URL=http://backend:8000
-ALLOWED_ORIGINS=http://YOUR_NAS_IP_OR_DOMAIN:13000
-MAX_UPLOAD_MB=50
-MAX_WEBPAGE_MB=5
 ```
 
-Important:
-- `NEXT_PUBLIC_API_BASE_URL=/api/backend` means the browser calls the frontend origin, and Next.js proxies the request to the backend.
-- `INTERNAL_API_BASE_URL=http://backend:8000` must stay reachable from the frontend container.
-- This proxy mode works better with Tailscale, reverse proxy, and NAS tunnel URLs because the external frontend URL can change without creating a new CORS origin.
-- `ALLOWED_ORIGINS` mainly matters for direct backend testing through Swagger or scripts from a browser origin. Normal app usage should go through `/api/backend`.
+4. Set `ALLOWED_ORIGINS`.
 
-### 2. Log in to GHCR on the NAS
+For the main frontend UI, browser requests go through `/api/backend`, so changing NAS access URLs is much less fragile than direct backend CORS. `ALLOWED_ORIGINS` is still useful for direct backend/Swagger access from a browser.
 
-If the packages are private, create a GitHub Personal Access Token with package read access and log in:
-
-```powershell
-docker login ghcr.io -u YOUR_GITHUB_USERNAME
-```
-
-When prompted, paste your token.
-
-### 3. Pull and start the stack
-
-From the NAS deployment folder:
+5. Pull and start:
 
 ```powershell
 docker compose -f docker-compose.nas.yml --env-file .env.nas pull
 docker compose -f docker-compose.nas.yml --env-file .env.nas up -d
 ```
 
-Success should look like:
-- backend container starts from the GHCR backend image
-- frontend container starts from the GHCR frontend image
-- the app opens without needing to upload source code to the NAS
-
-### 4. Update later
-
-After a new push to `main` finishes publishing images:
+6. Update later:
 
 ```powershell
 docker compose -f docker-compose.nas.yml --env-file .env.nas pull
 docker compose -f docker-compose.nas.yml --env-file .env.nas up -d
 ```
 
-That is the new normal deployment flow.
+### Optional Docker smoke test
 
-## Optional Automatic Updates Later
+A manual smoke script exists for local confidence checks:
 
-If you later want fully automatic updates, you can add Watchtower as a separate optional layer.
+```powershell
+.\scripts\smoke-docker.ps1
+```
 
-An example file is included:
-- `docker-compose.watchtower.example.yml`
+It builds and starts Docker Compose, checks backend health, checks frontend availability, checks the same-origin API proxy, and then cleans up. Do not run this from Codex unless explicitly allowed.
 
-This is intentionally separate so the main deployment stays simple and easy to understand first.
+## GitHub Actions and GHCR
+
+The repository includes `.github/workflows/publish-images.yml`.
+
+On push to `main`, GitHub Actions:
+- installs backend dependencies and runs backend unittest checks
+- installs frontend dependencies and runs `npm run build`
+- publishes separate backend and frontend images to GHCR only after the matching checks pass
+
+Repository/package setup needed:
+- GitHub Actions must have permission to write packages.
+- GHCR packages should be visible to the NAS account or made public/private as desired.
+- `GHCR_USERNAME` and `GHCR_TOKEN` may be needed on the NAS for pulling private images.
 
 ## Roadmap / Next Steps
 
-Recommended next work:
-- split the large global stylesheet into smaller, easier-to-maintain style modules or component sections
-- continue extracting reusable frontend UI primitives so future UI passes are less CSS-heavy
-- refine reader navigation search/jump controls for books with hundreds of chapters
-- more manual verification against real-world webpage layouts if URL import becomes part of the regular workflow
-- consider backup restore/import later, after export has been used safely
-- optional automatic update flow after GHCR-based deployment is stable
-- final Docker Compose / NAS verification pass after the latest frontend changes
-- polish confirmation UX and higher-density long-list management flows
-- complete any remaining V1 cleanup and documentation improvements
+Good next steps:
+- Manually verify the new reader progress/preferences flow on desktop and mobile.
+- Split the large global stylesheet into smaller maintainable sections.
+- Continue extracting reusable UI primitives from repeated buttons, panels, forms, and feedback messages.
+- Improve settings and glossary form/table usability.
+- Add provider connection testing and model-list helpers.
+- Consider backup restore later, but keep it separate because restore is riskier than export.
+- Optionally add Watchtower or another NAS auto-update flow after GHCR deployment remains stable.
 
 ## Non-Goals
 
-Still out of scope for V1:
-- automatic Narou crawling
-- bulk website scraping
+Do not add these unless explicitly requested:
+- public sharing or distribution
+- user registration/login
+- multi-user permissions
+- bulk website crawling
 - browser extension
-- multi-user accounts
-- social or sharing features
-- cloud sync
 - OCR
-- PDF support
+- PDF import
 - TTS
-- advanced AI analysis features
+- cloud sync
+- social features
+- complex distributed workers such as Redis/Celery
 
-## Notes
+## Notes for Future Agents
 
-- If PowerShell mangles Japanese text input, browser forms or Swagger UI usually work better for UTF-8 testing
-- On Windows, long frontend verification commands inside Codex can sometimes hang even when the project itself is fine
-- Codex should not run local frontend production builds (`npm run build`) unless explicitly allowed; GitHub Actions is the source of truth for production build verification
-- Codex should not run Docker build/up or Docker smoke tests unless explicitly allowed; the smoke script is available for manual verification
-- Manual verification is preferred when Windows Codex build runs become unreliable
-- TypeScript incremental build cache files such as `frontend/tsconfig.tsbuildinfo` are ignored and should not be committed
+- Follow `PROJECT_SPEC.md` first, then `AGENTS.md`.
+- Keep the app simple, private, NAS-friendly, and beginner-friendly.
+- Avoid unrelated product scope.
+- Prefer backend unittest and lightweight frontend inspection inside Codex.
+- Do not claim frontend production build or Docker smoke success unless those commands were actually run in an allowed environment.
