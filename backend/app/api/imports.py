@@ -2,8 +2,14 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, s
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.schemas.imports import ImportResponse, UrlImportRequest
-from app.services.import_service import ImportServiceError, import_epub_file, import_txt_file, import_webpage_url
+from app.schemas.imports import ImportResponse, UrlImportPreviewResponse, UrlImportRequest
+from app.services.import_service import (
+    ImportServiceError,
+    import_epub_file,
+    import_txt_file,
+    import_webpage_url,
+    preview_webpage_url,
+)
 
 router = APIRouter(prefix="/import", tags=["import"])
 
@@ -37,6 +43,17 @@ async def import_url(payload: UrlImportRequest, db: Session = Depends(get_db)) -
     try:
         return await import_webpage_url(
             db=db,
+            url=str(payload.url),
+            provided_book_title=payload.book_title,
+        )
+    except ImportServiceError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
+
+
+@router.post("/url/preview", response_model=UrlImportPreviewResponse)
+async def preview_url(payload: UrlImportRequest) -> UrlImportPreviewResponse:
+    try:
+        return await preview_webpage_url(
             url=str(payload.url),
             provided_book_title=payload.book_title,
         )

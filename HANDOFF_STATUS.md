@@ -11,7 +11,7 @@ The app currently supports:
 - creating chapters by pasting Japanese text
 - importing TXT files
 - importing EPUB files
-- importing webpage URLs into books/chapters
+- previewing and importing webpage URLs into books/chapters
 - configuring multiple translation presets and switching the active preset
 - translating single chapters
 - reusing cached translations
@@ -67,8 +67,10 @@ Completed and verified locally:
 ### Webpage URL import
 Completed in code:
 - backend URL import endpoint
+- backend URL import preview endpoint
 - webpage readable-text extraction for typical article / novel pages
 - frontend URL import entry on the bookshelf page
+- frontend URL import now previews detected title, chapter count, and extracted text before saving
 - imported webpage content reuses existing chapter creation and fallback splitting flow
 
 ### Phase 5A
@@ -163,6 +165,13 @@ Completed in code:
 - the frontend polls `GET /translation-jobs/{job_id}` for progress instead of translating each chapter directly in the browser
 - batch progress, success, cancellation, and failure messages are shown through the existing feedback area
 
+### Webpage import preview refinement
+Completed in code and covered by backend regression tests:
+- added `POST /import/url/preview`
+- the URL import UI now extracts a preview before creating a book
+- users can review detected title, chapter count, and the first extracted text before confirming import
+- the final confirm action still uses the existing URL import save path
+
 ### UI-R1 bookshelf refinement
 Implemented in the first slice:
 - modernized bookshelf layout while preserving the existing client-side book refresh flow
@@ -255,7 +264,7 @@ Verified working locally at this point:
 - chapters can be created manually from UI
 - TXT import works
 - EPUB import works for simple valid files
-- webpage URL import flow is implemented and ready for manual verification
+- webpage URL import preview and confirm-save flow is implemented and covered by backend tests
 - translation presets can be created, edited, deleted, and switched
 - invalid prompt templates are rejected before translation settings are saved
 - glossary entries can be created, edited, and deleted
@@ -291,7 +300,7 @@ Current UI state:
 - interaction feedback is clearer through stronger hover, focus, active, and loading states
 - long chapter lists are more manageable because the book detail page now paginates them
 - settings now support a practical preset-based workflow instead of a single flat config form
-- bookshelf import tools now cover TXT, EPUB, and webpage URL workflows
+- bookshelf import tools now cover TXT, EPUB, and webpage URL preview/confirm workflows
 - mobile usability is improved, especially on the bookshelf page, but not fully refined across every management page
 - success/error/loading feedback is clearer than before, especially around forms and batch translation
 

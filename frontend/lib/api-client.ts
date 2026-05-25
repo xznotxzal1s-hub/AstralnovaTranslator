@@ -8,6 +8,7 @@ import type {
   TranslationPreset,
   TranslationSettings,
   UrlImportInput,
+  UrlImportPreview,
 } from "@/lib/types";
 
 const API_BASE_URL = "/api/backend";
@@ -140,6 +141,16 @@ export async function importBookFile(input: {
 
 export async function importBookFromUrl(input: UrlImportInput): Promise<ImportResult> {
   return request<ImportResult>("/import/url", {
+    method: "POST",
+    body: JSON.stringify({
+      url: input.url,
+      book_title: input.bookTitle?.trim() || undefined,
+    }),
+  });
+}
+
+export async function previewBookFromUrl(input: UrlImportInput): Promise<UrlImportPreview> {
+  return request<UrlImportPreview>("/import/url/preview", {
     method: "POST",
     body: JSON.stringify({
       url: input.url,

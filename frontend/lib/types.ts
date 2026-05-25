@@ -40,6 +40,12 @@ export type UrlImportInput = {
   bookTitle?: string;
 };
 
+export type UrlImportPreview = {
+  title: string;
+  chapter_count: number;
+  preview_text: string;
+};
+
 export type TranslationSettings = {
   id: number;
   name: string;

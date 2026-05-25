@@ -13,3 +13,9 @@ class ImportResponse(BaseModel):
     book_title: str
     chapter_count: int
     chapters: list[ChapterRead]
+
+
+class UrlImportPreviewResponse(BaseModel):
+    title: str
+    chapter_count: int
+    preview_text: str

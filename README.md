@@ -11,7 +11,7 @@ The app currently supports:
 - creating chapters manually by pasting Japanese text
 - importing `.txt` files
 - importing `.epub` files
-- importing webpage URLs into books/chapters
+- previewing and importing webpage URLs into books/chapters
 - translating chapters with user-provided AI provider settings and saved presets
 - saving source text and translated text locally
 - reading source text and translation in a browser
@@ -41,6 +41,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - TXT import API
 - EPUB import API
 - webpage URL import API
+- webpage URL preview API
 - chapter translation API
 - persisted translation job API for batch translation progress
 - translation caching based on source hash + provider/model + prompt hash
@@ -77,6 +78,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - chapter list pagination on the book detail page
 - translation-only as the default reader mode, with manual bilingual switching still available
 - webpage URL import form on the bookshelf page
+- webpage URL import previews detected title, chapter count, and extracted text before saving
 - delete actions with confirmation
 - batch translation action from book detail page using persisted backend jobs and visible polling progress
 - active-page navigation highlighting
@@ -102,6 +104,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 This is still a V1-style private tool. A few things are intentionally simple:
 - no website crawling or scraping
 - webpage URL import is intentionally simple and works best for direct article / novel pages, not full-site crawling
+- webpage URL import now asks you to preview extracted content before saving, but extraction quality still depends on the page structure
 - no user accounts or multi-user support
 - no browser extension
 - no OCR, PDF, TTS, cloud sync, or advanced AI analysis features
@@ -215,8 +218,8 @@ You can currently verify all of these manually:
 - create a chapter by pasting Japanese text
 - import a TXT file
 - import an EPUB file
-- import a webpage URL
-- use the bookshelf add/import dialog to switch between manual create, URL, TXT, and EPUB import flows
+- preview and import a webpage URL
+- use the bookshelf add/import dialog to switch between manual create, URL preview/import, TXT, and EPUB import flows
 - create, edit, activate, and delete translation presets
 - create global glossary entries
 - create per-book glossary entries

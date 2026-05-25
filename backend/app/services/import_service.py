@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.models.book import Book
 from app.models.chapter import Chapter
-from app.schemas.imports import ImportResponse
+from app.schemas.imports import ImportResponse, UrlImportPreviewResponse
 from app.utils.epub import extract_epub_contents
 from app.utils.text_import import decode_txt_bytes, infer_book_title_from_filename, split_txt_into_chapters
 from app.utils.webpage_import import extract_webpage_import_content, fetch_webpage_html
@@ -156,4 +156,26 @@ async def import_webpage_url(
         db,
         book_title=imported_content.title,
         chapter_payloads=imported_content.chapter_payloads,
+    )
+
+
+async def preview_webpage_url(
+    url: str,
+    provided_book_title: str | None,
+) -> UrlImportPreviewResponse:
+    try:
+        html = await fetch_webpage_html(url)
+        imported_content = extract_webpage_import_content(html, url=url, provided_book_title=provided_book_title)
+    except httpx.HTTPError as exc:
+        raise ImportServiceError(f"Failed to fetch the webpage: {exc}") from exc
+    except ValueError as exc:
+        raise ImportServiceError(str(exc), status_code=400) from exc
+
+    preview_text = "\n\n".join(
+        chapter_payload["source_text"] for chapter_payload in imported_content.chapter_payloads
+    ).strip()
+    return UrlImportPreviewResponse(
+        title=imported_content.title,
+        chapter_count=len(imported_content.chapter_payloads),
+        preview_text=preview_text[:1000],
     )

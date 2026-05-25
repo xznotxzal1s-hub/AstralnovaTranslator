@@ -1458,6 +1458,36 @@ p {
   border-color: rgba(162, 61, 61, 0.2);
 }
 
+.url-preview-card {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(111, 83, 54, 0.13);
+  border-radius: 18px;
+  background: rgba(255, 253, 249, 0.72);
+}
+
+.url-preview-card h3 {
+  margin-top: 4px;
+  color: var(--ink);
+  font-size: 1.08rem;
+}
+
+.url-preview-text {
+  max-height: 220px;
+  overflow: auto;
+  white-space: pre-wrap;
+  margin: 0;
+  padding: 13px;
+  border: 1px solid rgba(111, 83, 54, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 252, 247, 0.82);
+  color: var(--ink-muted);
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.75;
+}
+
 .shelf-book-card {
   padding: 10px;
   gap: 12px;
@@ -2309,6 +2339,16 @@ p {
 
 :root[data-theme="dark"] .import-tab.active {
   background: rgba(217, 155, 108, 0.16);
+}
+
+:root[data-theme="dark"] .url-preview-card,
+:root[data-theme="dark"] .url-preview-text {
+  border-color: var(--line);
+  background: rgba(25, 28, 24, 0.68);
+}
+
+:root[data-theme="dark"] .url-preview-text {
+  color: var(--ink-soft);
 }
 
 :root[data-theme="dark"] .icon-button {
