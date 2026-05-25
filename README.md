@@ -19,6 +19,7 @@ The app currently supports:
 - reusing cached translations to avoid repeated identical API calls
 - deleting books and chapters
 - batch translating all untranslated chapters in a book
+- exporting a local backup zip from the settings page
 - publishing backend/frontend Docker images to GHCR through GitHub Actions
 - deploying on NAS with prebuilt images instead of local source builds
 - a warmer paper-and-ink UI refinement focused on bookshelf readability, reader comfort, and consistent management pages
@@ -44,6 +45,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - webpage URL preview API
 - chapter translation API
 - persisted translation job API for batch translation progress
+- backup export API
 - translation caching based on source hash + provider/model + prompt hash
 - configurable CORS origins through `ALLOWED_ORIGINS`
 - upload and webpage import size limits through `MAX_UPLOAD_MB` and `MAX_WEBPAGE_MB`
@@ -81,6 +83,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - webpage URL import previews detected title, chapter count, and extracted text before saving
 - delete actions with confirmation
 - batch translation action from book detail page using persisted backend jobs and visible polling progress
+- settings page backup export button
 - active-page navigation highlighting
 - user-friendly localized status labels
 - UI-R1 bookshelf refinement with a consolidated add/import dialog and cover-style book cards
@@ -109,6 +112,7 @@ This is still a V1-style private tool. A few things are intentionally simple:
 - no browser extension
 - no OCR, PDF, TTS, cloud sync, or advanced AI analysis features
 - API keys are still stored in the local SQLite database in V1; they are masked in API read responses and redacted from provider error messages, but not encrypted at rest
+- exported backup zip files include the SQLite database and may contain saved API keys, so store them privately
 - delete confirmation now uses a shared in-app confirmation dialog instead of browser-native confirm boxes
 - UI-R3 adds a few reusable frontend primitives, but the stylesheet is still large and could be split further
 - settings and glossary pages are usable and more visually consistent, but still need deeper form/table usability polish
@@ -231,6 +235,7 @@ You can currently verify all of these manually:
 - confirm chapter changes or translation activity move the touched book upward in the bookshelf ordering
 - confirm startup schema migrations are recorded once in `schema_migrations` and remain safe to rerun
 - batch translate all untranslated chapters in a book
+- export a backup zip from the settings page
 - page through long chapter lists on the book detail page
 - jump directly to a chapter-list page number on the book detail page
 - delete a chapter
@@ -422,6 +427,7 @@ Recommended next work:
 - continue extracting reusable frontend UI primitives so future UI passes are less CSS-heavy
 - refine reader navigation search/jump controls for books with hundreds of chapters
 - more manual verification against real-world webpage layouts if URL import becomes part of the regular workflow
+- consider backup restore/import later, after export has been used safely
 - optional automatic update flow after GHCR-based deployment is stable
 - final Docker Compose / NAS verification pass after the latest frontend changes
 - polish confirmation UX and higher-density long-list management flows

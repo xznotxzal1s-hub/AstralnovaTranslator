@@ -829,6 +829,31 @@ p {
   color: var(--success);
 }
 
+.settings-backup-card {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid rgba(111, 83, 54, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 252, 247, 0.64);
+}
+
+.settings-backup-card h3 {
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.settings-backup-card .button-secondary {
+  justify-content: center;
+}
+
+.backup-warning {
+  margin: 0;
+  color: var(--error);
+  font-size: 0.86rem;
+  line-height: 1.6;
+}
+
 .preset-toolbar {
   display: grid;
   gap: 12px;
@@ -2743,6 +2768,7 @@ p {
 
 :root[data-theme="dark"] .confirm-dialog,
 :root[data-theme="dark"] .settings-form-card .form-section-grid,
+:root[data-theme="dark"] .settings-backup-card,
 :root[data-theme="dark"] .chapter-page-number-row {
   border-color: var(--line);
   background:

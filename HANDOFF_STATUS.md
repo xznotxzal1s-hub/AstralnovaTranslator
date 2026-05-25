@@ -20,6 +20,7 @@ The app currently supports:
 - paginating chapter lists on the book detail page
 - deleting books and chapters
 - batch translating all untranslated chapters in a book
+- exporting a local backup zip from the settings page
 - publishing backend/frontend Docker images to GHCR via GitHub Actions
 - NAS deployment with prebuilt images through a separate Compose file
 - UI-R1 bookshelf modernization with a cleaner import workspace and cover-style book cards
@@ -172,6 +173,13 @@ Completed in code and covered by backend regression tests:
 - users can review detected title, chapter count, and the first extracted text before confirming import
 - the final confirm action still uses the existing URL import save path
 
+### Backup export refinement
+Completed in code and covered by backend regression tests:
+- added `GET /backup/export`
+- backup export creates a zip with `data/app.db`, uploaded files, and `metadata.json`
+- settings page now includes a simple download backup button
+- documentation warns that exported SQLite backups may contain saved API keys
+
 ### UI-R1 bookshelf refinement
 Implemented in the first slice:
 - modernized bookshelf layout while preserving the existing client-side book refresh flow
@@ -282,6 +290,7 @@ Verified working locally at this point:
 - books can be deleted
 - chapters can be deleted
 - batch translation works sequentially from the book detail page through persisted backend jobs and frontend polling
+- backup export creates a local zip containing the SQLite database, uploads, and metadata
 - chapter pagination works on the book detail page
 - reader opens in translation-only mode by default and can still switch to bilingual mode
 - bookshelf refresh still uses the browser-side API fetch after page load and after create/import/delete actions
@@ -300,6 +309,7 @@ Current UI state:
 - interaction feedback is clearer through stronger hover, focus, active, and loading states
 - long chapter lists are more manageable because the book detail page now paginates them
 - settings now support a practical preset-based workflow instead of a single flat config form
+- settings now include a simple local backup export action
 - bookshelf import tools now cover TXT, EPUB, and webpage URL preview/confirm workflows
 - mobile usability is improved, especially on the bookshelf page, but not fully refined across every management page
 - success/error/loading feedback is clearer than before, especially around forms and batch translation
@@ -321,6 +331,7 @@ Areas still somewhat rough:
 - webpage import relies on direct backend HTTP fetches, so pages behind login, heavy client-side rendering, or anti-bot protection may fail or import poorly
 - webpage import intentionally blocks local/private network targets for NAS safety, so it cannot import pages hosted on localhost or LAN-only private IPs
 - API keys are masked in read responses and redacted from provider error messages, but they are still stored unencrypted in the local SQLite database for V1 simplicity
+- exported backup zip files include the SQLite database and may therefore contain saved API keys
 
 ## Current Docker / NAS status
 - `docker-compose.yml`, backend Dockerfile, frontend Dockerfile, and `.env.example` are present
@@ -386,4 +397,5 @@ Recommended next direction:
 - continue extracting reusable frontend UI primitives from repeated form, button, and feedback patterns
 - consider reader chapter search/jump controls for very large books
 - manual verification of webpage URL import against a few real article/novel pages
+- consider backup restore/import later, but keep it separate because restore is riskier than export
 - optionally a deployment follow-up for automatic updates such as Watchtower or pull-and-restart automation

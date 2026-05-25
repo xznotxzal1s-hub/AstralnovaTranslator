@@ -204,6 +204,15 @@ export function SettingsForm({ initialSettings, initialPresets }: SettingsFormPr
             </button>
           ))}
         </div>
+        <div className="settings-backup-card">
+          <p className="eyebrow">{t("backupExportEyebrow")}</p>
+          <h3>{t("backupExportTitle")}</h3>
+          <p className="muted">{t("backupExportDescription")}</p>
+          <p className="backup-warning">{t("backupExportWarning")}</p>
+          <a className="button-secondary" download href="/api/backend/backup/export">
+            {t("backupExportButton")}
+          </a>
+        </div>
       </aside>
 
       <form className="form-card settings-form-card" onSubmit={handleSave}>
