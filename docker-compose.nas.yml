@@ -4,6 +4,8 @@ services:
     image: ${BACKEND_IMAGE:?Set BACKEND_IMAGE in .env.nas}
     env_file:
       - .env.nas
+    environment:
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:?Set ALLOWED_ORIGINS in .env.nas to the frontend browser origin, for example http://YOUR_NAS_IP:13000}
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     volumes:

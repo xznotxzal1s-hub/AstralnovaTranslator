@@ -125,7 +125,7 @@ Implemented:
 - GitHub Actions workflow for backend image publishing to GHCR
 - GitHub Actions workflow for frontend image publishing to GHCR
 - separate NAS Compose file using image tags instead of local build contexts
-- frontend build-time `NEXT_PUBLIC_API_BASE_URL` wired through automated image builds
+- frontend browser API calls now default to the same-origin `/api/backend` proxy, so random NAS tunnel / Tailscale frontend URLs do not require new CORS origins
 
 ### UI-R1 bookshelf refinement
 Implemented in the first slice:
@@ -259,6 +259,11 @@ Areas still somewhat rough:
 ## Current Docker / NAS status
 - `docker-compose.yml`, backend Dockerfile, frontend Dockerfile, and `.env.example` are present
 - `docker-compose.nas.yml`, `.env.nas.example`, and GHCR publishing workflow are present
+- NAS example ports now match the common deployed mapping: frontend `13000`, backend `18000`
+- NAS Compose now requires `ALLOWED_ORIGINS`, so CORS misconfiguration fails early instead of silently using localhost-only defaults
+- browser-side frontend requests now use `/api/backend` by default and are proxied by Next.js to `INTERNAL_API_BASE_URL`
+- this proxy mode avoids CORS for normal app usage when the external NAS URL changes
+- `ALLOWED_ORIGINS` only needs exact external origins when the browser is intentionally configured to call the backend directly
 - local development has been the main verification path
 - GHCR-based deployment automation is now configured in the repository
 - a final real-world GHCR push/pull validation on the target NAS is still recommended if it has not been exercised yet

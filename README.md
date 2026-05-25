@@ -84,7 +84,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - GitHub Actions workflow to build and publish backend image to GHCR on push to `main`
 - GitHub Actions workflow to build and publish frontend image to GHCR on push to `main`
 - separate NAS Docker Compose file that uses prebuilt GHCR images
-- frontend build-time `NEXT_PUBLIC_API_BASE_URL` preserved in automated image builds
+- frontend browser requests use a same-origin `/api/backend` proxy by default, which avoids CORS issues when NAS access URLs change
 
 ## Current Limitations
 
@@ -102,7 +102,7 @@ This is still a V1-style private tool. A few things are intentionally simple:
 - chapter pagination is intentionally simple and currently uses previous/next paging rather than direct page-number jumping
 - translation presets are global only and do not yet support import/export or per-book assignment
 - Docker/NAS deployment files exist, but a fresh full end-to-end Docker verification is still recommended after the latest refinements
-- GHCR publishing depends on GitHub repository/package setup and a correct `NEXT_PUBLIC_API_BASE_URL` repository variable
+- GHCR publishing depends on GitHub repository/package setup; direct browser-to-backend API URLs are still possible but require matching CORS origins
 
 ## Project Structure
 
@@ -153,6 +153,8 @@ Success should look like:
 
 Useful local defaults in `.env.example`:
 - `ALLOWED_ORIGINS` controls which browser origins may call the backend API.
+- `NEXT_PUBLIC_API_BASE_URL=/api/backend` makes the browser call the Next.js frontend first, then the frontend proxies to the backend.
+- `INTERNAL_API_BASE_URL=http://backend:8000` is used by Docker containers for frontend-to-backend server-side requests.
 - `MAX_UPLOAD_MB` limits TXT/EPUB upload size.
 - `MAX_WEBPAGE_MB` limits webpage URL import response size.
 
@@ -272,12 +274,14 @@ Required:
 
 ### GitHub variable
 
-Set this repository variable:
+The recommended value is now the same-origin proxy path:
 
 - Name: `NEXT_PUBLIC_API_BASE_URL`
-- Value: your browser-accessible backend URL, for example `http://YOUR_NAS_IP:8000`
+- Value: `/api/backend`
 
-This value is important because the frontend needs it during the Docker build, not only at runtime.
+You may also leave the variable unset; the workflow defaults to `/api/backend`.
+
+Only set an absolute backend URL, such as `http://YOUR_NAS_IP:18000`, if you intentionally want the browser to call the backend directly. Direct browser-to-backend calls require `ALLOWED_ORIGINS` to match every frontend URL you use.
 
 ### GitHub secrets
 
@@ -301,12 +305,20 @@ Create `.env.nas` from the example and update at least:
 ```env
 BACKEND_IMAGE=ghcr.io/YOUR_GITHUB_USERNAME_OR_ORG/astralnova-translator-backend:latest
 FRONTEND_IMAGE=ghcr.io/YOUR_GITHUB_USERNAME_OR_ORG/astralnova-translator-frontend:latest
-NEXT_PUBLIC_API_BASE_URL=http://YOUR_NAS_IP_OR_DOMAIN:8000
+BACKEND_PORT=18000
+FRONTEND_PORT=13000
+NEXT_PUBLIC_API_BASE_URL=/api/backend
 INTERNAL_API_BASE_URL=http://backend:8000
-ALLOWED_ORIGINS=http://YOUR_NAS_IP_OR_DOMAIN:3000
+ALLOWED_ORIGINS=http://YOUR_NAS_IP_OR_DOMAIN:13000
 MAX_UPLOAD_MB=50
 MAX_WEBPAGE_MB=5
 ```
+
+Important:
+- `NEXT_PUBLIC_API_BASE_URL=/api/backend` means the browser calls the frontend origin, and Next.js proxies the request to the backend.
+- `INTERNAL_API_BASE_URL=http://backend:8000` must stay reachable from the frontend container.
+- This proxy mode works better with Tailscale, reverse proxy, and NAS tunnel URLs because the external frontend URL can change without creating a new CORS origin.
+- `ALLOWED_ORIGINS` only matters for direct browser-to-backend calls. Keep it set to your most common frontend origin, or add more origins if you intentionally bypass the proxy.
 
 ### 2. Log in to GHCR on the NAS
 
