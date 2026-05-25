@@ -128,6 +128,7 @@ Implemented:
 - backend image publishing now waits for the backend unittest suite to pass
 - frontend image publishing now waits for a GitHub Actions `npm run build` check to pass
 - Next.js production builds no longer ignore TypeScript or ESLint build-time errors
+- `scripts/smoke-docker.ps1` is available for manual local Docker Compose smoke testing
 - separate NAS Compose file using image tags instead of local build contexts
 - frontend browser API calls now default to the same-origin `/api/backend` proxy, so random NAS tunnel / Tailscale frontend URLs do not require new CORS origins
 - frontend browser API calls are now hard-coded to `/api/backend` to prevent stale GitHub repository variables from baking old absolute backend URLs into GHCR images
@@ -275,6 +276,7 @@ Areas still somewhat rough:
 - PowerShell input can corrupt Japanese text if entered directly; browser forms or Swagger UI are safer for UTF-8 testing
 - frontend CSS may still produce non-blocking autoprefixer warnings for alignment values depending on environment/tooling
 - Docker Compose scaffolding exists, but the full stack has not been repeatedly re-verified after every late-phase refinement
+- the Docker smoke script is available for manual checks, but it has not been run automatically inside Codex to avoid long local Docker build retries
 - webpage import relies on direct backend HTTP fetches, so pages behind login, heavy client-side rendering, or anti-bot protection may fail or import poorly
 - webpage import intentionally blocks local/private network targets for NAS safety, so it cannot import pages hosted on localhost or LAN-only private IPs
 - API keys are masked in read responses and redacted from provider error messages, but they are still stored unencrypted in the local SQLite database for V1 simplicity
@@ -289,6 +291,7 @@ Areas still somewhat rough:
 - `ALLOWED_ORIGINS` only needs exact external origins when the browser is intentionally configured to call the backend directly
 - GitHub Actions now builds the frontend image with `NEXT_PUBLIC_API_BASE_URL=/api/backend` regardless of any old repository variable value
 - GitHub Actions now runs backend tests and a frontend production build check before publishing matching GHCR images
+- a PowerShell Docker smoke script can manually check local Compose build/startup, backend health, frontend availability, and the same-origin API proxy
 - local development has been the main verification path
 - GHCR-based deployment automation is now configured in the repository
 - a final real-world GHCR push/pull validation on the target NAS is still recommended if it has not been exercised yet
@@ -338,7 +341,6 @@ Typical local run:
 
 ## Current recommended next phase
 Recommended next direction:
-- add a lightweight Docker smoke test script for local/NAS confidence checks
 - split the large frontend stylesheet into smaller, easier-to-maintain sections
 - continue extracting reusable frontend UI primitives from repeated form, button, and feedback patterns
 - consider reader chapter search/jump controls for very large books

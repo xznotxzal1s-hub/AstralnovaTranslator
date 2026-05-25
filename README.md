@@ -88,6 +88,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - backend image publishing waits for backend unittest checks to pass
 - frontend image publishing waits for a clean `npm run build` check in GitHub Actions
 - Next.js production builds now use normal TypeScript and ESLint failure behavior instead of ignoring build-time errors
+- local Docker smoke test script for checking Compose startup, backend health, frontend availability, and the same-origin API proxy
 - separate NAS Docker Compose file that uses prebuilt GHCR images
 - frontend browser requests use a same-origin `/api/backend` proxy by default, which avoids CORS issues when NAS access URLs change
 
@@ -258,6 +259,35 @@ Expected URLs after startup:
 Important note:
 - Docker/NAS support is part of the project structure and earlier setup work, but the main verification path recently has been local manual testing rather than repeated full Docker retesting after every refinement
 
+### Optional Docker smoke test
+
+For a quick local confidence check, use the PowerShell smoke script from the project root:
+
+```powershell
+Copy-Item .env.example .env
+.\scripts\smoke-docker.ps1
+```
+
+The script will:
+- build the Docker images with `docker compose build`
+- start the stack with `docker compose up -d`
+- check `http://localhost:18000/health`
+- check `http://localhost:13000`
+- check the frontend same-origin proxy at `http://localhost:13000/api/backend/health`
+- stop the stack with `docker compose down`
+
+If the images are already built and you only want a faster startup check:
+
+```powershell
+.\scripts\smoke-docker.ps1 -SkipBuild
+```
+
+Success should end with:
+
+```text
+[ok] Docker smoke test completed successfully.
+```
+
 ## GitHub Actions + GHCR Setup
 
 The project now supports automatic Docker image publishing to GitHub Container Registry (GHCR).
@@ -380,7 +410,6 @@ This is intentionally separate so the main deployment stays simple and easy to u
 ## Roadmap / Next Steps
 
 Recommended next work:
-- add a lightweight Docker smoke test script for local/NAS deployment checks
 - split the large global stylesheet into smaller, easier-to-maintain style modules or component sections
 - continue extracting reusable frontend UI primitives so future UI passes are less CSS-heavy
 - refine reader navigation search/jump controls for books with hundreds of chapters
