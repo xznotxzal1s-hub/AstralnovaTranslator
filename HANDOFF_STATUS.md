@@ -133,6 +133,14 @@ Implemented:
 - frontend browser API calls now default to the same-origin `/api/backend` proxy, so random NAS tunnel / Tailscale frontend URLs do not require new CORS origins
 - frontend browser API calls are now hard-coded to `/api/backend` to prevent stale GitHub repository variables from baking old absolute backend URLs into GHCR images
 
+### Prompt template validation refinement
+Completed in code and covered by backend regression tests:
+- added backend prompt template validation for allowed placeholders
+- added `POST /settings/validate-prompt`
+- settings and preset saves now reject malformed templates and unknown placeholders before translation time
+- templates without `{glossary_guidance}` remain valid because glossary guidance is still appended automatically
+- the settings page validates prompt templates before saving or creating presets
+
 ### UI-R1 bookshelf refinement
 Implemented in the first slice:
 - modernized bookshelf layout while preserving the existing client-side book refresh flow
@@ -227,6 +235,7 @@ Verified working locally at this point:
 - EPUB import works for simple valid files
 - webpage URL import flow is implemented and ready for manual verification
 - translation presets can be created, edited, deleted, and switched
+- invalid prompt templates are rejected before translation settings are saved
 - glossary entries can be created, edited, and deleted
 - per-book glossary entries stay scoped to the correct book
 - chapter translation works with configured providers

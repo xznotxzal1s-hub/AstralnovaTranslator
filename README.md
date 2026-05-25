@@ -35,6 +35,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - lightweight versioned SQLite schema migrations tracked in a `schema_migrations` table
 - settings API
 - translation preset API
+- prompt template validation API
 - glossary API
 - book/chapter CRUD APIs
 - TXT import API
@@ -50,6 +51,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - OpenAI-compatible provider support
 - Gemini provider support
 - configurable model, API base URL, API key, translation mode, prompt template, and chunk size
+- prompt templates are validated before settings/presets are saved
 - glossary-aware prompt assembly
 - glossary guidance is still included when a custom prompt template does not explicitly contain `{glossary_guidance}`
 - per-book glossary entries override global glossary entries
@@ -64,6 +66,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - chapter reading page
 - settings page
 - multiple saved translation presets with one active preset
+- settings page validates prompt templates before saving presets
 - glossary page
 - global and per-book glossary management
 - language switching for Simplified Chinese, English, and Japanese

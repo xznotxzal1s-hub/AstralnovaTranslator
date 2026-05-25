@@ -3,6 +3,7 @@ import type {
   ChapterCreateInput,
   GlossaryEntry,
   ImportResult,
+  PromptTemplateValidationResult,
   TranslationPreset,
   TranslationSettings,
   UrlImportInput,
@@ -138,6 +139,13 @@ export async function updateSettings(payload: {
   return request<TranslationSettings>("/settings", {
     method: "PUT",
     body: JSON.stringify(payload),
+  });
+}
+
+export async function validatePromptTemplate(promptTemplate: string) {
+  return request<PromptTemplateValidationResult>("/settings/validate-prompt", {
+    method: "POST",
+    body: JSON.stringify({ prompt_template: promptTemplate }),
   });
 }
 

@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.schemas.settings import (
+    PromptTemplateValidationRequest,
+    PromptTemplateValidationResponse,
     TranslationConfigRead,
     TranslationConfigUpdate,
     TranslationPresetCreate,
@@ -18,6 +20,7 @@ from app.services.settings_service import (
     save_translation_config,
     update_translation_preset,
 )
+from app.utils.prompt_validation import PromptTemplateValidationError, validate_prompt_template
 
 router = APIRouter(prefix="/settings", tags=["settings"])
 
@@ -33,8 +36,23 @@ def update_settings(
     payload: TranslationConfigUpdate,
     db: Session = Depends(get_db),
 ) -> TranslationConfigRead:
-    config = save_translation_config(db, payload)
+    try:
+        config = save_translation_config(db, payload)
+    except PromptTemplateValidationError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=" ".join(exc.errors)) from exc
     return build_translation_config_read(config)
+
+
+@router.post("/validate-prompt", response_model=PromptTemplateValidationResponse)
+def validate_settings_prompt(
+    payload: PromptTemplateValidationRequest,
+) -> PromptTemplateValidationResponse:
+    result = validate_prompt_template(payload.prompt_template)
+    return PromptTemplateValidationResponse(
+        is_valid=result.is_valid,
+        errors=result.errors,
+        warnings=result.warnings,
+    )
 
 
 @router.get("/presets", response_model=list[TranslationConfigRead])
@@ -47,7 +65,10 @@ def create_settings_preset(
     payload: TranslationPresetCreate,
     db: Session = Depends(get_db),
 ) -> TranslationConfigRead:
-    return build_translation_config_read(create_translation_preset(db, payload))
+    try:
+        return build_translation_config_read(create_translation_preset(db, payload))
+    except PromptTemplateValidationError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=" ".join(exc.errors)) from exc
 
 
 @router.put("/presets/{preset_id}", response_model=TranslationConfigRead)
@@ -56,7 +77,10 @@ def update_settings_preset(
     payload: TranslationPresetUpdate,
     db: Session = Depends(get_db),
 ) -> TranslationConfigRead:
-    preset = update_translation_preset(db, preset_id, payload)
+    try:
+        preset = update_translation_preset(db, preset_id, payload)
+    except PromptTemplateValidationError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=" ".join(exc.errors)) from exc
     if preset is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Translation preset not found.")
     return build_translation_config_read(preset)

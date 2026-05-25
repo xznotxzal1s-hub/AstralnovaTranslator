@@ -10,6 +10,7 @@ import {
   createSettingsPreset,
   deleteSettingsPreset,
   updateSettingsPreset,
+  validatePromptTemplate,
 } from "@/lib/api-client";
 import { formatMessage } from "@/lib/i18n";
 import type { TranslationPreset, TranslationSettings } from "@/lib/types";
@@ -66,6 +67,17 @@ export function SettingsForm({ initialSettings, initialPresets }: SettingsFormPr
     selectPreset(updatedPreset);
   }
 
+  async function validatePromptBeforeSubmit() {
+    const validation = await validatePromptTemplate(formData.prompt_template);
+    if (validation.is_valid) {
+      return true;
+    }
+
+    setMessage(validation.errors.join(" "));
+    setMessageType("error");
+    return false;
+  }
+
   async function handleSave(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
@@ -73,6 +85,9 @@ export function SettingsForm({ initialSettings, initialPresets }: SettingsFormPr
 
     try {
       setIsSubmitting(true);
+      if (!(await validatePromptBeforeSubmit())) {
+        return;
+      }
       const result = await updateSettingsPreset(selectedPresetId, formData);
       replacePreset(result);
       setMessage(t("settingsSavedMessage"));
@@ -91,6 +106,9 @@ export function SettingsForm({ initialSettings, initialPresets }: SettingsFormPr
 
     try {
       setIsSubmitting(true);
+      if (!(await validatePromptBeforeSubmit())) {
+        return;
+      }
       const createdPreset = await createSettingsPreset(formData);
       setPresets((current) => [createdPreset, ...current]);
       selectPreset(createdPreset);

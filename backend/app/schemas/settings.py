@@ -41,3 +41,13 @@ class TranslationConfigRead(TranslationConfigBase):
     updated_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class PromptTemplateValidationRequest(BaseModel):
+    prompt_template: str = Field(min_length=1)
+
+
+class PromptTemplateValidationResponse(BaseModel):
+    is_valid: bool
+    errors: list[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)

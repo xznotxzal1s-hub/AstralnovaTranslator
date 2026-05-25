@@ -57,6 +57,12 @@ export type TranslationSettings = {
 
 export type TranslationPreset = TranslationSettings;
 
+export type PromptTemplateValidationResult = {
+  is_valid: boolean;
+  errors: string[];
+  warnings: string[];
+};
+
 export type GlossaryEntry = {
   id: number;
   book_id: number | null;

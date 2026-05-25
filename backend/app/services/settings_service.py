@@ -8,6 +8,7 @@ from app.schemas.settings import (
     TranslationPresetCreate,
     TranslationPresetUpdate,
 )
+from app.utils.prompt_validation import ensure_prompt_template_is_valid
 
 
 DEFAULT_PRESET_NAME = "默认预设"
@@ -96,6 +97,8 @@ def _apply_config_fields(
     *,
     preserve_existing_api_key: bool = True,
 ) -> TranslationConfig:
+    ensure_prompt_template_is_valid(payload.prompt_template)
+
     if hasattr(payload, "name"):
         config.name = payload.name  # type: ignore[attr-defined]
 
