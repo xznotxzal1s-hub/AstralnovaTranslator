@@ -126,6 +126,7 @@ Implemented:
 - GitHub Actions workflow for frontend image publishing to GHCR
 - separate NAS Compose file using image tags instead of local build contexts
 - frontend browser API calls now default to the same-origin `/api/backend` proxy, so random NAS tunnel / Tailscale frontend URLs do not require new CORS origins
+- frontend browser API calls are now hard-coded to `/api/backend` to prevent stale GitHub repository variables from baking old absolute backend URLs into GHCR images
 
 ### UI-R1 bookshelf refinement
 Implemented in the first slice:
@@ -264,6 +265,7 @@ Areas still somewhat rough:
 - browser-side frontend requests now use `/api/backend` by default and are proxied by Next.js to `INTERNAL_API_BASE_URL`
 - this proxy mode avoids CORS for normal app usage when the external NAS URL changes
 - `ALLOWED_ORIGINS` only needs exact external origins when the browser is intentionally configured to call the backend directly
+- GitHub Actions now builds the frontend image with `NEXT_PUBLIC_API_BASE_URL=/api/backend` regardless of any old repository variable value
 - local development has been the main verification path
 - GHCR-based deployment automation is now configured in the repository
 - a final real-world GHCR push/pull validation on the target NAS is still recommended if it has not been exercised yet

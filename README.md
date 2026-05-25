@@ -102,7 +102,7 @@ This is still a V1-style private tool. A few things are intentionally simple:
 - chapter pagination is intentionally simple and currently uses previous/next paging rather than direct page-number jumping
 - translation presets are global only and do not yet support import/export or per-book assignment
 - Docker/NAS deployment files exist, but a fresh full end-to-end Docker verification is still recommended after the latest refinements
-- GHCR publishing depends on GitHub repository/package setup; direct browser-to-backend API URLs are still possible but require matching CORS origins
+- GHCR publishing depends on GitHub repository/package setup; the frontend browser client is intentionally locked to the same-origin `/api/backend` proxy for NAS stability
 
 ## Project Structure
 
@@ -274,14 +274,14 @@ Required:
 
 ### GitHub variable
 
-The recommended value is now the same-origin proxy path:
+The frontend browser client is locked to the same-origin proxy path:
 
 - Name: `NEXT_PUBLIC_API_BASE_URL`
 - Value: `/api/backend`
 
-You may also leave the variable unset; the workflow defaults to `/api/backend`.
+You may also delete this repository variable; the workflow now builds with `/api/backend` directly.
 
-Only set an absolute backend URL, such as `http://YOUR_NAS_IP:18000`, if you intentionally want the browser to call the backend directly. Direct browser-to-backend calls require `ALLOWED_ORIGINS` to match every frontend URL you use.
+Do not set this variable to an absolute NAS backend URL such as `http://192.168.178.54:18000`. The browser-side frontend no longer needs that value, and using same-origin proxying avoids CORS problems when Tailscale or tunnel URLs change.
 
 ### GitHub secrets
 
@@ -318,7 +318,7 @@ Important:
 - `NEXT_PUBLIC_API_BASE_URL=/api/backend` means the browser calls the frontend origin, and Next.js proxies the request to the backend.
 - `INTERNAL_API_BASE_URL=http://backend:8000` must stay reachable from the frontend container.
 - This proxy mode works better with Tailscale, reverse proxy, and NAS tunnel URLs because the external frontend URL can change without creating a new CORS origin.
-- `ALLOWED_ORIGINS` only matters for direct browser-to-backend calls. Keep it set to your most common frontend origin, or add more origins if you intentionally bypass the proxy.
+- `ALLOWED_ORIGINS` mainly matters for direct backend testing through Swagger or scripts from a browser origin. Normal app usage should go through `/api/backend`.
 
 ### 2. Log in to GHCR on the NAS
 
