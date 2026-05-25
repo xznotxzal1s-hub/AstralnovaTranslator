@@ -17,6 +17,7 @@ The app currently supports:
 - reusing cached translations
 - using global and per-book glossary entries
 - reading chapters in a reading-focused UI
+- using clear previous/next navigation on the reader page
 - paginating chapter lists on the book detail page
 - filtering and searching chapters on the book detail page
 - deleting books and chapters
@@ -188,6 +189,13 @@ Completed in code:
 - pagination links preserve the active search/status filters
 - empty filtered results show a localized friendly message
 
+### Reader navigation refinement
+Completed in code:
+- reader page now shows explicit previous/current/next navigation above and below the reading surface
+- desktop reader includes a small floating previous/next control that avoids rendering huge chapter lists
+- mobile keeps navigation inline so it does not cover long-form text
+- existing focused chapter outline remains available in the reader sidebar
+
 ### UI-R1 bookshelf refinement
 Implemented in the first slice:
 - modernized bookshelf layout while preserving the existing client-side book refresh flow
@@ -302,6 +310,7 @@ Verified working locally at this point:
 - chapter pagination works on the book detail page
 - chapter status filtering and title search work on the book detail page
 - reader opens in translation-only mode by default and can still switch to bilingual mode
+- reader previous/next navigation is visible near both the top and bottom of the reading surface
 - bookshelf refresh still uses the browser-side API fetch after page load and after create/import/delete actions
 
 ## Current UI / UX status
@@ -314,6 +323,7 @@ Current UI state:
 - UI-R3 improves non-homepage management pages and replaces rough browser confirmations with in-app dialogs
 - the mobile app shell now uses a fixed bottom navigation bar and denser bookshelf rows for better one-handed browsing
 - the chapter reading page has the strongest polish and is the best current experience
+- the reader page now has clearer large-book navigation without rendering every chapter link
 - bookshelf and book detail pages are cleaner and more usable than earlier phases
 - interaction feedback is clearer through stronger hover, focus, active, and loading states
 - long chapter lists are more manageable because the book detail page now paginates them

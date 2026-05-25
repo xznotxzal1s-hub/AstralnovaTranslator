@@ -45,6 +45,30 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
   const outlineChapters = chapters.slice(outlineStartIndex, outlineEndIndex);
   const firstChapter = chapters[0] ?? null;
   const lastChapter = chapters[chapters.length - 1] ?? null;
+  const readerPosition = formatMessage(messages.readerChapterPosition, {
+    current: safeCurrentIndex + 1,
+    total: chapters.length,
+  });
+
+  type NavigationChapter = (typeof chapters)[number];
+
+  function renderChapterStepLink(target: NavigationChapter | null, label: string, unavailableLabel: string, direction: string) {
+    if (!target) {
+      return (
+        <span className={`reader-step-link ${direction} is-disabled`}>
+          <span>{label}</span>
+          <strong>{unavailableLabel}</strong>
+        </span>
+      );
+    }
+
+    return (
+      <Link className={`reader-step-link ${direction}`} href={`/books/${book.id}/chapters/${target.id}`}>
+        <span>{label}</span>
+        <strong>{target.title}</strong>
+      </Link>
+    );
+  }
 
   return (
     <main className="app-page reader-page">
@@ -87,6 +111,17 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
             </div>
           </section>
 
+          <nav className="reader-chapter-nav reader-chapter-nav-top" aria-label={messages.navigationHeading}>
+            {renderChapterStepLink(
+              previousChapter,
+              messages.previousChapter,
+              messages.readerNoPreviousChapter,
+              "previous",
+            )}
+            <span className="reader-position-chip">{readerPosition}</span>
+            {renderChapterStepLink(nextChapter, messages.nextChapter, messages.readerNoNextChapter, "next")}
+          </nav>
+
           <section className="reader-card reading-surface desktop-reading-surface">
             {chapter.source_text ? (
               <ReadModePanel chapter={chapter} />
@@ -94,7 +129,35 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
               <EmptyState title={messages.noSourceTitle} description={messages.noSourceDescription} />
             )}
           </section>
+
+          <nav className="reader-chapter-nav reader-chapter-nav-bottom" aria-label={messages.navigationHeading}>
+            {renderChapterStepLink(
+              previousChapter,
+              messages.previousChapter,
+              messages.readerNoPreviousChapter,
+              "previous",
+            )}
+            <Link className="reader-position-chip reader-position-link" href={`/books/${book.id}`}>
+              {messages.backToBook}
+            </Link>
+            {renderChapterStepLink(nextChapter, messages.nextChapter, messages.readerNoNextChapter, "next")}
+          </nav>
         </div>
+
+        {previousChapter || nextChapter ? (
+          <nav className="reader-floating-nav" aria-label={messages.navigationHeading}>
+            {previousChapter ? (
+              <Link className="reader-floating-link" href={`/books/${book.id}/chapters/${previousChapter.id}`}>
+                {messages.previousChapter}
+              </Link>
+            ) : null}
+            {nextChapter ? (
+              <Link className="reader-floating-link" href={`/books/${book.id}/chapters/${nextChapter.id}`}>
+                {messages.nextChapter}
+              </Link>
+            ) : null}
+          </nav>
+        ) : null}
 
         <aside className="sidebar-stack reader-sidebar desktop-reader-sidebar">
           <section className="form-card reader-nav-card">

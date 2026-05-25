@@ -15,6 +15,7 @@ The app currently supports:
 - translating chapters with user-provided AI provider settings and saved presets
 - saving source text and translated text locally
 - reading source text and translation in a browser
+- moving between previous and next chapters from the reader page
 - managing a global glossary and per-book glossary
 - reusing cached translations to avoid repeated identical API calls
 - deleting books and chapters
@@ -81,6 +82,8 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - chapter list pagination on the book detail page
 - chapter list status filtering and title search on the book detail page
 - translation-only as the default reader mode, with manual bilingual switching still available
+- clear previous/current/next chapter navigation above and below the reader surface
+- small desktop floating previous/next reader controls
 - webpage URL import form on the bookshelf page
 - webpage URL import previews detected title, chapter count, and extracted text before saving
 - delete actions with confirmation
@@ -246,6 +249,7 @@ You can currently verify all of these manually:
 - confirm destructive actions through the in-app confirmation dialog
 - open a chapter with translation-only as the default reading mode
 - switch manually between translation-only mode and source + translation mode
+- use previous/next chapter controls at the top and bottom of the reader page
 
 ## Current Docker / NAS Status
 
