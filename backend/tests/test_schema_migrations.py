@@ -145,6 +145,12 @@ class SchemaMigrationTests(unittest.TestCase):
             active_count = connection.exec_driver_sql(
                 "SELECT COUNT(*) FROM translation_configs WHERE is_active = 1",
             ).scalar_one()
+            reading_progress_columns = {
+                row[1] for row in connection.exec_driver_sql("PRAGMA table_info(reading_progress)").fetchall()
+            }
+            reading_progress_index_names = {
+                row[1] for row in connection.exec_driver_sql("PRAGMA index_list(reading_progress)").fetchall()
+            }
 
         self.assertEqual([row[0] for row in chapter_indexes], [1, 2, 3])
         self.assertIn("uq_chapters_book_index", chapter_index_names)
@@ -154,6 +160,10 @@ class SchemaMigrationTests(unittest.TestCase):
         self.assertIn("name", translation_config_columns)
         self.assertIn("is_active", translation_config_columns)
         self.assertEqual(active_count, 1)
+        self.assertIn("book_id", reading_progress_columns)
+        self.assertIn("chapter_id", reading_progress_columns)
+        self.assertIn("progress_percent", reading_progress_columns)
+        self.assertIn("uq_reading_progress_book_id", reading_progress_index_names)
         self.assertEqual(self._applied_versions(), [migration.version for migration in MIGRATIONS])
 
 

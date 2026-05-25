@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import models  # noqa: F401
-from app.api import backup, books, chapters, glossary, imports, settings, translate, translation_jobs
+from app.api import backup, books, chapters, glossary, imports, reading_progress, settings, translate, translation_jobs
 from app.core.config import settings as app_settings
 from app.core.database import Base, engine, ensure_schema
 from app.services.translation_job_service import mark_interrupted_translation_jobs
@@ -26,6 +26,7 @@ def create_application() -> FastAPI:
     application.include_router(chapters.router)
     application.include_router(glossary.router)
     application.include_router(imports.router)
+    application.include_router(reading_progress.router)
     application.include_router(settings.router)
     application.include_router(translate.router)
     application.include_router(translation_jobs.router)

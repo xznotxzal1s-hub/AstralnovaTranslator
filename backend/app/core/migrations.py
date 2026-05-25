@@ -132,6 +132,24 @@ def _create_translation_jobs_table(connection: Connection) -> None:
     connection.exec_driver_sql("CREATE INDEX IF NOT EXISTS ix_translation_jobs_chapter_id ON translation_jobs (chapter_id)")
 
 
+def _create_reading_progress_table(connection: Connection) -> None:
+    connection.exec_driver_sql(
+        """
+        CREATE TABLE IF NOT EXISTS reading_progress (
+            id INTEGER NOT NULL PRIMARY KEY,
+            book_id INTEGER NOT NULL,
+            chapter_id INTEGER,
+            progress_percent INTEGER NOT NULL DEFAULT 0,
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(book_id) REFERENCES books (id) ON DELETE CASCADE,
+            FOREIGN KEY(chapter_id) REFERENCES chapters (id) ON DELETE SET NULL
+        )
+        """,
+    )
+    connection.exec_driver_sql("CREATE UNIQUE INDEX IF NOT EXISTS uq_reading_progress_book_id ON reading_progress (book_id)")
+    connection.exec_driver_sql("CREATE INDEX IF NOT EXISTS ix_reading_progress_chapter_id ON reading_progress (chapter_id)")
+
+
 MIGRATIONS: tuple[SchemaMigration, ...] = (
     SchemaMigration(
         version="001_chapter_index_unique_constraint",
@@ -157,6 +175,11 @@ MIGRATIONS: tuple[SchemaMigration, ...] = (
         version="005_translation_jobs",
         description="Add simple persisted translation jobs.",
         apply=_create_translation_jobs_table,
+    ),
+    SchemaMigration(
+        version="006_reading_progress",
+        description="Add per-book reading progress.",
+        apply=_create_reading_progress_table,
     ),
 )
 

@@ -31,7 +31,7 @@ Add a `ReadingProgress` model/table:
 - `progress_percent`
 - `updated_at`
 
-`book_id` should be unique so each book has one current reading progress row. `progress_percent` stores an integer from `0` to `100`. This is enough for a first pass and avoids over-modeling pixel offsets.
+`book_id` should be unique so each book has one current reading progress row. `chapter_id` should be nullable or otherwise safe when chapters are deleted. `progress_percent` stores an integer from `0` to `100`. This is enough for a first pass and avoids over-modeling pixel offsets.
 
 Add API endpoints:
 - `GET /books/{book_id}/reading-progress`
@@ -39,14 +39,21 @@ Add API endpoints:
 
 Read behavior:
 - If the book does not exist, return `404`.
-- If no progress exists, return a response with `chapter_id = null` and `progress_percent = 0`.
+- If no progress exists, return a response with `chapter_id = null`, `progress_percent = 0`, `updated_at = null`, and `fallback_used = false`.
 - If saved progress points to a deleted chapter, return the first available chapter for that book if one exists; otherwise return `chapter_id = null`.
+- Include `fallback_used = true` when a deleted or invalid saved chapter was replaced by a fallback chapter.
+- Deleting a book should delete its reading progress.
+- Deleting a chapter should not break reading progress lookup.
 
 Write behavior:
 - Validate that the book exists.
 - Validate that the target chapter exists and belongs to the book.
 - Clamp or validate progress percent between `0` and `100`.
 - Upsert the single progress row for that book.
+
+Response schemas:
+- `ReadingProgressResponse`: `book_id`, nullable `chapter_id`, `progress_percent`, nullable `updated_at`, `fallback_used`
+- `ReadingProgressUpdate`: `chapter_id`, `progress_percent`
 
 Schema maintenance:
 - Use the existing lightweight migration runner.
@@ -63,6 +70,7 @@ Add server-side fetching for reading progress on the book detail page:
 
 Continue behavior:
 - If progress has a valid chapter, open that chapter.
+- If progress has a valid percentage, restore approximate scroll position after the chapter content renders.
 - If no progress exists but the book has chapters, open the first chapter.
 - If the book has no chapters, keep the user on the book detail page and show existing empty-state guidance.
 
@@ -70,9 +78,12 @@ Continue behavior:
 
 On the reader page, a small client component will:
 - watch scroll position after page load
+- restore saved scroll position before enabling automatic saves
+- avoid immediately overwriting saved progress with `0%` during initial load
 - compute progress percentage from current scroll position
 - send `PUT /books/{book_id}/reading-progress` with debounce/throttle
 - save at most once every few seconds during scrolling
+- only save when progress changes meaningfully, such as at least `1-2%`
 - save once on page visibility change when the browser supports it
 
 The component should avoid noisy state updates and should not block reading if the save request fails.
@@ -104,6 +115,10 @@ to:
 
 Default mode should come from localStorage. If no preference exists, keep the current translation-only default.
 
+Compatibility:
+- map old localStorage value `source-and-translation` to `bilingual`
+- reset safely to defaults if localStorage has invalid JSON or an invalid mode
+
 ### Reader Navigation
 
 Keep existing previous/next chapter buttons and add:
@@ -112,11 +127,15 @@ Keep existing previous/next chapter buttons and add:
 - `T`: cycle read mode
 - mobile sticky bottom bar: previous / book / next
 
+Keyboard shortcuts must not trigger while the user is typing in `input`, `textarea`, `select`, `contenteditable`, or when Ctrl/Meta/Alt modifiers are pressed.
+
 Add a compact chapter jump/search panel:
 - search chapter title
 - show current chapter
 - quick jump to first and last chapter
 - render a lightweight list of matching chapter links rather than heavy cards
+- cap visible search results, for example to `50`
+- show a small hint when more matches exist
 
 The existing focused sidebar window can remain; the search panel is an additive improvement for large books.
 
@@ -151,6 +170,8 @@ Backend unittest:
 - reject progress for another book's chapter
 - deleted chapter fallback returns first available chapter
 - migration creates the `reading_progress` table on existing databases
+- no chapters returns `chapter_id = null`
+- route registration covers reading progress endpoints
 
 Frontend verification in Codex:
 - do not run `npm run build`

@@ -4,7 +4,7 @@
 AstralnovaTranslator
 
 ## Current status
-The project is functionally through the latest URL import and UI refinement passes, with Integration Hardening R1 now applied for safer single-user NAS operation. The current backend focus is keeping already-added features reliable: batch translation jobs now reject duplicates, stale in-process jobs are cleaned up after restarts, and backup export uses a SQLite snapshot instead of directly zipping the live database.
+The project is functionally through the latest URL import and UI refinement passes, with Integration Hardening R1 now applied for safer single-user NAS operation. Reader Experience R2A is now implemented in code: books can store SQLite-backed reading progress, Continue Reading can reopen the saved chapter with approximate scroll restoration, and the reader has local visual preferences, keyboard shortcuts, and a lighter chapter jump/search panel.
 
 The app currently supports:
 - creating books
@@ -17,7 +17,11 @@ The app currently supports:
 - reusing cached translations
 - using global and per-book glossary entries
 - reading chapters in a reading-focused UI
+- saving reading progress in SQLite across devices
+- restoring approximate scroll position when continuing a book
+- adjusting reader font size, line height, content width, paragraph spacing, and reader theme per browser/device
 - using clear previous/next navigation on the reader page
+- using reader keyboard shortcuts and a compact chapter jump/search panel
 - paginating chapter lists on the book detail page
 - filtering and searching chapters on the book detail page
 - deleting books and chapters
@@ -212,6 +216,20 @@ Completed in code:
 - chapter outline rows are denser with two-line title clamping, so large books show more usable navigation at once
 - mobile keeps the outline unconstrained so it remains natural in the page flow
 
+### Reader Experience R2A
+Implemented in code and covered by backend regression tests:
+- added `ReadingProgress` storage with one progress row per book
+- added `GET /books/{book_id}/reading-progress` and `PUT /books/{book_id}/reading-progress`
+- Continue Reading now targets the saved chapter when available, or the first chapter when no saved progress exists
+- saved progress falls back gracefully if the saved chapter was deleted, and empty books return `chapter_id: null`
+- reader page restores approximate scroll position after content renders without immediately overwriting it with `0%`
+- scroll progress saves are throttled, meaningful-change based, and also attempted on `visibilitychange` / `pagehide`
+- reader visual preferences are stored in browser `localStorage` and include font size, line height, content width, paragraph spacing, reader theme, and read mode
+- legacy localStorage mode `source-and-translation` is mapped to the new `bilingual` mode
+- supported final read modes are `translation-only`, `bilingual`, and `source-only`
+- keyboard shortcuts support Left/Right chapter navigation and `T` mode cycling while avoiding form fields and modified shortcuts
+- reader chapter jump/search supports title search, current/first/last shortcuts, and caps visible matches for large books
+
 ### UI-R1 bookshelf refinement
 Implemented in the first slice:
 - modernized bookshelf layout while preserving the existing client-side book refresh flow
@@ -327,7 +345,11 @@ Verified working locally at this point:
 - backup export creates a local zip containing a SQLite snapshot, uploads, and metadata
 - chapter pagination works on the book detail page
 - chapter status filtering and title search work on the book detail page
-- reader opens in translation-only mode by default and can still switch to bilingual mode
+- reader opens in translation-only mode by default and can still switch to bilingual or source-only mode
+- Continue Reading restores the saved chapter and approximate scroll position
+- reader progress is stored in SQLite and covered by backend tests for missing progress, updates, wrong-book rejection, deleted-chapter fallback, no-chapter fallback, migration, and route registration
+- reader visual preferences persist per browser/device through `localStorage`
+- reader keyboard shortcuts and compact chapter search/jump controls are implemented in code
 - reader previous/next navigation is visible near both the top and bottom of the reading surface
 - reader chapter outline follows day/night mode correctly and shows more entries per screen
 - bookshelf refresh still uses the browser-side API fetch after page load and after create/import/delete actions
@@ -343,6 +365,8 @@ Current UI state:
 - the mobile app shell now uses a fixed bottom navigation bar and denser bookshelf rows for better one-handed browsing
 - the chapter reading page has the strongest polish and is the best current experience
 - the reader page now has clearer large-book navigation without rendering every chapter link
+- the reader page now has per-browser visual controls for font size, line height, content width, paragraph spacing, reader theme, and read mode
+- the reader page now has sticky mobile previous/book/next controls inside the reading experience
 - the reader sidebar no longer uses a permanently dark card in day mode
 - bookshelf and book detail pages are cleaner and more usable than earlier phases
 - interaction feedback is clearer through stronger hover, focus, active, and loading states
@@ -358,6 +382,7 @@ Current UI state:
 Areas still somewhat rough:
 - UI-R2 is still CSS-focused; some components could later be refactored into reusable UI primitives
 - settings and glossary pages are more consistent than before but still need deeper form/table usability polish
+- reader scroll restoration is approximate and may be slightly off if translated content changes significantly after progress is saved
 - destructive actions now use a shared in-app confirmation dialog
 - book detail pagination now supports direct page-number jumping, while reader-side chapter navigation intentionally shows a focused window instead of every chapter
 - translation presets are global only; there is not yet import/export or per-book preset binding
@@ -424,6 +449,9 @@ Backend regression test command:
 Integration Hardening R1 targeted test command:
 - from `backend/`, run `.\.venv\Scripts\python.exe -m unittest tests.test_translation_jobs tests.test_backup_export tests.test_route_registration`
 
+Reader Experience R2A targeted test command:
+- from `backend/`, run `.\.venv\Scripts\python.exe -m unittest tests.test_reading_progress tests.test_schema_migrations tests.test_route_registration`
+
 ### Frontend
 Typical local run:
 1. `cd frontend`
@@ -446,7 +474,7 @@ Typical local run:
 Recommended next direction:
 - split the large frontend stylesheet into smaller, easier-to-maintain sections
 - continue extracting reusable frontend UI primitives from repeated form, button, and feedback patterns
-- consider richer reader chapter search/jump controls for very large books
+- manually verify Reader Experience R2A on desktop and mobile with a long chapter/book before deeper UI work
 - manual verification of webpage URL import against a few real article/novel pages
 - consider backup restore/import later, but keep it separate because restore is riskier than export
 - optionally a deployment follow-up for automatic updates such as Watchtower or pull-and-restart automation

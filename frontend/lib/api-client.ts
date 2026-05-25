@@ -4,6 +4,7 @@ import type {
   GlossaryEntry,
   ImportResult,
   PromptTemplateValidationResult,
+  ReadingProgress,
   TranslationJob,
   TranslationPreset,
   TranslationSettings,
@@ -106,6 +107,25 @@ export async function createBookTranslationJob(bookId: number) {
 export async function fetchTranslationJob(jobId: number) {
   return request<TranslationJob>(`/translation-jobs/${jobId}`, {
     method: "GET",
+  });
+}
+
+export async function fetchReadingProgressClient(bookId: number) {
+  return request<ReadingProgress>(`/books/${bookId}/reading-progress`, {
+    method: "GET",
+  });
+}
+
+export async function updateReadingProgress(
+  bookId: number,
+  payload: {
+    chapter_id: number;
+    progress_percent: number;
+  },
+) {
+  return request<ReadingProgress>(`/books/${bookId}/reading-progress`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
   });
 }
 

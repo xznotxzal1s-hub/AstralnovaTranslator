@@ -7,7 +7,7 @@ import { ChapterCard } from "@/components/chapter-card";
 import { CreateChapterForm } from "@/components/create-chapter-form";
 import { DeleteBookButton } from "@/components/delete-book-button";
 import { EmptyState } from "@/components/empty-state";
-import { fetchBook, fetchBookChapters } from "@/lib/api";
+import { fetchBook, fetchBookChapters, fetchReadingProgress } from "@/lib/api";
 import { formatMessage } from "@/lib/i18n";
 import { getServerI18n } from "@/lib/i18n-server";
 
@@ -57,9 +57,10 @@ export default async function BookDetailPage({ params, searchParams }: BookDetai
     notFound();
   }
 
-  const [book, chapters] = await Promise.all([
+  const [book, chapters, readingProgress] = await Promise.all([
     fetchBook(parsedBookId),
     fetchBookChapters(parsedBookId),
+    fetchReadingProgress(parsedBookId),
   ]);
   const { messages } = await getServerI18n();
   const chapterLabel = chapters.length === 1 ? messages.chapterSingular : messages.chapterPlural;
@@ -83,6 +84,9 @@ export default async function BookDetailPage({ params, searchParams }: BookDetai
   const rangeEnd = filteredChapters.length === 0 ? 0 : startIndex + pagedChapters.length;
   const paginationItems = getPaginationItems(currentPage, totalPages);
   const hasActiveChapterFilters = Boolean(searchQuery) || statusFilter !== "all";
+  const continueChapter =
+    chapters.find((chapter) => chapter.id === readingProgress.chapter_id) ?? chapters[0] ?? null;
+  const continueLabel = readingProgress.chapter_id ? messages.continueReadingButton : messages.startReadingButton;
 
   function getChapterListHref(page: number) {
     const params = new URLSearchParams();
@@ -112,6 +116,11 @@ export default async function BookDetailPage({ params, searchParams }: BookDetai
                 <span className="stat-chip">{new Date(book.updated_at).toLocaleDateString()}</span>
               </div>
               <div className="action-row">
+                {continueChapter ? (
+                  <Link className="button" href={`/books/${book.id}/chapters/${continueChapter.id}`}>
+                    {continueLabel}
+                  </Link>
+                ) : null}
                 <Link className="button-link" href="/">
                   {messages.backToBookshelf}
                 </Link>
@@ -119,6 +128,13 @@ export default async function BookDetailPage({ params, searchParams }: BookDetai
                   {messages.manageBookGlossary}
                 </Link>
               </div>
+              {continueChapter ? (
+                <p className="chapter-page-meta">
+                  {formatMessage(messages.readingProgressLabel, {
+                    progress: readingProgress.chapter_id ? readingProgress.progress_percent : 0,
+                  })}
+                </p>
+              ) : null}
             </div>
           </section>
 

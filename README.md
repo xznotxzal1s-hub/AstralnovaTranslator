@@ -82,11 +82,18 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - language switching for Simplified Chinese, English, and Japanese
 - Simplified Chinese as the default UI language
 - reading-focused UI refresh for chapter reading
+- Continue Reading opens the saved chapter and restores the approximate scroll position
+- reading progress is stored in SQLite so the saved position follows you across desktop and mobile browsers
+- reader visual preferences are stored per browser/device in `localStorage`
 - chapter list pagination on the book detail page
 - chapter list status filtering and title search on the book detail page
-- translation-only as the default reader mode, with manual bilingual switching still available
+- translation-only as the default reader mode, with manual bilingual and source-only switching still available
+- reader display controls for font size, line height, content width, paragraph spacing, and paper/sepia/dark reader themes
+- reader keyboard shortcuts: Left/Right arrows move between chapters, and `T` cycles the read mode
+- compact reader chapter search/jump panel with first/current/last shortcuts and capped search results for large books
 - clear previous/current/next chapter navigation above and below the reader surface
 - small desktop floating previous/next reader controls
+- sticky mobile reader navigation for previous/book/next
 - theme-aware, denser reader chapter outline for large books
 - webpage URL import form on the bookshelf page
 - webpage URL import previews detected title, chapter count, and extracted text before saving
@@ -126,6 +133,8 @@ This is still a V1-style private tool. A few things are intentionally simple:
 - UI-R3 adds a few reusable frontend primitives, but the stylesheet is still large and could be split further
 - settings and glossary pages are usable and more visually consistent, but still need deeper form/table usability polish
 - book detail chapter pagination supports direct page links, while reader-side navigation intentionally shows a focused chapter window for long books
+- reader scroll progress is approximate; if translated content changes later, the restored position may be close rather than exact
+- reader visual preferences are intentionally stored in browser `localStorage`, so each browser/device can have its own font, width, theme, and read-mode choices
 - mobile bookshelf browsing is denser than before, but some non-bookshelf management pages may still need additional small-screen polish
 - translation presets are global only and do not yet support import/export or per-book assignment
 - Docker/NAS deployment files exist, but a fresh full end-to-end Docker verification is still recommended after the latest refinements
@@ -253,7 +262,11 @@ You can currently verify all of these manually:
 - delete a book
 - confirm destructive actions through the in-app confirmation dialog
 - open a chapter with translation-only as the default reading mode
-- switch manually between translation-only mode and source + translation mode
+- switch manually between translation-only, source + translation, and source-only modes
+- use Continue Reading from the book detail page to reopen the saved chapter and approximate scroll position
+- adjust reader font size, line height, content width, paragraph spacing, and reader theme from the reading page
+- use Left/Right arrow keys for previous/next chapter and `T` to cycle reader modes when not typing in a form field
+- search chapter titles from the reader jump panel and use first/current/last chapter shortcuts
 - use previous/next chapter controls at the top and bottom of the reader page
 - switch day/night mode on the reader page and confirm the chapter outline follows the active theme
 
@@ -267,6 +280,12 @@ For the Integration Hardening R1 checks specifically:
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest tests.test_translation_jobs tests.test_backup_export tests.test_route_registration
+```
+
+For the Reader Experience R2A checks specifically:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest tests.test_reading_progress tests.test_schema_migrations tests.test_route_registration
 ```
 
 ## Current Docker / NAS Status
@@ -476,5 +495,7 @@ Still out of scope for V1:
 
 - If PowerShell mangles Japanese text input, browser forms or Swagger UI usually work better for UTF-8 testing
 - On Windows, long frontend verification commands inside Codex can sometimes hang even when the project itself is fine
+- Codex should not run local frontend production builds (`npm run build`) unless explicitly allowed; GitHub Actions is the source of truth for production build verification
+- Codex should not run Docker build/up or Docker smoke tests unless explicitly allowed; the smoke script is available for manual verification
 - Manual verification is preferred when Windows Codex build runs become unreliable
 - TypeScript incremental build cache files such as `frontend/tsconfig.tsbuildinfo` are ignored and should not be committed

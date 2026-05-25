@@ -69,6 +69,14 @@ export type PromptTemplateValidationResult = {
   warnings: string[];
 };
 
+export type ReadingProgress = {
+  book_id: number;
+  chapter_id: number | null;
+  progress_percent: number;
+  updated_at: string | null;
+  fallback_used: boolean;
+};
+
 export type TranslationJob = {
   id: number;
   book_id: number | null;

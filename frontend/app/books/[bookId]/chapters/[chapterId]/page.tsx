@@ -2,9 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { EmptyState } from "@/components/empty-state";
-import { ReadModePanel } from "@/components/read-mode-panel";
+import { ReaderExperience } from "@/components/reader-experience";
 import { TranslateChapterButton } from "@/components/translate-chapter-button";
-import { fetchBook, fetchBookChapters, fetchChapter } from "@/lib/api";
+import { fetchBook, fetchBookChapters, fetchChapter, fetchReadingProgress } from "@/lib/api";
 import { formatMessage } from "@/lib/i18n";
 import { getServerI18n } from "@/lib/i18n-server";
 import { getLocalizedStatus } from "@/lib/status-label";
@@ -27,10 +27,11 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
     notFound();
   }
 
-  const [book, chapter, chapters] = await Promise.all([
+  const [book, chapter, chapters, readingProgress] = await Promise.all([
     fetchBook(parsedBookId),
     fetchChapter(parsedChapterId),
     fetchBookChapters(parsedBookId),
+    fetchReadingProgress(parsedBookId),
   ]);
   const { messages } = await getServerI18n();
   const localizedStatus = getLocalizedStatus(chapter.translation_status, messages);
@@ -124,7 +125,14 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
 
           <section className="reader-card reading-surface desktop-reading-surface">
             {chapter.source_text ? (
-              <ReadModePanel chapter={chapter} />
+              <ReaderExperience
+                book={book}
+                chapter={chapter}
+                chapters={chapters}
+                previousChapter={previousChapter}
+                nextChapter={nextChapter}
+                initialProgress={readingProgress}
+              />
             ) : (
               <EmptyState title={messages.noSourceTitle} description={messages.noSourceDescription} />
             )}

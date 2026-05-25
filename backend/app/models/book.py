@@ -29,3 +29,9 @@ class Book(Base):
         cascade="all, delete-orphan",
         order_by="Chapter.index_in_book",
     )
+    reading_progress = relationship(
+        "ReadingProgress",
+        back_populates="book",
+        cascade="all, delete-orphan",
+        uselist=False,
+    )
