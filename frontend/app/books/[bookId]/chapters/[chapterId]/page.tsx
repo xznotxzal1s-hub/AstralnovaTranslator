@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { EmptyState } from "@/components/empty-state";
 import { ReaderExperience } from "@/components/reader-experience";
 import { TranslateChapterButton } from "@/components/translate-chapter-button";
+import { ButtonLink } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { fetchBook, fetchBookChapters, fetchChapter, fetchReadingProgress } from "@/lib/api";
 import { formatMessage } from "@/lib/i18n";
@@ -96,18 +97,18 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
             <div className="reader-header-actions">
               <TranslateChapterButton chapterId={chapter.id} />
               <div className="reader-jump-links">
-                <Link className="button-link" href={`/books/${book.id}`}>
+                <ButtonLink href={`/books/${book.id}`}>
                   {messages.backToBook}
-                </Link>
+                </ButtonLink>
                 {previousChapter ? (
-                  <Link className="button-link" href={`/books/${book.id}/chapters/${previousChapter.id}`}>
+                  <ButtonLink href={`/books/${book.id}/chapters/${previousChapter.id}`}>
                     {messages.previousChapter}
-                  </Link>
+                  </ButtonLink>
                 ) : null}
                 {nextChapter ? (
-                  <Link className="button-link" href={`/books/${book.id}/chapters/${nextChapter.id}`}>
+                  <ButtonLink href={`/books/${book.id}/chapters/${nextChapter.id}`}>
                     {messages.nextChapter}
-                  </Link>
+                  </ButtonLink>
                 ) : null}
               </div>
             </div>

@@ -16,6 +16,7 @@ The app is beyond the original V1 baseline and is currently a usable NAS-friendl
 - Reader Experience R2A is implemented: reading progress is stored in SQLite, Continue Reading restores the saved chapter and approximate scroll position, and reader visual preferences are stored in browser `localStorage`.
 - GHCR image publishing and NAS prebuilt-image deployment files exist.
 - Frontend Maintainability R3A is in progress/completed in code: the large global stylesheet has been split into ordered responsibility files, and a few low-risk UI primitives now cover repeated button, form field, pagination, and status badge patterns.
+- Frontend Maintainability R3B continued the primitive migration without changing product behavior or visual design.
 
 The project should stay small, private, and beginner-friendly. Do not turn it into a public platform or a distributed job system.
 
@@ -204,10 +205,33 @@ R3A verification:
 - Docker build/up/smoke was intentionally skipped due to Codex constraints
 
 R3B candidates:
-- migrate repeated button/link markup gradually to `Button` / `ButtonLink`
-- migrate more forms to `FormField`
+- continue migrating any newly added direct button/link markup to `Button` / `ButtonLink`
+- continue migrating any newly added simple forms to `FormField`
 - split or simplify `visual-polish.css` and `reader-polish.css` after visual browser checks
 - consider component-level CSS only after the current split has proven stable
+
+### Frontend Maintainability R3B notes
+
+R3B migrated more repeated markup to existing primitives:
+- create book form
+- create chapter form
+- TXT/EPUB import form
+- URL import preview form
+- book title editor
+- delete book/chapter buttons
+- batch translate button
+- translate chapter button
+- confirm dialog actions
+- glossary manager form/actions
+- settings preset form/actions
+- book card action link
+- reader/book/glossary page button-like links
+
+R3B verification:
+- `npm exec tsc -- --noEmit --incremental false` passed in `frontend/`
+- no backend tests were required because backend files were not touched
+- local `npm run build` was intentionally skipped because GitHub Actions is the production build source of truth
+- Docker build/up/smoke was intentionally skipped due to Codex constraints
 
 ### Reader R2A manual checklist
 

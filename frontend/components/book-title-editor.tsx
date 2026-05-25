@@ -3,7 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { FeedbackMessage } from "@/components/feedback-message";
 import { useI18n } from "@/components/i18n-provider";
+import { Button } from "@/components/ui/button";
+import { FormField } from "@/components/ui/form-field";
 import { updateBook } from "@/lib/api-client";
 
 type BookTitleEditorProps = {
@@ -60,40 +63,33 @@ export function BookTitleEditor({ bookId, initialTitle }: BookTitleEditorProps) 
     <div className="book-title-editor">
       {isEditing ? (
         <form className="inline-edit-form" onSubmit={handleSubmit}>
-          <div className="field">
-            <label htmlFor="book-title-editor">{t("editBookTitleLabel")}</label>
+          <FormField htmlFor="book-title-editor" label={t("editBookTitleLabel")}>
             <input
               id="book-title-editor"
               value={draftTitle}
               onChange={(event) => setDraftTitle(event.target.value)}
               placeholder={t("bookTitlePlaceholder")}
             />
-          </div>
+          </FormField>
           <div className="action-row compact-actions">
-            <button className="button" type="submit" disabled={isSaving} aria-busy={isSaving}>
+            <Button type="submit" disabled={isSaving} aria-busy={isSaving}>
               {isSaving ? t("savingLabel") : t("saveBookTitleButton")}
-            </button>
-            <button className="button-link" type="button" onClick={handleCancel} disabled={isSaving}>
+            </Button>
+            <Button variant="link" type="button" onClick={handleCancel} disabled={isSaving}>
               {t("cancelEditBookTitle")}
-            </button>
+            </Button>
           </div>
         </form>
       ) : (
         <div className="title-display-row">
           <h1>{title}</h1>
-          <button className="button-link" type="button" onClick={() => setIsEditing(true)}>
+          <Button variant="link" type="button" onClick={() => setIsEditing(true)}>
             {t("editBookTitleButton")}
-          </button>
+          </Button>
         </div>
       )}
 
-      <p
-        className={`feedback${
-          messageType === "error" ? " error" : messageType === "success" ? " success" : ""
-        }`}
-      >
-        {message}
-      </p>
+      <FeedbackMessage message={message} type={messageType} />
     </div>
   );
 }

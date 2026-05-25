@@ -6,6 +6,7 @@ import { useState } from "react";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { FeedbackMessage } from "@/components/feedback-message";
 import { useI18n } from "@/components/i18n-provider";
+import { Button } from "@/components/ui/button";
 import { deleteBook } from "@/lib/api-client";
 import { formatMessage } from "@/lib/i18n";
 
@@ -59,15 +60,16 @@ export function DeleteBookButton({
 
   return (
     <div className={compact ? "destructive-action compact" : "destructive-action"}>
-      <button
+      <Button
         aria-busy={isSubmitting}
-        className={compact ? "button-danger button-danger-ghost compact-button" : "button-danger"}
+        className={compact ? "compact-button" : undefined}
         disabled={isSubmitting}
         onClick={() => setIsConfirmOpen(true)}
         type="button"
+        variant={compact ? "dangerGhost" : "danger"}
       >
         {t("deleteBookButton")}
-      </button>
+      </Button>
       {!compact ? <FeedbackMessage message={message} type={messageType} /> : null}
       <ConfirmDialog
         open={isConfirmOpen}

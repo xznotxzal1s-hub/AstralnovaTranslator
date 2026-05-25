@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
-
 import { DeleteChapterButton } from "@/components/delete-chapter-button";
 import { useI18n } from "@/components/i18n-provider";
 import { TranslateChapterButton } from "@/components/translate-chapter-button";
+import { ButtonLink } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { formatMessage } from "@/lib/i18n";
 import { getLocalizedStatus } from "@/lib/status-label";
@@ -38,9 +37,9 @@ export function ChapterCard({ bookId, chapter }: ChapterCardProps) {
         </div>
       </div>
       <div className="action-row chapter-card-actions">
-        <Link className="button" href={`/books/${bookId}/chapters/${chapter.id}`}>
+        <ButtonLink variant="primary" href={`/books/${bookId}/chapters/${chapter.id}`}>
           {t("readChapterButton")}
-        </Link>
+        </ButtonLink>
         <TranslateChapterButton chapterId={chapter.id} compact />
         <DeleteChapterButton chapterId={chapter.id} title={chapter.title} />
       </div>

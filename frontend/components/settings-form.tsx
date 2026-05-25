@@ -5,6 +5,8 @@ import { useState } from "react";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { FeedbackMessage } from "@/components/feedback-message";
 import { useI18n } from "@/components/i18n-provider";
+import { Button, buttonClassName } from "@/components/ui/button";
+import { FormField } from "@/components/ui/form-field";
 import {
   activateSettingsPreset,
   createSettingsPreset,
@@ -209,7 +211,7 @@ export function SettingsForm({ initialSettings, initialPresets }: SettingsFormPr
           <h3>{t("backupExportTitle")}</h3>
           <p className="muted">{t("backupExportDescription")}</p>
           <p className="backup-warning">{t("backupExportWarning")}</p>
-          <a className="button-secondary" download href="/api/backend/backup/export">
+          <a className={buttonClassName("secondary")} download href="/api/backend/backup/export">
             {t("backupExportButton")}
           </a>
         </div>
@@ -222,17 +224,15 @@ export function SettingsForm({ initialSettings, initialPresets }: SettingsFormPr
         </div>
 
         <section className="form-section-grid">
-          <div className="field">
-            <label htmlFor="preset_name">{t("presetNameLabel")}</label>
+          <FormField htmlFor="preset_name" label={t("presetNameLabel")}>
             <input
               id="preset_name"
               value={formData.name}
               onChange={(event) => updateField("name", event.target.value)}
             />
-          </div>
+          </FormField>
 
-          <div className="field">
-            <label htmlFor="provider_type">{t("providerTypeLabel")}</label>
+          <FormField htmlFor="provider_type" label={t("providerTypeLabel")}>
             <select
               id="provider_type"
               value={formData.provider_type}
@@ -241,38 +241,34 @@ export function SettingsForm({ initialSettings, initialPresets }: SettingsFormPr
               <option value="openai_compatible">{t("providerOpenAiCompatible")}</option>
               <option value="gemini">{t("providerGemini")}</option>
             </select>
-          </div>
+          </FormField>
 
-          <div className="field">
-            <label htmlFor="model_name">{t("modelNameLabel")}</label>
+          <FormField htmlFor="model_name" label={t("modelNameLabel")}>
             <input
               id="model_name"
               value={formData.model_name}
               onChange={(event) => updateField("model_name", event.target.value)}
             />
-          </div>
+          </FormField>
 
-          <div className="field">
-            <label htmlFor="api_base_url">{t("apiBaseUrlLabel")}</label>
+          <FormField htmlFor="api_base_url" label={t("apiBaseUrlLabel")}>
             <input
               id="api_base_url"
               value={formData.api_base_url}
               onChange={(event) => updateField("api_base_url", event.target.value)}
             />
-          </div>
+          </FormField>
 
-          <div className="field">
-            <label htmlFor="api_key">{t("apiKeyLabel")}</label>
+          <FormField htmlFor="api_key" label={t("apiKeyLabel")}>
             <input
               id="api_key"
               type="password"
               value={formData.api_key}
               onChange={(event) => updateField("api_key", event.target.value)}
             />
-          </div>
+          </FormField>
 
-          <div className="field">
-            <label htmlFor="chunk_size">{t("chunkSizeLabel")}</label>
+          <FormField htmlFor="chunk_size" label={t("chunkSizeLabel")}>
             <input
               id="chunk_size"
               min={1}
@@ -280,61 +276,59 @@ export function SettingsForm({ initialSettings, initialPresets }: SettingsFormPr
               value={formData.chunk_size}
               onChange={(event) => updateField("chunk_size", Number(event.target.value))}
             />
-          </div>
+          </FormField>
 
-          <div className="field">
-            <label htmlFor="translation_mode">{t("translationModeLabel")}</label>
+          <FormField htmlFor="translation_mode" label={t("translationModeLabel")}>
             <input
               id="translation_mode"
               value={formData.translation_mode}
               onChange={(event) => updateField("translation_mode", event.target.value)}
             />
-          </div>
+          </FormField>
         </section>
 
-        <div className="field prompt-field">
-          <label htmlFor="prompt_template">{t("promptTemplateLabel")}</label>
+        <FormField className="prompt-field" htmlFor="prompt_template" label={t("promptTemplateLabel")}>
           <textarea
             id="prompt_template"
             value={formData.prompt_template}
             onChange={(event) => updateField("prompt_template", event.target.value)}
           />
-        </div>
+        </FormField>
 
         <div className="preset-toolbar">
           <div className="action-row">
-            <button className="button" disabled={isSubmitting} aria-busy={isSubmitting} type="submit">
+            <Button disabled={isSubmitting} aria-busy={isSubmitting} type="submit">
               {isSubmitting ? t("savingLabel") : t("saveSettingsButton")}
-            </button>
-            <button
-              className="button-secondary"
+            </Button>
+            <Button
+              variant="secondary"
               disabled={isSubmitting}
               aria-busy={isSubmitting}
               onClick={handleCreatePreset}
               type="button"
             >
               {t("createPresetButton")}
-            </button>
+            </Button>
           </div>
           <div className="action-row">
-            <button
-              className="button-link"
+            <Button
+              variant="link"
               disabled={Boolean(selectedPreset?.is_active) || isActivating}
               aria-busy={isActivating}
               onClick={handleActivatePreset}
               type="button"
             >
               {t("activatePresetButton")}
-            </button>
-            <button
-              className="button-danger"
+            </Button>
+            <Button
+              variant="danger"
               disabled={isDeleting || presets.length <= 1}
               aria-busy={isDeleting}
               onClick={() => setIsDeleteConfirmOpen(true)}
               type="button"
             >
               {t("deletePresetButton")}
-            </button>
+            </Button>
           </div>
         </div>
 

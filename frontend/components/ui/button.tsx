@@ -10,7 +10,7 @@ const variantClassName: Record<ButtonVariant, string> = {
   secondary: "button-secondary",
   link: "button-link",
   danger: "button-danger",
-  dangerGhost: "button-danger-ghost",
+  dangerGhost: "button-danger button-danger-ghost",
 };
 
 export function buttonClassName(variant: ButtonVariant = "primary", className?: string) {

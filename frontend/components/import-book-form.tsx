@@ -3,7 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { FeedbackMessage } from "@/components/feedback-message";
 import { useI18n } from "@/components/i18n-provider";
+import { Button } from "@/components/ui/button";
+import { FormField } from "@/components/ui/form-field";
 import { importBookFile } from "@/lib/api-client";
 import { formatMessage } from "@/lib/i18n";
 import type { ImportResult } from "@/lib/types";
@@ -67,17 +70,15 @@ export function ImportBookForm({ title, description, endpoint, accept, onSuccess
         <h2>{title}</h2>
         <p className="muted">{description}</p>
       </div>
-      <div className="field">
-        <label htmlFor={`${endpoint}-book-title`}>{t("importBookTitleOverride")}</label>
+      <FormField htmlFor={`${endpoint}-book-title`} label={t("importBookTitleOverride")}>
         <input
           id={`${endpoint}-book-title`}
           placeholder={t("importBookTitlePlaceholder")}
           value={bookTitle}
           onChange={(event) => setBookTitle(event.target.value)}
         />
-      </div>
-      <div className="field">
-        <label htmlFor={`${endpoint}-file`}>{t("importChooseFile")}</label>
+      </FormField>
+      <FormField htmlFor={`${endpoint}-file`} label={t("importChooseFile")}>
         <input
           accept={accept}
           id={`${endpoint}-file`}
@@ -85,11 +86,14 @@ export function ImportBookForm({ title, description, endpoint, accept, onSuccess
           onChange={(event) => setFile(event.target.files?.[0] ?? null)}
           type="file"
         />
-      </div>
-      <button aria-busy={isSubmitting} className="button" disabled={isSubmitting} type="submit">
+      </FormField>
+      <Button aria-busy={isSubmitting} disabled={isSubmitting} type="submit">
         {isSubmitting ? t("importingLabel") : title}
-      </button>
-      <p className={`feedback${message && message === t("importFailed") ? " error" : message ? " success" : ""}`}>{message}</p>
+      </Button>
+      <FeedbackMessage
+        message={message}
+        type={message && message === t("importFailed") ? "error" : message ? "success" : ""}
+      />
     </form>
   );
 }

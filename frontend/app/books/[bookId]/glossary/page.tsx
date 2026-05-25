@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { EmptyState } from "@/components/empty-state";
 import { GlossaryManager } from "@/components/glossary-manager";
+import { ButtonLink } from "@/components/ui/button";
 import { fetchBook, fetchBookGlossaryEntries } from "@/lib/api";
 import { getServerI18n } from "@/lib/i18n-server";
 
@@ -37,12 +37,12 @@ export default async function BookGlossaryPage({ params }: BookGlossaryPageProps
           <p className="lede">{messages.glossaryBookDescription}</p>
           <p className="page-lead">{messages.glossaryLead}</p>
           <div className="action-row">
-            <Link className="button-link" href={`/books/${book.id}`}>
+            <ButtonLink href={`/books/${book.id}`}>
               {messages.backToBook}
-            </Link>
-            <Link className="button-link" href="/glossary">
+            </ButtonLink>
+            <ButtonLink href="/glossary">
               {messages.navGlossary}
-            </Link>
+            </ButtonLink>
           </div>
         </div>
         <div className="info-card">

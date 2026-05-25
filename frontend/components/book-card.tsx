@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { DeleteBookButton } from "@/components/delete-book-button";
 import { useI18n } from "@/components/i18n-provider";
+import { ButtonLink } from "@/components/ui/button";
 import type { BookSummary } from "@/lib/types";
 
 type BookCardProps = {
@@ -41,9 +42,9 @@ export function BookCard({ book, onDeleted }: BookCardProps) {
       </div>
 
       <div className="book-card-actions">
-        <Link className="button-link compact-button" href={`/books/${book.id}`}>
+        <ButtonLink className="compact-button" href={`/books/${book.id}`}>
           {t("openBookButton")}
-        </Link>
+        </ButtonLink>
         <DeleteBookButton bookId={book.id} title={book.title} compact onDeleted={onDeleted} />
       </div>
     </article>

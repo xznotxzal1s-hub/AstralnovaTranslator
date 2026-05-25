@@ -3,7 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { FeedbackMessage } from "@/components/feedback-message";
 import { useI18n } from "@/components/i18n-provider";
+import { Button } from "@/components/ui/button";
+import { FormField } from "@/components/ui/form-field";
 import { createBook } from "@/lib/api-client";
 import type { BookSummary } from "@/lib/types";
 
@@ -50,8 +53,7 @@ export function CreateBookForm({ onSuccess }: CreateBookFormProps) {
         <p className="eyebrow">{t("newBookEyebrow")}</p>
         <h2>{t("createBookTitle")}</h2>
       </div>
-      <div className="field">
-        <label htmlFor="book-title">{t("titleLabel")}</label>
+      <FormField htmlFor="book-title" label={t("titleLabel")}>
         <input
           id="book-title"
           name="title"
@@ -59,11 +61,14 @@ export function CreateBookForm({ onSuccess }: CreateBookFormProps) {
           value={title}
           onChange={(event) => setTitle(event.target.value)}
         />
-      </div>
-      <button className="button" type="submit" disabled={isSubmitting} aria-busy={isSubmitting}>
+      </FormField>
+      <Button type="submit" disabled={isSubmitting} aria-busy={isSubmitting}>
         {isSubmitting ? t("creatingLabel") : t("createBookButton")}
-      </button>
-      <p className={`feedback${message && message === t("createBookError") ? " error" : message ? " success" : ""}`}>{message}</p>
+      </Button>
+      <FeedbackMessage
+        message={message}
+        type={message && message === t("createBookError") ? "error" : message ? "success" : ""}
+      />
     </form>
   );
 }

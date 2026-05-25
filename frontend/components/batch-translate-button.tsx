@@ -3,7 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { FeedbackMessage } from "@/components/feedback-message";
 import { useI18n } from "@/components/i18n-provider";
+import { Button } from "@/components/ui/button";
 import { createBookTranslationJob, fetchTranslationJob } from "@/lib/api-client";
 import { formatMessage } from "@/lib/i18n";
 import type { Chapter, TranslationJob } from "@/lib/types";
@@ -90,11 +92,11 @@ export function BatchTranslateButton({ bookId, chapters }: BatchTranslateButtonP
 
   return (
     <div className="batch-translate-panel">
-      <button className="button" disabled={isSubmitting} aria-busy={isSubmitting} onClick={handleBatchTranslate} type="button">
+      <Button disabled={isSubmitting} aria-busy={isSubmitting} onClick={handleBatchTranslate} type="button">
         {isSubmitting ? t("batchTranslateRunning") : t("batchTranslateButton")}
-      </button>
+      </Button>
       {isSubmitting ? <p className="batch-translate-note">{t("batchTranslateCancelNote")}</p> : null}
-      {message ? <p className={`feedback${messageType ? ` ${messageType}` : ""}`}>{message}</p> : null}
+      <FeedbackMessage message={message} type={messageType} />
     </div>
   );
 }

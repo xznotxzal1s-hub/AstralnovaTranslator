@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BatchTranslateButton } from "@/components/batch-translate-button";
@@ -7,6 +6,7 @@ import { ChapterCard } from "@/components/chapter-card";
 import { CreateChapterForm } from "@/components/create-chapter-form";
 import { DeleteBookButton } from "@/components/delete-book-button";
 import { EmptyState } from "@/components/empty-state";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { PaginationControls } from "@/components/ui/pagination";
 import { fetchBook, fetchBookChapters, fetchReadingProgress } from "@/lib/api";
@@ -102,16 +102,16 @@ export default async function BookDetailPage({ params, searchParams }: BookDetai
               </div>
               <div className="action-row">
                 {continueChapter ? (
-                  <Link className="button" href={`/books/${book.id}/chapters/${continueChapter.id}`}>
+                  <ButtonLink variant="primary" href={`/books/${book.id}/chapters/${continueChapter.id}`}>
                     {continueLabel}
-                  </Link>
+                  </ButtonLink>
                 ) : null}
-                <Link className="button-link" href="/">
+                <ButtonLink href="/">
                   {messages.backToBookshelf}
-                </Link>
-                <Link className="button-link" href={`/books/${book.id}/glossary`}>
+                </ButtonLink>
+                <ButtonLink href={`/books/${book.id}/glossary`}>
                   {messages.manageBookGlossary}
-                </Link>
+                </ButtonLink>
               </div>
               {continueChapter ? (
                 <p className="chapter-page-meta">
@@ -178,13 +178,13 @@ export default async function BookDetailPage({ params, searchParams }: BookDetai
                   </select>
                 </FormField>
                 <div className="chapter-filter-actions">
-                  <button className="button-secondary" type="submit">
+                  <Button variant="secondary" type="submit">
                     {messages.chapterFilterApply}
-                  </button>
+                  </Button>
                   {hasActiveChapterFilters ? (
-                    <Link className="button-link" href={`/books/${book.id}`}>
+                    <ButtonLink href={`/books/${book.id}`}>
                       {messages.chapterFilterClear}
-                    </Link>
+                    </ButtonLink>
                   ) : null}
                 </div>
               </form>
@@ -229,9 +229,9 @@ export default async function BookDetailPage({ params, searchParams }: BookDetai
             <h3>{messages.manageBookGlossary}</h3>
             <p className="muted">{messages.bookDetailDescription}</p>
             <div className="action-row">
-              <Link className="button-link" href={`/books/${book.id}/glossary`}>
+              <ButtonLink href={`/books/${book.id}/glossary`}>
                 {messages.manageBookGlossary}
-              </Link>
+              </ButtonLink>
               <DeleteBookButton bookId={book.id} redirectToBookshelf title={book.title} />
             </div>
           </section>

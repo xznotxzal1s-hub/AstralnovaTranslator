@@ -6,6 +6,8 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import { EmptyState } from "@/components/empty-state";
 import { FeedbackMessage } from "@/components/feedback-message";
 import { useI18n } from "@/components/i18n-provider";
+import { Button } from "@/components/ui/button";
+import { FormField } from "@/components/ui/form-field";
 import { createGlossaryEntry, deleteGlossaryEntry, updateGlossaryEntry } from "@/lib/api-client";
 import { formatMessage } from "@/lib/i18n";
 import type { GlossaryEntry } from "@/lib/types";
@@ -116,41 +118,38 @@ export function GlossaryManager({ initialEntries, scope, bookId }: GlossaryManag
           <p className="muted">{t("glossaryFormDescription")}</p>
         </div>
 
-        <div className="field">
-          <label htmlFor="source_term">{t("glossarySourceLabel")}</label>
+        <FormField htmlFor="source_term" label={t("glossarySourceLabel")}>
           <input
             id="source_term"
             value={formData.source_term}
             onChange={(event) => setFormData((current) => ({ ...current, source_term: event.target.value }))}
           />
-        </div>
+        </FormField>
 
-        <div className="field">
-          <label htmlFor="target_term">{t("glossaryTargetLabel")}</label>
+        <FormField htmlFor="target_term" label={t("glossaryTargetLabel")}>
           <input
             id="target_term"
             value={formData.target_term}
             onChange={(event) => setFormData((current) => ({ ...current, target_term: event.target.value }))}
           />
-        </div>
+        </FormField>
 
-        <div className="field">
-          <label htmlFor="note">{t("glossaryNoteLabel")}</label>
+        <FormField htmlFor="note" label={t("glossaryNoteLabel")}>
           <textarea
             id="note"
             value={formData.note}
             onChange={(event) => setFormData((current) => ({ ...current, note: event.target.value }))}
           />
-        </div>
+        </FormField>
 
         <div className="action-row">
-          <button className="button" disabled={isSubmitting} type="submit">
+          <Button disabled={isSubmitting} type="submit">
             {isSubmitting ? t("savingLabel") : editingId === null ? t("glossaryCreateButton") : t("glossarySaveButton")}
-          </button>
+          </Button>
           {editingId !== null ? (
-            <button className="button-link" onClick={resetForm} type="button">
+            <Button variant="link" onClick={resetForm} type="button">
               {t("glossaryCancel")}
-            </button>
+            </Button>
           ) : null}
         </div>
         <FeedbackMessage message={message} type={messageType} />
@@ -178,12 +177,12 @@ export function GlossaryManager({ initialEntries, scope, bookId }: GlossaryManag
               </div>
               <p className="muted">{entry.note?.trim() ? entry.note : t("glossaryNoNote")}</p>
               <div className="action-row">
-                <button className="button-secondary" disabled={isSubmitting} onClick={() => beginEdit(entry)} type="button">
+                <Button variant="secondary" disabled={isSubmitting} onClick={() => beginEdit(entry)} type="button">
                   {t("glossaryEdit")}
-                </button>
-                <button className="button-link" disabled={isSubmitting} onClick={() => setEntryToDelete(entry)} type="button">
+                </Button>
+                <Button variant="link" disabled={isSubmitting} onClick={() => setEntryToDelete(entry)} type="button">
                   {t("glossaryDelete")}
-                </button>
+                </Button>
               </div>
             </article>
           ))

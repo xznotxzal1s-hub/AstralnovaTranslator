@@ -3,7 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { FeedbackMessage } from "@/components/feedback-message";
 import { useI18n } from "@/components/i18n-provider";
+import { Button } from "@/components/ui/button";
 import { translateChapter } from "@/lib/api-client";
 
 type TranslateChapterButtonProps = {
@@ -37,19 +39,17 @@ export function TranslateChapterButton({
 
   return (
     <div className={compact ? "translate-button-wrap compact" : "translate-button-wrap"}>
-      <button
-        className={compact ? "button-secondary" : "button"}
+      <Button
+        variant={compact ? "secondary" : "primary"}
         disabled={isSubmitting}
         aria-busy={isSubmitting}
         onClick={handleTranslate}
         type="button"
       >
         {isSubmitting ? t("translatingLabel") : compact ? t("translateButton") : t("translateChapterButton")}
-      </button>
-      {!compact && message ? (
-        <p className={`feedback${message === t("translationFailedMessage") ? " error" : " success"}`}>
-          {message}
-        </p>
+      </Button>
+      {!compact ? (
+        <FeedbackMessage message={message} type={message === t("translationFailedMessage") ? "error" : message ? "success" : ""} />
       ) : null}
     </div>
   );

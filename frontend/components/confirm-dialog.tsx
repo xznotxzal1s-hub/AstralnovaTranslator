@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 
+import { Button } from "@/components/ui/button";
+
 type ConfirmDialogProps = {
   open: boolean;
   title: string;
@@ -56,12 +58,12 @@ export function ConfirmDialog({
           <p>{message}</p>
         </div>
         <div className="confirm-dialog-actions">
-          <button className="button-link" disabled={isSubmitting} type="button" onClick={onCancel}>
+          <Button variant="link" disabled={isSubmitting} type="button" onClick={onCancel}>
             {cancelLabel}
-          </button>
-          <button className="button-danger" aria-busy={isSubmitting} disabled={isSubmitting} type="button" onClick={onConfirm}>
+          </Button>
+          <Button variant="danger" aria-busy={isSubmitting} disabled={isSubmitting} type="button" onClick={onConfirm}>
             {confirmLabel}
-          </button>
+          </Button>
         </div>
       </section>
     </div>

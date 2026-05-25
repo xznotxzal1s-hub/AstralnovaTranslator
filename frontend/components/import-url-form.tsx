@@ -3,7 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
+import { FeedbackMessage } from "@/components/feedback-message";
 import { useI18n } from "@/components/i18n-provider";
+import { Button } from "@/components/ui/button";
+import { FormField } from "@/components/ui/form-field";
 import { importBookFromUrl, previewBookFromUrl } from "@/lib/api-client";
 import { formatMessage } from "@/lib/i18n";
 import type { ImportResult, UrlImportPreview } from "@/lib/types";
@@ -100,8 +103,7 @@ export function ImportUrlForm({ onSuccess }: ImportUrlFormProps) {
         <h2>{t("importUrlTitle")}</h2>
         <p className="muted">{t("importUrlDescription")}</p>
       </div>
-      <div className="field">
-        <label htmlFor="url-import-input">{t("importUrlLabel")}</label>
+      <FormField htmlFor="url-import-input" label={t("importUrlLabel")}>
         <input
           id="url-import-input"
           inputMode="url"
@@ -113,9 +115,8 @@ export function ImportUrlForm({ onSuccess }: ImportUrlFormProps) {
             clearPreview();
           }}
         />
-      </div>
-      <div className="field">
-        <label htmlFor="url-book-title">{t("importBookTitleOverride")}</label>
+      </FormField>
+      <FormField htmlFor="url-book-title" label={t("importBookTitleOverride")}>
         <input
           id="url-book-title"
           placeholder={t("importBookTitlePlaceholder")}
@@ -125,10 +126,10 @@ export function ImportUrlForm({ onSuccess }: ImportUrlFormProps) {
             clearPreview();
           }}
         />
-      </div>
-      <button aria-busy={isSubmitting} className="button" disabled={isSubmitting} type="submit">
+      </FormField>
+      <Button aria-busy={isSubmitting} disabled={isSubmitting} type="submit">
         {isSubmitting ? t("importUrlPreviewing") : t("importUrlPreviewButton")}
-      </button>
+      </Button>
       {preview ? (
         <div className="url-preview-card">
           <div>
@@ -139,18 +140,18 @@ export function ImportUrlForm({ onSuccess }: ImportUrlFormProps) {
             </p>
           </div>
           <pre className="url-preview-text">{preview.preview_text}</pre>
-          <button
+          <Button
             aria-busy={isSubmitting}
-            className="button-secondary"
             disabled={isSubmitting}
             onClick={handleConfirmImport}
             type="button"
+            variant="secondary"
           >
             {isSubmitting ? t("importingLabel") : t("importUrlConfirmButton")}
-          </button>
+          </Button>
         </div>
       ) : null}
-      <p className={`feedback${messageType ? ` ${messageType}` : ""}`}>{message}</p>
+      <FeedbackMessage message={message} type={messageType} />
     </form>
   );
 }

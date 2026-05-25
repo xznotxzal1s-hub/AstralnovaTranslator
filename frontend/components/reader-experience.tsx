@@ -14,6 +14,7 @@ import {
   type ReaderPreferences,
 } from "@/components/reader-preferences";
 import { ReadModePanel } from "@/components/read-mode-panel";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { updateReadingProgress } from "@/lib/api-client";
 import { formatMessage } from "@/lib/i18n";
 import type { BookSummary, Chapter, ReadingProgress } from "@/lib/types";
@@ -254,9 +255,9 @@ export function ReaderExperience({
       style={preferenceStyle}
     >
       <div className="reader-control-strip">
-        <button className="button-secondary" type="button" onClick={() => setIsSettingsOpen((current) => !current)}>
+        <Button variant="secondary" type="button" onClick={() => setIsSettingsOpen((current) => !current)}>
           {t("readerSettingsButton")}
-        </button>
+        </Button>
         <label className="reader-search-control">
           <span>{t("readerChapterSearchTitle")}</span>
           <input
@@ -376,13 +377,13 @@ export function ReaderExperience({
           <p>{t("readerCompletionDescription")}</p>
         </div>
         <div className="reader-completion-actions">
-          <Link className="button-link" href={`/books/${book.id}`}>
+          <ButtonLink href={`/books/${book.id}`}>
             {t("backToBook")}
-          </Link>
+          </ButtonLink>
           {nextChapter ? (
-            <Link className="button" href={`/books/${book.id}/chapters/${nextChapter.id}`}>
+            <ButtonLink variant="primary" href={`/books/${book.id}/chapters/${nextChapter.id}`}>
               {t("nextChapter")}
-            </Link>
+            </ButtonLink>
           ) : null}
         </div>
       </section>

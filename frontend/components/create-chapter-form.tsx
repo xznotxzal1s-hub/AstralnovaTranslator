@@ -3,7 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { FeedbackMessage } from "@/components/feedback-message";
 import { useI18n } from "@/components/i18n-provider";
+import { Button } from "@/components/ui/button";
+import { FormField } from "@/components/ui/form-field";
 import { createChapter } from "@/lib/api-client";
 
 type CreateChapterFormProps = {
@@ -50,28 +53,29 @@ export function CreateChapterForm({ bookId }: CreateChapterFormProps) {
         <p className="eyebrow">{t("manualPasteEyebrow")}</p>
         <h2>{t("addChapterTitle")}</h2>
       </div>
-      <div className="field">
-        <label htmlFor="chapter-title">{t("chapterTitleLabel")}</label>
+      <FormField htmlFor="chapter-title" label={t("chapterTitleLabel")}>
         <input
           id="chapter-title"
           value={title}
           onChange={(event) => setTitle(event.target.value)}
           placeholder={t("chapterTitlePlaceholder")}
         />
-      </div>
-      <div className="field">
-        <label htmlFor="source-text">{t("sourceTextLabel")}</label>
+      </FormField>
+      <FormField htmlFor="source-text" label={t("sourceTextLabel")}>
         <textarea
           id="source-text"
           value={sourceText}
           onChange={(event) => setSourceText(event.target.value)}
           placeholder={t("sourceTextPlaceholder")}
         />
-      </div>
-      <button className="button" type="submit" disabled={isSubmitting} aria-busy={isSubmitting}>
+      </FormField>
+      <Button type="submit" disabled={isSubmitting} aria-busy={isSubmitting}>
         {isSubmitting ? t("savingLabel") : t("createChapterButton")}
-      </button>
-      <p className={`feedback${message && message === t("createChapterError") ? " error" : message ? " success" : ""}`}>{message}</p>
+      </Button>
+      <FeedbackMessage
+        message={message}
+        type={message && message === t("createChapterError") ? "error" : message ? "success" : ""}
+      />
     </form>
   );
 }
