@@ -84,6 +84,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - translation-only as the default reader mode, with manual bilingual switching still available
 - clear previous/current/next chapter navigation above and below the reader surface
 - small desktop floating previous/next reader controls
+- theme-aware, denser reader chapter outline for large books
 - webpage URL import form on the bookshelf page
 - webpage URL import previews detected title, chapter count, and extracted text before saving
 - delete actions with confirmation
@@ -250,6 +251,7 @@ You can currently verify all of these manually:
 - open a chapter with translation-only as the default reading mode
 - switch manually between translation-only mode and source + translation mode
 - use previous/next chapter controls at the top and bottom of the reader page
+- switch day/night mode on the reader page and confirm the chapter outline follows the active theme
 
 ## Current Docker / NAS Status
 

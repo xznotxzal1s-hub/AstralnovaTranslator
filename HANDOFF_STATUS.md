@@ -196,6 +196,13 @@ Completed in code:
 - mobile keeps navigation inline so it does not cover long-form text
 - existing focused chapter outline remains available in the reader sidebar
 
+### Reader sidebar theme/density refinement
+Completed in code:
+- reader chapter outline now follows the active day/night theme instead of staying dark in day mode
+- reader sidebar card is constrained to the viewport on desktop and scrolls internally
+- chapter outline rows are denser with two-line title clamping, so large books show more usable navigation at once
+- mobile keeps the outline unconstrained so it remains natural in the page flow
+
 ### UI-R1 bookshelf refinement
 Implemented in the first slice:
 - modernized bookshelf layout while preserving the existing client-side book refresh flow
@@ -311,6 +318,7 @@ Verified working locally at this point:
 - chapter status filtering and title search work on the book detail page
 - reader opens in translation-only mode by default and can still switch to bilingual mode
 - reader previous/next navigation is visible near both the top and bottom of the reading surface
+- reader chapter outline follows day/night mode correctly and shows more entries per screen
 - bookshelf refresh still uses the browser-side API fetch after page load and after create/import/delete actions
 
 ## Current UI / UX status
@@ -324,6 +332,7 @@ Current UI state:
 - the mobile app shell now uses a fixed bottom navigation bar and denser bookshelf rows for better one-handed browsing
 - the chapter reading page has the strongest polish and is the best current experience
 - the reader page now has clearer large-book navigation without rendering every chapter link
+- the reader sidebar no longer uses a permanently dark card in day mode
 - bookshelf and book detail pages are cleaner and more usable than earlier phases
 - interaction feedback is clearer through stronger hover, focus, active, and loading states
 - long chapter lists are more manageable because the book detail page now paginates them
