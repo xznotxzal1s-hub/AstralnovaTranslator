@@ -107,7 +107,7 @@ export default async function BookDetailPage({ params, searchParams }: BookDetai
                   </p>
                 ) : null}
               </div>
-              {chapters.length > 0 ? <BatchTranslateButton chapters={chapters} /> : null}
+              {chapters.length > 0 ? <BatchTranslateButton bookId={book.id} chapters={chapters} /> : null}
             </div>
 
             {chapters.length === 0 ? (

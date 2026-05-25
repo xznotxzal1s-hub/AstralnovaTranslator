@@ -4,6 +4,7 @@ import type {
   GlossaryEntry,
   ImportResult,
   PromptTemplateValidationResult,
+  TranslationJob,
   TranslationPreset,
   TranslationSettings,
   UrlImportInput,
@@ -89,6 +90,26 @@ export async function deleteChapter(chapterId: number) {
 
 export async function translateChapter(chapterId: number) {
   return request(`/chapters/${chapterId}/translate`, {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
+}
+
+export async function createBookTranslationJob(bookId: number) {
+  return request<TranslationJob>(`/books/${bookId}/translation-jobs`, {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
+}
+
+export async function fetchTranslationJob(jobId: number) {
+  return request<TranslationJob>(`/translation-jobs/${jobId}`, {
+    method: "GET",
+  });
+}
+
+export async function cancelTranslationJob(jobId: number) {
+  return request<TranslationJob>(`/translation-jobs/${jobId}/cancel`, {
     method: "POST",
     body: JSON.stringify({}),
   });

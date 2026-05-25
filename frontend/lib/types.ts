@@ -63,6 +63,19 @@ export type PromptTemplateValidationResult = {
   warnings: string[];
 };
 
+export type TranslationJob = {
+  id: number;
+  book_id: number | null;
+  chapter_id: number | null;
+  status: "pending" | "running" | "succeeded" | "failed" | "cancelled";
+  total_items: number;
+  completed_items: number;
+  current_item_label: string | null;
+  error_message: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type GlossaryEntry = {
   id: number;
   book_id: number | null;

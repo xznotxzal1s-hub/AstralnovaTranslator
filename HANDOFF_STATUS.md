@@ -157,6 +157,12 @@ Completed in code and covered by backend regression tests:
 - added `POST /translation-jobs/{job_id}/cancel`
 - jobs process untranslated chapters sequentially through the existing translation service without Redis/Celery
 
+### Batch translation polling refinement
+Completed in code:
+- the book detail page now creates a persisted translation job for batch translation
+- the frontend polls `GET /translation-jobs/{job_id}` for progress instead of translating each chapter directly in the browser
+- batch progress, success, cancellation, and failure messages are shown through the existing feedback area
+
 ### UI-R1 bookshelf refinement
 Implemented in the first slice:
 - modernized bookshelf layout while preserving the existing client-side book refresh flow
@@ -266,8 +272,7 @@ Verified working locally at this point:
 - translated content persists after restart
 - books can be deleted
 - chapters can be deleted
-- batch translation works sequentially from the book detail page
-- persisted backend translation jobs are available for the next frontend batch-translation polling pass
+- batch translation works sequentially from the book detail page through persisted backend jobs and frontend polling
 - chapter pagination works on the book detail page
 - reader opens in translation-only mode by default and can still switch to bilingual mode
 - bookshelf refresh still uses the browser-side API fetch after page load and after create/import/delete actions

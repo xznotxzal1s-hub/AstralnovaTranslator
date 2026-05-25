@@ -78,7 +78,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - translation-only as the default reader mode, with manual bilingual switching still available
 - webpage URL import form on the bookshelf page
 - delete actions with confirmation
-- batch translation action from book detail page
+- batch translation action from book detail page using persisted backend jobs and visible polling progress
 - active-page navigation highlighting
 - user-friendly localized status labels
 - UI-R1 bookshelf refinement with a consolidated add/import dialog and cover-style book cards

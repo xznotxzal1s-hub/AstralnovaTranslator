@@ -4,20 +4,34 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { useI18n } from "@/components/i18n-provider";
-import { translateChapter } from "@/lib/api-client";
+import { createBookTranslationJob, fetchTranslationJob } from "@/lib/api-client";
 import { formatMessage } from "@/lib/i18n";
-import type { Chapter } from "@/lib/types";
+import type { Chapter, TranslationJob } from "@/lib/types";
 
 type BatchTranslateButtonProps = {
+  bookId: number;
   chapters: Chapter[];
 };
 
-export function BatchTranslateButton({ chapters }: BatchTranslateButtonProps) {
+const POLL_INTERVAL_MS = 1200;
+const TERMINAL_JOB_STATUSES = new Set<TranslationJob["status"]>(["succeeded", "failed", "cancelled"]);
+
+function wait(milliseconds: number) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, milliseconds);
+  });
+}
+
+export function BatchTranslateButton({ bookId, chapters }: BatchTranslateButtonProps) {
   const router = useRouter();
   const { t } = useI18n();
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<"success" | "error" | "">("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  function setProgressMessage(job: TranslationJob) {
+    setMessage(formatMessage(t("batchTranslateProgress"), { done: job.completed_items, total: job.total_items }));
+  }
 
   async function handleBatchTranslate() {
     const targets = chapters.filter(
@@ -35,13 +49,34 @@ export function BatchTranslateButton({ chapters }: BatchTranslateButtonProps) {
     setMessage(formatMessage(t("batchTranslateProgress"), { done: 0, total: targets.length }));
 
     try {
-      for (let index = 0; index < targets.length; index += 1) {
-        await translateChapter(targets[index].id);
-        setMessage(formatMessage(t("batchTranslateProgress"), { done: index + 1, total: targets.length }));
+      let job = await createBookTranslationJob(bookId);
+      if (job.total_items === 0 || job.status === "succeeded") {
+        setMessage(t("batchTranslateNothingToDo"));
+        setMessageType("success");
+        router.refresh();
+        return;
       }
 
-      setMessage(t("batchTranslateDone"));
-      setMessageType("success");
+      setProgressMessage(job);
+      while (!TERMINAL_JOB_STATUSES.has(job.status)) {
+        await wait(POLL_INTERVAL_MS);
+        job = await fetchTranslationJob(job.id);
+        setProgressMessage(job);
+      }
+
+      if (job.status === "succeeded") {
+        setMessage(t("batchTranslateDone"));
+        setMessageType("success");
+        router.refresh();
+        return;
+      }
+
+      const failureMessage =
+        job.status === "cancelled"
+          ? t("batchTranslateCancelled")
+          : job.error_message || t("translationFailedMessage");
+      setMessage(formatMessage(t("batchTranslateError"), { message: failureMessage }));
+      setMessageType("error");
       router.refresh();
     } catch (error) {
       const fallbackMessage = error instanceof Error ? error.message : t("translationFailedMessage");
