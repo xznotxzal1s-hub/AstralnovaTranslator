@@ -64,6 +64,9 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - Japanese-aware chunk splitting for long chapters, preferring paragraphs, sentence endings, dialogue closings, and ellipses before hard length fallback
 - normal translation can reuse matching cached results, while retranslation bypasses the cache and calls the provider again
 - backend batch translation jobs are stored in SQLite and processed sequentially in-process for single-user NAS use
+- duplicate active batch translation jobs for the same book are rejected with HTTP 409
+- pending/running batch jobs left behind by an app restart are marked failed with a clear interrupted message on next startup
+- batch cancellation is cooperative and may take effect only after the current chapter or provider request finishes
 - API keys are masked in settings read responses and preserved when the settings form submits an empty or masked key
 - provider request failures redact configured API keys before errors are returned to the frontend
 
@@ -118,7 +121,7 @@ This is still a V1-style private tool. A few things are intentionally simple:
 - no browser extension
 - no OCR, PDF, TTS, cloud sync, or advanced AI analysis features
 - API keys are still stored in the local SQLite database in V1; they are masked in API read responses and redacted from provider error messages, but not encrypted at rest
-- exported backup zip files include the SQLite database and may contain saved API keys, so store them privately
+- backup export uses a SQLite snapshot before zipping the database, but exported zip files still include the SQLite database and may contain saved API keys, so store them privately
 - delete confirmation now uses a shared in-app confirmation dialog instead of browser-native confirm boxes
 - UI-R3 adds a few reusable frontend primitives, but the stylesheet is still large and could be split further
 - settings and glossary pages are usable and more visually consistent, but still need deeper form/table usability polish
@@ -241,6 +244,7 @@ You can currently verify all of these manually:
 - confirm chapter changes or translation activity move the touched book upward in the bookshelf ordering
 - confirm startup schema migrations are recorded once in `schema_migrations` and remain safe to rerun
 - batch translate all untranslated chapters in a book
+- confirm a second batch translation request for the same book is rejected while the first job is pending/running
 - export a backup zip from the settings page
 - page through long chapter lists on the book detail page
 - jump directly to a chapter-list page number on the book detail page
@@ -252,6 +256,18 @@ You can currently verify all of these manually:
 - switch manually between translation-only mode and source + translation mode
 - use previous/next chapter controls at the top and bottom of the reader page
 - switch day/night mode on the reader page and confirm the chapter outline follows the active theme
+
+Backend regression tests can be run from `backend/`:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -p "test*.py"
+```
+
+For the Integration Hardening R1 checks specifically:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest tests.test_translation_jobs tests.test_backup_export tests.test_route_registration
+```
 
 ## Current Docker / NAS Status
 

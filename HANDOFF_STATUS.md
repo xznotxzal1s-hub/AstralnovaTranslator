@@ -4,7 +4,7 @@
 AstralnovaTranslator
 
 ## Current status
-The project is functionally through the latest URL import feature pass and is now in incremental UI refinement. The current frontend focus is making the reading and bookshelf experience feel calmer, denser where useful, and more comfortable on desktop and mobile without changing backend behavior, translation behavior, or deployment behavior.
+The project is functionally through the latest URL import and UI refinement passes, with Integration Hardening R1 now applied for safer single-user NAS operation. The current backend focus is keeping already-added features reliable: batch translation jobs now reject duplicates, stale in-process jobs are cleaned up after restarts, and backup export uses a SQLite snapshot instead of directly zipping the live database.
 
 The app currently supports:
 - creating books
@@ -179,8 +179,17 @@ Completed in code and covered by backend regression tests:
 Completed in code and covered by backend regression tests:
 - added `GET /backup/export`
 - backup export creates a zip with `data/app.db`, uploaded files, and `metadata.json`
+- backup export now copies the SQLite database through the SQLite online backup API before adding it to the zip
 - settings page now includes a simple download backup button
 - documentation warns that exported SQLite backups may contain saved API keys
+
+### Integration Hardening R1
+Completed in code and covered by backend regression tests:
+- duplicate active batch translation jobs for the same book are rejected with HTTP 409
+- pending/running translation jobs left by an app/container restart are marked failed with an interrupted message on next startup
+- batch job cancellation remains cooperative and may take effect only after the current chapter or provider request finishes
+- batch job failures still stop on the first failed chapter and keep the failed chapter title plus error message visible in the job record
+- route registration tests cover translation job, backup, and URL preview endpoints
 
 ### Chapter list filtering refinement
 Completed in code:
@@ -313,7 +322,9 @@ Verified working locally at this point:
 - books can be deleted
 - chapters can be deleted
 - batch translation works sequentially from the book detail page through persisted backend jobs and frontend polling
-- backup export creates a local zip containing the SQLite database, uploads, and metadata
+- duplicate active batch translation jobs are blocked for the same book
+- interrupted pending/running jobs are marked failed on the next backend startup
+- backup export creates a local zip containing a SQLite snapshot, uploads, and metadata
 - chapter pagination works on the book detail page
 - chapter status filtering and title search work on the book detail page
 - reader opens in translation-only mode by default and can still switch to bilingual mode
@@ -342,6 +353,7 @@ Current UI state:
 - bookshelf import tools now cover TXT, EPUB, and webpage URL preview/confirm workflows
 - mobile usability is improved, especially on the bookshelf page, but not fully refined across every management page
 - success/error/loading feedback is clearer than before, especially around forms and batch translation
+- batch translation now shows a short note that cancellation may wait for the current chapter/request to finish
 
 Areas still somewhat rough:
 - UI-R2 is still CSS-focused; some components could later be refactored into reusable UI primitives
@@ -360,7 +372,8 @@ Areas still somewhat rough:
 - webpage import relies on direct backend HTTP fetches, so pages behind login, heavy client-side rendering, or anti-bot protection may fail or import poorly
 - webpage import intentionally blocks local/private network targets for NAS safety, so it cannot import pages hosted on localhost or LAN-only private IPs
 - API keys are masked in read responses and redacted from provider error messages, but they are still stored unencrypted in the local SQLite database for V1 simplicity
-- exported backup zip files include the SQLite database and may therefore contain saved API keys
+- exported backup zip files include a SQLite database snapshot and may therefore contain saved API keys
+- batch translation jobs are in-process; restart cleanup marks pending/running jobs failed instead of resuming them automatically
 
 ## Current Docker / NAS status
 - `docker-compose.yml`, backend Dockerfile, frontend Dockerfile, and `.env.example` are present
@@ -401,6 +414,12 @@ Typical local run:
 1. activate backend virtual environment
 2. `pip install -r requirements.txt`
 3. `uvicorn app.main:app --reload --host 0.0.0.0 --port 8000`
+
+Backend regression test command:
+- from `backend/`, run `.\.venv\Scripts\python.exe -m unittest discover -s tests -p "test*.py"`
+
+Integration Hardening R1 targeted test command:
+- from `backend/`, run `.\.venv\Scripts\python.exe -m unittest tests.test_translation_jobs tests.test_backup_export tests.test_route_registration`
 
 ### Frontend
 Typical local run:

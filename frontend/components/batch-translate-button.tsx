@@ -93,6 +93,7 @@ export function BatchTranslateButton({ bookId, chapters }: BatchTranslateButtonP
       <button className="button" disabled={isSubmitting} aria-busy={isSubmitting} onClick={handleBatchTranslate} type="button">
         {isSubmitting ? t("batchTranslateRunning") : t("batchTranslateButton")}
       </button>
+      {isSubmitting ? <p className="batch-translate-note">{t("batchTranslateCancelNote")}</p> : null}
       {message ? <p className={`feedback${messageType ? ` ${messageType}` : ""}`}>{message}</p> : null}
     </div>
   );

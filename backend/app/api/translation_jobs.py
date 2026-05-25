@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.schemas.translation_job import TranslationJobRead
 from app.services.translation_job_service import (
+    ActiveTranslationJobError,
     cancel_translation_job,
     create_book_translation_job,
     get_translation_job,
@@ -19,7 +20,11 @@ def create_book_translation_job_endpoint(
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ) -> TranslationJobRead:
-    job = create_book_translation_job(db, book_id)
+    try:
+        job = create_book_translation_job(db, book_id)
+    except ActiveTranslationJobError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+
     if job is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book not found.")
 

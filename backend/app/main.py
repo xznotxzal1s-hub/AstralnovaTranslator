@@ -5,6 +5,7 @@ from app import models  # noqa: F401
 from app.api import backup, books, chapters, glossary, imports, settings, translate, translation_jobs
 from app.core.config import settings as app_settings
 from app.core.database import Base, engine, ensure_schema
+from app.services.translation_job_service import mark_interrupted_translation_jobs
 
 
 def create_application() -> FastAPI:
@@ -39,4 +40,5 @@ def create_application() -> FastAPI:
 
 Base.metadata.create_all(bind=engine)
 ensure_schema()
+mark_interrupted_translation_jobs()
 app = create_application()

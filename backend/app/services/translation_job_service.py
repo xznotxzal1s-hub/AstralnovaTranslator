@@ -8,16 +8,34 @@ from app.services.translation_service import TranslationServiceError, translate_
 
 
 TERMINAL_JOB_STATUSES = {"succeeded", "failed", "cancelled"}
+ACTIVE_JOB_STATUSES = {"pending", "running"}
+INTERRUPTED_JOB_MESSAGE = "Job was interrupted by application restart. Please start a new batch translation job."
+
+
+class ActiveTranslationJobError(Exception):
+    """Raised when a book already has an active batch translation job."""
 
 
 def get_translation_job(db: Session, job_id: int) -> TranslationJob | None:
     return db.query(TranslationJob).filter(TranslationJob.id == job_id).first()
 
 
+def get_active_book_translation_job(db: Session, book_id: int) -> TranslationJob | None:
+    return (
+        db.query(TranslationJob)
+        .filter(TranslationJob.book_id == book_id, TranslationJob.status.in_(ACTIVE_JOB_STATUSES))
+        .order_by(TranslationJob.created_at.desc(), TranslationJob.id.desc())
+        .first()
+    )
+
+
 def create_book_translation_job(db: Session, book_id: int) -> TranslationJob | None:
     book = db.query(Book).filter(Book.id == book_id).first()
     if book is None:
         return None
+
+    if get_active_book_translation_job(db, book_id) is not None:
+        raise ActiveTranslationJobError("A translation job is already active for this book.")
 
     chapters_to_translate = _get_untranslated_chapters(db, book_id)
     job = TranslationJob(
@@ -33,6 +51,22 @@ def create_book_translation_job(db: Session, book_id: int) -> TranslationJob | N
     db.commit()
     db.refresh(job)
     return job
+
+
+def mark_interrupted_translation_jobs(db: Session | None = None) -> int:
+    owns_session = db is None
+    session = db or SessionLocal()
+    try:
+        jobs = session.query(TranslationJob).filter(TranslationJob.status.in_(ACTIVE_JOB_STATUSES)).all()
+        for job in jobs:
+            job.status = "failed"
+            job.error_message = INTERRUPTED_JOB_MESSAGE
+            session.add(job)
+        session.commit()
+        return len(jobs)
+    finally:
+        if owns_session:
+            session.close()
 
 
 def cancel_translation_job(db: Session, job_id: int) -> TranslationJob | None:
