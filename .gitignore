@@ -21,3 +21,6 @@ uploads/
 .DS_Store
 Thumbs.db
 .vscode/
+
+# Local brainstorming artifacts
+.superpowers/
