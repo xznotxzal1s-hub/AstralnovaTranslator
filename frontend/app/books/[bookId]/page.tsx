@@ -19,10 +19,18 @@ type BookDetailPageProps = {
   }>;
   searchParams?: Promise<{
     page?: string;
+    q?: string;
+    status?: string;
   }>;
 };
 
 const CHAPTERS_PER_PAGE = 12;
+const CHAPTER_STATUS_FILTERS = ["all", "pending", "translated", "failed"] as const;
+type ChapterStatusFilter = (typeof CHAPTER_STATUS_FILTERS)[number];
+
+function getChapterStatusFilter(value: string | undefined): ChapterStatusFilter {
+  return CHAPTER_STATUS_FILTERS.includes(value as ChapterStatusFilter) ? (value as ChapterStatusFilter) : "all";
+}
 
 function getPaginationItems(currentPage: number, totalPages: number): Array<number | "gap-start" | "gap-end"> {
   const pages = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
@@ -55,16 +63,38 @@ export default async function BookDetailPage({ params, searchParams }: BookDetai
   ]);
   const { messages } = await getServerI18n();
   const chapterLabel = chapters.length === 1 ? messages.chapterSingular : messages.chapterPlural;
-  const totalPages = Math.max(1, Math.ceil(chapters.length / CHAPTERS_PER_PAGE));
+  const searchQuery = (resolvedSearchParams?.q ?? "").trim();
+  const normalizedSearchQuery = searchQuery.toLowerCase();
+  const statusFilter = getChapterStatusFilter(resolvedSearchParams?.status);
+  const filteredChapters = chapters.filter((chapter) => {
+    const matchesStatus = statusFilter === "all" || chapter.translation_status === statusFilter;
+    const matchesSearch = !normalizedSearchQuery || chapter.title.toLowerCase().includes(normalizedSearchQuery);
+    return matchesStatus && matchesSearch;
+  });
+  const filteredChapterLabel = filteredChapters.length === 1 ? messages.chapterSingular : messages.chapterPlural;
+  const totalPages = Math.max(1, Math.ceil(filteredChapters.length / CHAPTERS_PER_PAGE));
   const requestedPage = Number(resolvedSearchParams?.page ?? "1");
   const currentPage = Number.isFinite(requestedPage)
     ? Math.min(Math.max(1, Math.floor(requestedPage)), totalPages)
     : 1;
   const startIndex = (currentPage - 1) * CHAPTERS_PER_PAGE;
-  const pagedChapters = chapters.slice(startIndex, startIndex + CHAPTERS_PER_PAGE);
-  const rangeStart = chapters.length === 0 ? 0 : startIndex + 1;
-  const rangeEnd = chapters.length === 0 ? 0 : startIndex + pagedChapters.length;
+  const pagedChapters = filteredChapters.slice(startIndex, startIndex + CHAPTERS_PER_PAGE);
+  const rangeStart = filteredChapters.length === 0 ? 0 : startIndex + 1;
+  const rangeEnd = filteredChapters.length === 0 ? 0 : startIndex + pagedChapters.length;
   const paginationItems = getPaginationItems(currentPage, totalPages);
+  const hasActiveChapterFilters = Boolean(searchQuery) || statusFilter !== "all";
+
+  function getChapterListHref(page: number) {
+    const params = new URLSearchParams();
+    params.set("page", String(page));
+    if (searchQuery) {
+      params.set("q", searchQuery);
+    }
+    if (statusFilter !== "all") {
+      params.set("status", statusFilter);
+    }
+    return `/books/${book.id}?${params.toString()}`;
+  }
 
   return (
     <main className="app-page">
@@ -97,12 +127,21 @@ export default async function BookDetailPage({ params, searchParams }: BookDetai
               <div>
                 <h2>{messages.chaptersHeading}</h2>
                 <p>{formatMessage(messages.chaptersCount, { count: chapters.length, label: chapterLabel })}</p>
+                {hasActiveChapterFilters ? (
+                  <p className="chapter-page-meta">
+                    {formatMessage(messages.chapterFilteredCount, {
+                      count: filteredChapters.length,
+                      label: filteredChapterLabel,
+                      total: chapters.length,
+                    })}
+                  </p>
+                ) : null}
                 {chapters.length > 0 ? (
                   <p className="chapter-page-meta">
                     {formatMessage(messages.chapterPageRange, {
                       from: rangeStart,
                       to: rangeEnd,
-                      count: chapters.length,
+                      count: filteredChapters.length,
                     })}
                   </p>
                 ) : null}
@@ -110,8 +149,47 @@ export default async function BookDetailPage({ params, searchParams }: BookDetai
               {chapters.length > 0 ? <BatchTranslateButton bookId={book.id} chapters={chapters} /> : null}
             </div>
 
+            {chapters.length > 0 ? (
+              <form action={`/books/${book.id}`} className="chapter-filter-bar">
+                <div className="field chapter-search-field">
+                  <label htmlFor="chapter-search">{messages.chapterSearchLabel}</label>
+                  <input
+                    id="chapter-search"
+                    name="q"
+                    placeholder={messages.chapterSearchPlaceholder}
+                    type="search"
+                    defaultValue={searchQuery}
+                  />
+                </div>
+                <div className="field chapter-status-field">
+                  <label htmlFor="chapter-status">{messages.chapterStatusFilterLabel}</label>
+                  <select id="chapter-status" name="status" defaultValue={statusFilter}>
+                    <option value="all">{messages.chapterFilterAll}</option>
+                    <option value="pending">{messages.chapterFilterPending}</option>
+                    <option value="translated">{messages.chapterFilterTranslated}</option>
+                    <option value="failed">{messages.chapterFilterFailed}</option>
+                  </select>
+                </div>
+                <div className="chapter-filter-actions">
+                  <button className="button-secondary" type="submit">
+                    {messages.chapterFilterApply}
+                  </button>
+                  {hasActiveChapterFilters ? (
+                    <Link className="button-link" href={`/books/${book.id}`}>
+                      {messages.chapterFilterClear}
+                    </Link>
+                  ) : null}
+                </div>
+              </form>
+            ) : null}
+
             {chapters.length === 0 ? (
               <EmptyState title={messages.noChaptersTitle} description={messages.noChaptersDescription} />
+            ) : filteredChapters.length === 0 ? (
+              <EmptyState
+                title={messages.chapterFilterNoResultsTitle}
+                description={messages.chapterFilterNoResultsDescription}
+              />
             ) : (
               <>
                 <section className="list-stack chapter-list">
@@ -133,7 +211,7 @@ export default async function BookDetailPage({ params, searchParams }: BookDetai
                     </div>
                     <div className="chapter-pagination-actions">
                       {currentPage > 1 ? (
-                        <Link className="button-link pagination-link" href={`/books/${book.id}?page=${currentPage - 1}`}>
+                        <Link className="button-link pagination-link" href={getChapterListHref(currentPage - 1)}>
                           {messages.previousPage}
                         </Link>
                       ) : (
@@ -154,7 +232,7 @@ export default async function BookDetailPage({ params, searchParams }: BookDetai
                               <Link
                                 key={item}
                                 className="button-link pagination-link pagination-number"
-                                href={`/books/${book.id}?page=${item}`}
+                                href={getChapterListHref(item)}
                               >
                                 {item}
                               </Link>
@@ -167,7 +245,7 @@ export default async function BookDetailPage({ params, searchParams }: BookDetai
                         )}
                       </div>
                       {currentPage < totalPages ? (
-                        <Link className="button-link pagination-link" href={`/books/${book.id}?page=${currentPage + 1}`}>
+                        <Link className="button-link pagination-link" href={getChapterListHref(currentPage + 1)}>
                           {messages.nextPage}
                         </Link>
                       ) : (

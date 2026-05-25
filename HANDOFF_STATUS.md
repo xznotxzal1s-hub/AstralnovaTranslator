@@ -18,6 +18,7 @@ The app currently supports:
 - using global and per-book glossary entries
 - reading chapters in a reading-focused UI
 - paginating chapter lists on the book detail page
+- filtering and searching chapters on the book detail page
 - deleting books and chapters
 - batch translating all untranslated chapters in a book
 - exporting a local backup zip from the settings page
@@ -180,6 +181,13 @@ Completed in code and covered by backend regression tests:
 - settings page now includes a simple download backup button
 - documentation warns that exported SQLite backups may contain saved API keys
 
+### Chapter list filtering refinement
+Completed in code:
+- book detail page chapter lists can be filtered by translation status
+- chapter title search is available on the book detail page
+- pagination links preserve the active search/status filters
+- empty filtered results show a localized friendly message
+
 ### UI-R1 bookshelf refinement
 Implemented in the first slice:
 - modernized bookshelf layout while preserving the existing client-side book refresh flow
@@ -292,6 +300,7 @@ Verified working locally at this point:
 - batch translation works sequentially from the book detail page through persisted backend jobs and frontend polling
 - backup export creates a local zip containing the SQLite database, uploads, and metadata
 - chapter pagination works on the book detail page
+- chapter status filtering and title search work on the book detail page
 - reader opens in translation-only mode by default and can still switch to bilingual mode
 - bookshelf refresh still uses the browser-side API fetch after page load and after create/import/delete actions
 
@@ -308,6 +317,7 @@ Current UI state:
 - bookshelf and book detail pages are cleaner and more usable than earlier phases
 - interaction feedback is clearer through stronger hover, focus, active, and loading states
 - long chapter lists are more manageable because the book detail page now paginates them
+- long chapter lists are easier to scan because users can filter by untranslated/translated/failed and search titles
 - settings now support a practical preset-based workflow instead of a single flat config form
 - settings now include a simple local backup export action
 - bookshelf import tools now cover TXT, EPUB, and webpage URL preview/confirm workflows
@@ -395,7 +405,7 @@ Typical local run:
 Recommended next direction:
 - split the large frontend stylesheet into smaller, easier-to-maintain sections
 - continue extracting reusable frontend UI primitives from repeated form, button, and feedback patterns
-- consider reader chapter search/jump controls for very large books
+- consider richer reader chapter search/jump controls for very large books
 - manual verification of webpage URL import against a few real article/novel pages
 - consider backup restore/import later, but keep it separate because restore is riskier than export
 - optionally a deployment follow-up for automatic updates such as Watchtower or pull-and-restart automation

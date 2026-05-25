@@ -1680,6 +1680,31 @@ p {
   min-height: 420px;
 }
 
+.chapter-filter-bar {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(180px, 240px) auto;
+  align-items: end;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(111, 83, 54, 0.11);
+  border-radius: 22px;
+  background: rgba(255, 252, 247, 0.58);
+}
+
+.chapter-filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.chapter-filter-actions .button-secondary,
+.chapter-filter-actions .button-link {
+  min-height: 42px;
+  justify-content: center;
+}
+
 .chapter-pagination {
   display: flex;
   flex-wrap: wrap;
@@ -2769,6 +2794,7 @@ p {
 :root[data-theme="dark"] .confirm-dialog,
 :root[data-theme="dark"] .settings-form-card .form-section-grid,
 :root[data-theme="dark"] .settings-backup-card,
+:root[data-theme="dark"] .chapter-filter-bar,
 :root[data-theme="dark"] .chapter-page-number-row {
   border-color: var(--line);
   background:
@@ -2826,6 +2852,14 @@ p {
   }
 
   .chapter-card-actions {
+    justify-content: flex-start;
+  }
+
+  .chapter-filter-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .chapter-filter-actions {
     justify-content: flex-start;
   }
 

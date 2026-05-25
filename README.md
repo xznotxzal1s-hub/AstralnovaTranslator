@@ -19,6 +19,7 @@ The app currently supports:
 - reusing cached translations to avoid repeated identical API calls
 - deleting books and chapters
 - batch translating all untranslated chapters in a book
+- filtering chapter lists by status and searching chapter titles
 - exporting a local backup zip from the settings page
 - publishing backend/frontend Docker images to GHCR through GitHub Actions
 - deploying on NAS with prebuilt images instead of local source builds
@@ -78,6 +79,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - Simplified Chinese as the default UI language
 - reading-focused UI refresh for chapter reading
 - chapter list pagination on the book detail page
+- chapter list status filtering and title search on the book detail page
 - translation-only as the default reader mode, with manual bilingual switching still available
 - webpage URL import form on the bookshelf page
 - webpage URL import previews detected title, chapter count, and extracted text before saving
@@ -238,6 +240,7 @@ You can currently verify all of these manually:
 - export a backup zip from the settings page
 - page through long chapter lists on the book detail page
 - jump directly to a chapter-list page number on the book detail page
+- filter chapters by translation status and search chapter titles on the book detail page
 - delete a chapter
 - delete a book
 - confirm destructive actions through the in-app confirmation dialog
