@@ -58,10 +58,34 @@ export type TranslationSettings = {
   prompt_template: string;
   chunk_size: number;
   translation_mode: string;
+  request_timeout_seconds: number;
+  retry_count: number;
+  retry_backoff_seconds: number;
+  rate_limit_delay_ms: number;
+  temperature: number | null;
+  max_output_tokens: number | null;
   updated_at: string;
 };
 
 export type TranslationPreset = TranslationSettings;
+
+export type ProviderConnectionTestResult = {
+  success: boolean;
+  provider_type: TranslationSettings["provider_type"];
+  model_name: string;
+  latency_ms: number | null;
+  message: string;
+  detail: string | null;
+};
+
+export type ModelListResult = {
+  success: boolean;
+  provider_type: TranslationSettings["provider_type"];
+  models: string[];
+  manual_model_input_required: boolean;
+  message: string;
+  detail: string | null;
+};
 
 export type PromptTemplateValidationResult = {
   is_valid: boolean;

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Integer, String, Text, func
+from sqlalchemy import Boolean, DateTime, Float, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
@@ -19,6 +19,12 @@ class TranslationConfig(Base):
     prompt_template: Mapped[str] = mapped_column(Text, nullable=False)
     chunk_size: Mapped[int] = mapped_column(Integer, nullable=False)
     translation_mode: Mapped[str] = mapped_column(String(50), nullable=False)
+    request_timeout_seconds: Mapped[int] = mapped_column(Integer, nullable=False, default=60, server_default="60")
+    retry_count: Mapped[int] = mapped_column(Integer, nullable=False, default=1, server_default="1")
+    retry_backoff_seconds: Mapped[int] = mapped_column(Integer, nullable=False, default=2, server_default="2")
+    rate_limit_delay_ms: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    temperature: Mapped[float | None] = mapped_column(Float, nullable=True, default=0.3, server_default="0.3")
+    max_output_tokens: Mapped[int | None] = mapped_column(Integer, nullable=True)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),

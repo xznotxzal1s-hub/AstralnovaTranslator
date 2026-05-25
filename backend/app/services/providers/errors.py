@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import re
 
+import httpx
+
 
 class ProviderRequestError(RuntimeError):
     """User-safe provider error that should not contain API secrets."""
@@ -30,11 +32,33 @@ def redact_sensitive_text(text: str, *secrets: str) -> str:
 
 
 def build_provider_error_message(provider_name: str, error: Exception, api_key: str) -> str:
+    summary = "The provider request failed."
+    if isinstance(error, httpx.TimeoutException):
+        summary = "The provider request timed out."
+    elif isinstance(error, httpx.ConnectError | httpx.InvalidURL):
+        summary = "The API base URL could not be reached. Check the provider URL."
+    elif isinstance(error, httpx.HTTPStatusError):
+        status_code = error.response.status_code
+        if status_code in {401, 403}:
+            summary = "The provider rejected the API key or credentials."
+        elif status_code == 404:
+            summary = "The provider endpoint or model was not found."
+        elif status_code == 429:
+            summary = "The provider rate limit was reached."
+        elif 500 <= status_code < 600:
+            summary = "The provider service returned a server error."
+        else:
+            summary = f"The provider returned HTTP {status_code}."
+
     details = [redact_sensitive_text(str(error), api_key).strip()]
     request = getattr(error, "request", None)
     request_url = getattr(request, "url", None)
     if request_url is not None:
         details.append(redact_sensitive_text(str(request_url), api_key))
+    response = getattr(error, "response", None)
+    response_text = getattr(response, "text", None)
+    if response_text:
+        details.append(redact_sensitive_text(str(response_text)[:500], api_key))
 
     safe_details = " ".join(detail for detail in details if detail) or "The provider request failed."
-    return f"{provider_name} provider request failed: {safe_details}"
+    return f"{provider_name} provider request failed: {summary} Details: {safe_details}"

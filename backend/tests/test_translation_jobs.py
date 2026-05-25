@@ -36,7 +36,8 @@ from app.services.translation_service import TranslationServiceError  # noqa: E4
 
 
 class FakeProvider:
-    def translate_text(self, *, prompt: str, api_base_url: str, api_key: str, model_name: str) -> str:
+    def translate_text(self, **kwargs: object) -> str:
+        prompt = str(kwargs["prompt"])
         return f"translated: {prompt[:12]}"
 
 

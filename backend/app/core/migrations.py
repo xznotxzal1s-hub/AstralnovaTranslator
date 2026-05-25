@@ -150,6 +150,31 @@ def _create_reading_progress_table(connection: Connection) -> None:
     connection.exec_driver_sql("CREATE INDEX IF NOT EXISTS ix_reading_progress_chapter_id ON reading_progress (chapter_id)")
 
 
+def _add_provider_request_options(connection: Connection) -> None:
+    if not _table_exists(connection, "translation_configs"):
+        return
+
+    translation_column_names = _column_names(connection, "translation_configs")
+    if "request_timeout_seconds" not in translation_column_names:
+        connection.exec_driver_sql(
+            "ALTER TABLE translation_configs ADD COLUMN request_timeout_seconds INTEGER NOT NULL DEFAULT 60",
+        )
+    if "retry_count" not in translation_column_names:
+        connection.exec_driver_sql("ALTER TABLE translation_configs ADD COLUMN retry_count INTEGER NOT NULL DEFAULT 1")
+    if "retry_backoff_seconds" not in translation_column_names:
+        connection.exec_driver_sql(
+            "ALTER TABLE translation_configs ADD COLUMN retry_backoff_seconds INTEGER NOT NULL DEFAULT 2",
+        )
+    if "rate_limit_delay_ms" not in translation_column_names:
+        connection.exec_driver_sql(
+            "ALTER TABLE translation_configs ADD COLUMN rate_limit_delay_ms INTEGER NOT NULL DEFAULT 0",
+        )
+    if "temperature" not in translation_column_names:
+        connection.exec_driver_sql("ALTER TABLE translation_configs ADD COLUMN temperature FLOAT DEFAULT 0.3")
+    if "max_output_tokens" not in translation_column_names:
+        connection.exec_driver_sql("ALTER TABLE translation_configs ADD COLUMN max_output_tokens INTEGER")
+
+
 MIGRATIONS: tuple[SchemaMigration, ...] = (
     SchemaMigration(
         version="001_chapter_index_unique_constraint",
@@ -180,6 +205,11 @@ MIGRATIONS: tuple[SchemaMigration, ...] = (
         version="006_reading_progress",
         description="Add per-book reading progress.",
         apply=_create_reading_progress_table,
+    ),
+    SchemaMigration(
+        version="007_provider_request_options",
+        description="Add advanced provider request options to translation presets.",
+        apply=_add_provider_request_options,
     ),
 )
 

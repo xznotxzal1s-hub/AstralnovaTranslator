@@ -37,7 +37,10 @@ class FakeUpload:
 
 
 class LeakyProvider:
-    def translate_text(self, *, prompt: str, api_base_url: str, api_key: str, model_name: str) -> str:
+    def translate_text(self, **kwargs: object) -> str:
+        api_base_url = str(kwargs["api_base_url"])
+        model_name = str(kwargs["model_name"])
+        api_key = str(kwargs["api_key"])
         raise RuntimeError(f"request failed for {api_base_url}/models/{model_name}:generateContent?key={api_key}")
 
 

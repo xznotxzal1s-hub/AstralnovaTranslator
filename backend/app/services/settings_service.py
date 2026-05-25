@@ -38,6 +38,12 @@ def build_translation_config_read(config: TranslationConfig) -> TranslationConfi
         prompt_template=config.prompt_template,
         chunk_size=config.chunk_size,
         translation_mode=config.translation_mode,
+        request_timeout_seconds=config.request_timeout_seconds,
+        retry_count=config.retry_count,
+        retry_backoff_seconds=config.retry_backoff_seconds,
+        rate_limit_delay_ms=config.rate_limit_delay_ms,
+        temperature=config.temperature,
+        max_output_tokens=config.max_output_tokens,
         updated_at=config.updated_at,
     )
 
@@ -53,6 +59,12 @@ def _build_default_config() -> TranslationConfig:
         prompt_template=settings.initial_prompt_template,
         chunk_size=settings.initial_chunk_size,
         translation_mode=settings.initial_translation_mode,
+        request_timeout_seconds=60,
+        retry_count=1,
+        retry_backoff_seconds=2,
+        rate_limit_delay_ms=0,
+        temperature=0.3,
+        max_output_tokens=None,
     )
 
 
@@ -113,6 +125,12 @@ def _apply_config_fields(
     config.prompt_template = payload.prompt_template
     config.chunk_size = payload.chunk_size
     config.translation_mode = payload.translation_mode
+    config.request_timeout_seconds = payload.request_timeout_seconds
+    config.retry_count = payload.retry_count
+    config.retry_backoff_seconds = payload.retry_backoff_seconds
+    config.rate_limit_delay_ms = payload.rate_limit_delay_ms
+    config.temperature = payload.temperature
+    config.max_output_tokens = payload.max_output_tokens
     return config
 
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
+import time
 
 from sqlalchemy.orm import Session
 
@@ -53,6 +54,12 @@ def translate_chapter(db: Session, chapter: Chapter, force: bool) -> Chapter:
             config.prompt_template.strip(),
             f"translation_mode={config.translation_mode}",
             f"chunk_size={config.chunk_size}",
+            f"request_timeout_seconds={config.request_timeout_seconds}",
+            f"retry_count={config.retry_count}",
+            f"retry_backoff_seconds={config.retry_backoff_seconds}",
+            f"rate_limit_delay_ms={config.rate_limit_delay_ms}",
+            f"temperature={config.temperature}",
+            f"max_output_tokens={config.max_output_tokens}",
             glossary_guidance,
         ],
     ).strip()
@@ -94,16 +101,12 @@ def translate_chapter(db: Session, chapter: Chapter, force: bool) -> Chapter:
     except ValueError as exc:
         raise TranslationServiceError(str(exc), status_code=400) from exc
 
+    translated_chunks: list[str] = []
     try:
-        translated_chunks = [
-            provider.translate_text(
-                prompt=prompt,
-                api_base_url=config.api_base_url,
-                api_key=config.api_key,
-                model_name=config.model_name,
-            )
-            for prompt in prompt_chunks
-        ]
+        for index, prompt in enumerate(prompt_chunks):
+            translated_chunks.append(_translate_prompt_with_retries(provider, config, prompt))
+            if config.rate_limit_delay_ms > 0 and index < len(prompt_chunks) - 1:
+                time.sleep(config.rate_limit_delay_ms / 1000)
     except Exception as exc:
         chapter.translation_status = "failed"
         db.add(chapter)
@@ -130,3 +133,27 @@ def translate_chapter(db: Session, chapter: Chapter, force: bool) -> Chapter:
         translated_text=chapter.translated_text,
     )
     return chapter
+
+
+def _translate_prompt_with_retries(provider: object, config: object, prompt: str) -> str:
+    attempts = int(getattr(config, "retry_count", 1)) + 1
+    backoff_seconds = int(getattr(config, "retry_backoff_seconds", 2))
+
+    for attempt_index in range(max(1, attempts)):
+        try:
+            return provider.translate_text(
+                prompt=prompt,
+                api_base_url=getattr(config, "api_base_url"),
+                api_key=getattr(config, "api_key"),
+                model_name=getattr(config, "model_name"),
+                request_timeout_seconds=int(getattr(config, "request_timeout_seconds", 60)),
+                temperature=getattr(config, "temperature", 0.3),
+                max_output_tokens=getattr(config, "max_output_tokens", None),
+            )
+        except Exception:
+            if attempt_index >= attempts - 1:
+                raise
+            if backoff_seconds > 0:
+                time.sleep(backoff_seconds)
+
+    raise RuntimeError("Translation retry loop ended unexpectedly.")

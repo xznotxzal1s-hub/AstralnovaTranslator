@@ -3,6 +3,8 @@ import type {
   ChapterCreateInput,
   GlossaryEntry,
   ImportResult,
+  ModelListResult,
+  ProviderConnectionTestResult,
   PromptTemplateValidationResult,
   ReadingProgress,
   TranslationJob,
@@ -187,6 +189,12 @@ export async function updateSettings(payload: {
   prompt_template: string;
   chunk_size: number;
   translation_mode: string;
+  request_timeout_seconds: number;
+  retry_count: number;
+  retry_backoff_seconds: number;
+  rate_limit_delay_ms: number;
+  temperature: number | null;
+  max_output_tokens: number | null;
 }) {
   return request<TranslationSettings>("/settings", {
     method: "PUT",
@@ -210,6 +218,12 @@ export async function createSettingsPreset(payload: {
   prompt_template: string;
   chunk_size: number;
   translation_mode: string;
+  request_timeout_seconds: number;
+  retry_count: number;
+  retry_backoff_seconds: number;
+  rate_limit_delay_ms: number;
+  temperature: number | null;
+  max_output_tokens: number | null;
 }) {
   return request<TranslationPreset>("/settings/presets", {
     method: "POST",
@@ -228,10 +242,45 @@ export async function updateSettingsPreset(
     prompt_template: string;
     chunk_size: number;
     translation_mode: string;
+    request_timeout_seconds: number;
+    retry_count: number;
+    retry_backoff_seconds: number;
+    rate_limit_delay_ms: number;
+    temperature: number | null;
+    max_output_tokens: number | null;
   },
 ) {
   return request<TranslationPreset>(`/settings/presets/${presetId}`, {
     method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function testProviderConnection(payload: {
+  preset_id?: number;
+  provider_type: TranslationSettings["provider_type"];
+  api_base_url: string;
+  api_key: string;
+  model_name: string;
+  request_timeout_seconds: number;
+  temperature: number | null;
+  max_output_tokens: number | null;
+}) {
+  return request<ProviderConnectionTestResult>("/settings/test-provider", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function fetchProviderModels(payload: {
+  preset_id?: number;
+  provider_type: TranslationSettings["provider_type"];
+  api_base_url: string;
+  api_key: string;
+  request_timeout_seconds: number;
+}) {
+  return request<ModelListResult>("/settings/list-models", {
+    method: "POST",
     body: JSON.stringify(payload),
   });
 }

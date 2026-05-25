@@ -25,7 +25,10 @@ This project is for personal reading assistance only. It is not a public sharing
 ### Translation
 - Configure OpenAI-compatible and Gemini providers.
 - Save multiple translation presets and choose one active preset.
-- Configure API base URL, API key, model name, prompt template, chunk size, and translation mode.
+- Configure API base URL, API key, model name, prompt template, chunk size, translation mode, and advanced provider request options.
+- Apply provider setup templates for OpenAI-compatible generic, DeepSeek, OpenRouter, SiliconFlow, Gemini native, Gemini OpenAI-compatible, Ollama, and LM Studio.
+- Test provider connections from the Settings page without saving first.
+- Fetch model lists for supported OpenAI-compatible and Gemini providers while keeping manual model input available.
 - Validate prompt templates before saving.
 - Translate a single chapter.
 - Retranslate a chapter while bypassing the existing translation cache.
@@ -50,11 +53,14 @@ This project is for personal reading assistance only. It is not a public sharing
 - URL import works best with normal article/novel pages. Pages behind login, heavy client-side rendering, or anti-bot protection may fail.
 - No browser extension, OCR, PDF import, TTS, cloud sync, public sharing, or social features.
 - API keys are stored in local SQLite for V1 simplicity. They are masked/redacted in API responses, but not encrypted at rest.
+- Provider model names change over time. Templates include examples only; check your provider dashboard if a model fails.
+- Model list fetching is best-effort. Some providers disable `/models`, require special account permissions, or require manual model entry.
+- Local providers such as Ollama and LM Studio may need a reachable host/container address on NAS/Docker; `localhost` can point inside a container.
 - Backup zip files may contain saved API keys because they include a SQLite database snapshot. Store backups privately.
 - Batch translation jobs are simple in-process jobs. If the backend restarts, pending/running jobs are marked failed and should be restarted manually.
 - Batch cancellation is cooperative and may take effect only after the current chapter/provider request finishes.
 - Reader scroll restoration is approximate, especially if translation text changes after progress was saved.
-- The global stylesheet is still large and should eventually be split into smaller style modules.
+- Frontend styles are split into ordered global files. Further styling cleanup should be small and browser-verified.
 
 ## Project Structure
 
@@ -137,6 +143,7 @@ In the browser:
 - Open the book detail page.
 - Create a chapter by pasting Japanese text.
 - Configure a translation preset in Settings.
+- Optionally apply a provider template, test the connection, and fetch models before saving.
 - Translate the chapter.
 - Read the translated chapter.
 - Scroll in the reader, leave the page, then use Continue Reading to confirm progress is restored.
@@ -154,6 +161,12 @@ Reader Experience R2A targeted tests:
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest tests.test_reading_progress tests.test_schema_migrations tests.test_route_registration
+```
+
+Provider Integration R4A targeted tests:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest tests.test_provider_settings tests.test_schema_migrations tests.test_route_registration
 ```
 
 Lightweight frontend TypeScript check from `frontend/`:
@@ -248,10 +261,10 @@ Repository/package setup needed:
 
 Good next steps:
 - Manually verify the new reader progress/preferences flow on desktop and mobile.
-- Split the large global stylesheet into smaller maintainable sections.
-- Continue extracting reusable UI primitives from repeated buttons, panels, forms, and feedback messages.
+- Manually verify provider templates, connection testing, and model fetching against your real API providers.
+- Continue small, browser-verified frontend cleanup only where it improves maintainability.
 - Improve settings and glossary form/table usability.
-- Add provider connection testing and model-list helpers.
+- Add more provider-specific setup notes only after real-world NAS testing shows they are needed.
 - Consider backup restore later, but keep it separate because restore is riskier than export.
 - Optionally add Watchtower or another NAS auto-update flow after GHCR deployment remains stable.
 

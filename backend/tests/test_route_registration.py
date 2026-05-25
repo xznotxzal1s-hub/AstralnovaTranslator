@@ -32,6 +32,8 @@ class RouteRegistrationTests(unittest.TestCase):
         self.assertTrue(has_route("/import/url/preview", "POST"))
         self.assertTrue(has_route("/books/{book_id}/reading-progress", "GET"))
         self.assertTrue(has_route("/books/{book_id}/reading-progress", "PUT"))
+        self.assertTrue(has_route("/settings/test-provider", "POST"))
+        self.assertTrue(has_route("/settings/list-models", "POST"))
 
 
 if __name__ == "__main__":

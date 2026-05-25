@@ -11,6 +11,7 @@ Private, single-user, self-hosted Japanese light novel translator and browser re
 The app is beyond the original V1 baseline and is currently a usable NAS-friendly private reader:
 - Books, chapters, TXT import, EPUB import, and single-page URL import are implemented.
 - Translation works through user-configured presets for OpenAI-compatible and Gemini providers.
+- Provider Integration R4A is implemented: Settings has provider setup templates, connection testing, model-list fetching, and advanced provider request options.
 - Glossary injection, translation cache, and retranslation cache bypass are implemented.
 - Batch translation uses simple persisted in-process jobs with visible frontend polling.
 - Reader Experience R2A is implemented: reading progress is stored in SQLite, Continue Reading restores the saved chapter and approximate scroll position, and reader visual preferences are stored in browser `localStorage`.
@@ -37,6 +38,10 @@ The project should stay small, private, and beginner-friendly. Do not turn it in
 
 ### Translation
 - Active translation preset controls provider, base URL, API key, model, prompt template, chunk size, and translation mode.
+- Presets also store request timeout, retry count, retry backoff, delay between chunks, temperature, and optional max output tokens.
+- Settings includes templates for OpenAI-compatible generic, DeepSeek, OpenRouter, SiliconFlow, Gemini native, Gemini OpenAI-compatible, Ollama, and LM Studio.
+- Settings can test a provider connection without saving the form first.
+- Settings can fetch model lists where providers support it, while manual model input remains available.
 - Prompt templates are validated before save.
 - Glossary guidance is injected even if the prompt template does not include `{glossary_guidance}`.
 - Per-book glossary entries override global glossary entries.
@@ -98,7 +103,14 @@ cd backend
 .\.venv\Scripts\python.exe -m unittest discover -s tests -p "test*.py"
 ```
 
-Result: `55 tests OK`
+Result: `60 tests OK`
+
+```powershell
+cd backend
+.\.venv\Scripts\python.exe -m unittest tests.test_provider_settings tests.test_schema_migrations tests.test_route_registration
+```
+
+Result: `8 tests OK`
 
 ```powershell
 cd frontend
@@ -129,6 +141,9 @@ GitHub Actions is the source of truth for frontend production build verification
 ## Known Issues and Risks
 
 - API keys are stored in SQLite for V1 simplicity. They are masked/redacted in API responses but not encrypted at rest.
+- Provider templates include example model names only; providers can rename, remove, or restrict models.
+- Model list fetching is best-effort and may fail for providers that do not expose `/models` or require extra permissions.
+- Ollama/LM Studio `localhost` examples may need a reachable host/container address on NAS/Docker.
 - Backup zip files include a SQLite snapshot and may contain saved API keys.
 - URL import is practical but simple; pages behind login, heavy client rendering, or anti-bot protection may fail.
 - URL import intentionally blocks local/private targets for NAS safety.
@@ -165,6 +180,28 @@ Deployment:
 ## Recommended Next Phase
 
 Best next phase: UI/code maintainability cleanup, not new product scope.
+
+### Provider Integration R4A notes
+
+Backend changes:
+- `POST /settings/test-provider` tests current form values without saving.
+- `POST /settings/list-models` fetches model IDs for OpenAI-compatible providers and simple Gemini model listings when available.
+- `translation_configs` now stores advanced request options: timeout, retry count, retry backoff, inter-chunk delay, temperature, and max output tokens.
+- Translation uses retry/backoff and optional delay between chunks; providers receive timeout, temperature, and max output token options.
+- Provider errors are normalized and redacted before returning to the UI.
+
+Frontend changes:
+- Settings page has provider setup templates.
+- Settings page has Test connection and Fetch models actions.
+- Advanced API options are collapsed by default.
+- Manual model entry is always available even when model fetching fails.
+
+R4A verification:
+- `python -m unittest tests.test_provider_settings tests.test_schema_migrations tests.test_route_registration` passed in `backend/`.
+- `python -m unittest discover -s tests -p "test*.py"` passed in `backend/`.
+- `npm exec tsc -- --noEmit --incremental false` passed in `frontend/`.
+- local `npm run build` was intentionally skipped because GitHub Actions is the production build source of truth.
+- Docker build/up/smoke was intentionally skipped due to Codex constraints.
 
 ### Frontend Maintainability R3A notes
 
@@ -271,7 +308,7 @@ Suggested order:
 2. Split `frontend/app/globals.css` into smaller style files or clearly separated sections.
 3. Extract repeated frontend primitives: buttons, panels, form rows, feedback messages, pagination controls.
 4. Improve settings and glossary density/usability without changing backend architecture.
-5. Add provider connection testing and optional model-list helpers.
+5. Manually verify provider templates, connection testing, and model fetching against real providers on local/NAS.
 6. Consider backup restore/import only later, because restore is riskier than export.
 
 ## Explicit Non-Goals Still Unchanged

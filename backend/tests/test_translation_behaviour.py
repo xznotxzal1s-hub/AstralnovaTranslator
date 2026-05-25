@@ -27,7 +27,17 @@ class FakeProvider:
         self.translated_text = translated_text
         self.prompts: list[str] = []
 
-    def translate_text(self, *, prompt: str, api_base_url: str, api_key: str, model_name: str) -> str:
+    def translate_text(
+        self,
+        *,
+        prompt: str,
+        api_base_url: str,
+        api_key: str,
+        model_name: str,
+        request_timeout_seconds: int = 60,
+        temperature: float | None = 0.3,
+        max_output_tokens: int | None = None,
+    ) -> str:
         self.prompts.append(prompt)
         return self.translated_text
 
@@ -69,6 +79,12 @@ class TranslationBehaviourTests(unittest.TestCase):
                 "Mode: {translation_mode}\n\nText:\n{source_text}",
                 "translation_mode=natural",
                 "chunk_size=1500",
+                "request_timeout_seconds=60",
+                "retry_count=1",
+                "retry_backoff_seconds=2",
+                "rate_limit_delay_ms=0",
+                "temperature=0.3",
+                "max_output_tokens=None",
                 "",
             ],
         ).strip()
@@ -116,6 +132,12 @@ class TranslationBehaviourTests(unittest.TestCase):
                 "Mode: {translation_mode}\n\nText:\n{source_text}",
                 "translation_mode=natural",
                 "chunk_size=1500",
+                "request_timeout_seconds=60",
+                "retry_count=1",
+                "retry_backoff_seconds=2",
+                "rate_limit_delay_ms=0",
+                "temperature=0.3",
+                "max_output_tokens=None",
                 "",
             ],
         ).strip()

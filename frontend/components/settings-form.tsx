@@ -11,10 +11,13 @@ import {
   activateSettingsPreset,
   createSettingsPreset,
   deleteSettingsPreset,
+  fetchProviderModels,
+  testProviderConnection,
   updateSettingsPreset,
   validatePromptTemplate,
 } from "@/lib/api-client";
 import { formatMessage } from "@/lib/i18n";
+import { PROVIDER_TEMPLATES } from "@/lib/provider-templates";
 import type { TranslationPreset, TranslationSettings } from "@/lib/types";
 
 type SettingsFormProps = {
@@ -34,6 +37,12 @@ function toFormState(preset: TranslationPreset): FormState {
     prompt_template: preset.prompt_template,
     chunk_size: preset.chunk_size,
     translation_mode: preset.translation_mode,
+    request_timeout_seconds: preset.request_timeout_seconds,
+    retry_count: preset.retry_count,
+    retry_backoff_seconds: preset.retry_backoff_seconds,
+    rate_limit_delay_ms: preset.rate_limit_delay_ms,
+    temperature: preset.temperature,
+    max_output_tokens: preset.max_output_tokens,
   };
 }
 
@@ -47,7 +56,11 @@ export function SettingsForm({ initialSettings, initialPresets }: SettingsFormPr
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isActivating, setIsActivating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isTestingProvider, setIsTestingProvider] = useState(false);
+  const [isFetchingModels, setIsFetchingModels] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [selectedTemplateId, setSelectedTemplateId] = useState("");
+  const [modelOptions, setModelOptions] = useState<string[]>([]);
 
   function updateField<Key extends keyof FormState>(field: Key, value: FormState[Key]) {
     setFormData((current) => ({
@@ -59,6 +72,8 @@ export function SettingsForm({ initialSettings, initialPresets }: SettingsFormPr
   function selectPreset(preset: TranslationPreset) {
     setSelectedPresetId(preset.id);
     setFormData(toFormState(preset));
+    setSelectedTemplateId("");
+    setModelOptions([]);
     setMessage("");
     setMessageType("");
   }
@@ -67,6 +82,24 @@ export function SettingsForm({ initialSettings, initialPresets }: SettingsFormPr
     const nextPresets = presets.map((preset) => (preset.id === updatedPreset.id ? updatedPreset : preset));
     setPresets(nextPresets);
     selectPreset(updatedPreset);
+  }
+
+  function applyProviderTemplate(templateId: string) {
+    setSelectedTemplateId(templateId);
+    const template = PROVIDER_TEMPLATES.find((item) => item.id === templateId);
+    if (!template) {
+      return;
+    }
+
+    setFormData((current) => ({
+      ...current,
+      provider_type: template.provider_type,
+      api_base_url: template.api_base_url,
+      model_name: template.modelExamples[0] ?? current.model_name,
+    }));
+    setModelOptions(template.modelExamples);
+    setMessage(t("providerTemplateApplied"));
+    setMessageType("success");
   }
 
   async function validatePromptBeforeSubmit() {
@@ -148,6 +181,62 @@ export function SettingsForm({ initialSettings, initialPresets }: SettingsFormPr
     }
   }
 
+  async function handleTestProvider() {
+    setMessage("");
+    setMessageType("");
+
+    try {
+      setIsTestingProvider(true);
+      const result = await testProviderConnection({
+        preset_id: selectedPresetId,
+        provider_type: formData.provider_type,
+        api_base_url: formData.api_base_url,
+        api_key: formData.api_key,
+        model_name: formData.model_name,
+        request_timeout_seconds: formData.request_timeout_seconds,
+        temperature: formData.temperature,
+        max_output_tokens: formData.max_output_tokens,
+      });
+      const latency = result.latency_ms == null ? "" : ` (${result.latency_ms} ms)`;
+      setMessage(result.success ? `${t("providerTestSuccess")}${latency}` : `${t("providerTestFailed")} ${result.detail ?? result.message}`);
+      setMessageType(result.success ? "success" : "error");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : t("providerTestFailed"));
+      setMessageType("error");
+    } finally {
+      setIsTestingProvider(false);
+    }
+  }
+
+  async function handleFetchModels() {
+    setMessage("");
+    setMessageType("");
+
+    try {
+      setIsFetchingModels(true);
+      const result = await fetchProviderModels({
+        preset_id: selectedPresetId,
+        provider_type: formData.provider_type,
+        api_base_url: formData.api_base_url,
+        api_key: formData.api_key,
+        request_timeout_seconds: formData.request_timeout_seconds,
+      });
+      setModelOptions(result.models);
+      if (result.success && result.models.length > 0) {
+        setMessage(t("modelListFetched"));
+        setMessageType("success");
+      } else {
+        setMessage(`${t("modelListFetchFailed")} ${result.detail ?? result.message}`);
+        setMessageType("error");
+      }
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : t("modelListFetchFailed"));
+      setMessageType("error");
+    } finally {
+      setIsFetchingModels(false);
+    }
+  }
+
   async function handleDeletePreset() {
     setMessage("");
     setMessageType("");
@@ -181,6 +270,7 @@ export function SettingsForm({ initialSettings, initialPresets }: SettingsFormPr
   }
 
   const selectedPreset = presets.find((preset) => preset.id === selectedPresetId) ?? presets[0];
+  const selectedTemplate = PROVIDER_TEMPLATES.find((template) => template.id === selectedTemplateId);
 
   return (
     <section className="split-layout settings-layout">
@@ -223,6 +313,42 @@ export function SettingsForm({ initialSettings, initialPresets }: SettingsFormPr
           <p className="muted">{t("providerConfigurationDescription")}</p>
         </div>
 
+        <section className="provider-setup-section">
+          <FormField
+            htmlFor="provider_template"
+            label={t("providerTemplateLabel")}
+            helpText={selectedTemplate ? t(selectedTemplate.helpKey) : t("providerTemplateHelp")}
+          >
+            <select
+              id="provider_template"
+              value={selectedTemplateId}
+              onChange={(event) => applyProviderTemplate(event.target.value)}
+            >
+              <option value="">{t("providerTemplatePlaceholder")}</option>
+              {PROVIDER_TEMPLATES.map((template) => (
+                <option key={template.id} value={template.id}>
+                  {t(template.nameKey)}
+                </option>
+              ))}
+            </select>
+          </FormField>
+          {selectedTemplate ? (
+            <div className="provider-template-note">
+              <p>
+                {selectedTemplate.apiKeyRequired
+                  ? t("providerTemplateApiKeyRequired")
+                  : t("providerTemplateApiKeyOptional")}
+              </p>
+              <p>
+                {formatMessage(t("providerTemplateModels"), {
+                  models: selectedTemplate.modelExamples.join(", "),
+                })}
+              </p>
+              {selectedTemplate.dockerNote ? <p>{t("providerTemplateDockerNote")}</p> : null}
+            </div>
+          ) : null}
+        </section>
+
         <section className="form-section-grid">
           <FormField htmlFor="preset_name" label={t("presetNameLabel")}>
             <input
@@ -245,10 +371,18 @@ export function SettingsForm({ initialSettings, initialPresets }: SettingsFormPr
 
           <FormField htmlFor="model_name" label={t("modelNameLabel")}>
             <input
+              list="provider-model-options"
               id="model_name"
               value={formData.model_name}
               onChange={(event) => updateField("model_name", event.target.value)}
             />
+            {modelOptions.length > 0 ? (
+              <datalist id="provider-model-options">
+                {modelOptions.map((model) => (
+                  <option key={model} value={model} />
+                ))}
+              </datalist>
+            ) : null}
           </FormField>
 
           <FormField htmlFor="api_base_url" label={t("apiBaseUrlLabel")}>
@@ -286,6 +420,104 @@ export function SettingsForm({ initialSettings, initialPresets }: SettingsFormPr
             />
           </FormField>
         </section>
+
+        <div className="provider-action-panel">
+          <div>
+            <p className="eyebrow">{t("providerToolsTitle")}</p>
+            <p className="muted">{t("providerToolsDescription")}</p>
+          </div>
+          <div className="action-row">
+            <Button
+              variant="secondary"
+              disabled={isTestingProvider}
+              aria-busy={isTestingProvider}
+              onClick={handleTestProvider}
+              type="button"
+            >
+              {isTestingProvider ? t("testingProviderLabel") : t("testProviderButton")}
+            </Button>
+            <Button
+              variant="link"
+              disabled={isFetchingModels}
+              aria-busy={isFetchingModels}
+              onClick={handleFetchModels}
+              type="button"
+            >
+              {isFetchingModels ? t("fetchingModelsLabel") : t("fetchModelsButton")}
+            </Button>
+          </div>
+        </div>
+
+        <details className="advanced-provider-options">
+          <summary>{t("advancedProviderOptionsSummary")}</summary>
+          <section className="form-section-grid">
+            <FormField htmlFor="request_timeout_seconds" label={t("requestTimeoutLabel")}>
+              <input
+                id="request_timeout_seconds"
+                min={1}
+                max={300}
+                type="number"
+                value={formData.request_timeout_seconds}
+                onChange={(event) => updateField("request_timeout_seconds", Number(event.target.value))}
+              />
+            </FormField>
+            <FormField htmlFor="retry_count" label={t("retryCountLabel")}>
+              <input
+                id="retry_count"
+                min={0}
+                max={5}
+                type="number"
+                value={formData.retry_count}
+                onChange={(event) => updateField("retry_count", Number(event.target.value))}
+              />
+            </FormField>
+            <FormField htmlFor="retry_backoff_seconds" label={t("retryBackoffLabel")}>
+              <input
+                id="retry_backoff_seconds"
+                min={0}
+                max={60}
+                type="number"
+                value={formData.retry_backoff_seconds}
+                onChange={(event) => updateField("retry_backoff_seconds", Number(event.target.value))}
+              />
+            </FormField>
+            <FormField htmlFor="rate_limit_delay_ms" label={t("rateLimitDelayLabel")}>
+              <input
+                id="rate_limit_delay_ms"
+                min={0}
+                max={60000}
+                type="number"
+                value={formData.rate_limit_delay_ms}
+                onChange={(event) => updateField("rate_limit_delay_ms", Number(event.target.value))}
+              />
+            </FormField>
+            <FormField htmlFor="temperature" label={t("temperatureLabel")}>
+              <input
+                id="temperature"
+                min={0}
+                max={2}
+                step={0.1}
+                type="number"
+                value={formData.temperature ?? ""}
+                onChange={(event) =>
+                  updateField("temperature", event.target.value === "" ? null : Number(event.target.value))
+                }
+              />
+            </FormField>
+            <FormField htmlFor="max_output_tokens" label={t("maxOutputTokensLabel")}>
+              <input
+                id="max_output_tokens"
+                min={1}
+                placeholder={t("maxOutputTokensPlaceholder")}
+                type="number"
+                value={formData.max_output_tokens ?? ""}
+                onChange={(event) =>
+                  updateField("max_output_tokens", event.target.value === "" ? null : Number(event.target.value))
+                }
+              />
+            </FormField>
+          </section>
+        </details>
 
         <FormField className="prompt-field" htmlFor="prompt_template" label={t("promptTemplateLabel")}>
           <textarea

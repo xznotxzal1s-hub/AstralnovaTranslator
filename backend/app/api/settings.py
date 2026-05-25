@@ -5,11 +5,16 @@ from app.core.database import get_db
 from app.schemas.settings import (
     PromptTemplateValidationRequest,
     PromptTemplateValidationResponse,
+    ModelListRequest,
+    ModelListResponse,
+    ProviderConnectionTestRequest,
+    ProviderConnectionTestResponse,
     TranslationConfigRead,
     TranslationConfigUpdate,
     TranslationPresetCreate,
     TranslationPresetUpdate,
 )
+from app.services.provider_settings_service import list_provider_models, test_provider_connection
 from app.services.settings_service import (
     activate_translation_preset,
     build_translation_config_read,
@@ -53,6 +58,22 @@ def validate_settings_prompt(
         errors=result.errors,
         warnings=result.warnings,
     )
+
+
+@router.post("/test-provider", response_model=ProviderConnectionTestResponse)
+def test_settings_provider(
+    payload: ProviderConnectionTestRequest,
+    db: Session = Depends(get_db),
+) -> ProviderConnectionTestResponse:
+    return test_provider_connection(db, payload)
+
+
+@router.post("/list-models", response_model=ModelListResponse)
+def list_settings_provider_models(
+    payload: ModelListRequest,
+    db: Session = Depends(get_db),
+) -> ModelListResponse:
+    return list_provider_models(db, payload)
 
 
 @router.get("/presets", response_model=list[TranslationConfigRead])

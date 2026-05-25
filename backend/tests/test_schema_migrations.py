@@ -164,6 +164,21 @@ class SchemaMigrationTests(unittest.TestCase):
         self.assertIn("chapter_id", reading_progress_columns)
         self.assertIn("progress_percent", reading_progress_columns)
         self.assertIn("uq_reading_progress_book_id", reading_progress_index_names)
+        self.assertIn("request_timeout_seconds", translation_config_columns)
+        self.assertIn("retry_count", translation_config_columns)
+        self.assertIn("retry_backoff_seconds", translation_config_columns)
+        self.assertIn("rate_limit_delay_ms", translation_config_columns)
+        self.assertIn("temperature", translation_config_columns)
+        self.assertIn("max_output_tokens", translation_config_columns)
+        with self.engine.begin() as connection:
+            provider_options = connection.exec_driver_sql(
+                """
+                SELECT request_timeout_seconds, retry_count, retry_backoff_seconds,
+                       rate_limit_delay_ms, temperature, max_output_tokens
+                FROM translation_configs WHERE id = 1
+                """,
+            ).first()
+        self.assertEqual(provider_options, (60, 1, 2, 0, 0.3, None))
         self.assertEqual(self._applied_versions(), [migration.version for migration in MIGRATIONS])
 
 
