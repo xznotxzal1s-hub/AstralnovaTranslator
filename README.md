@@ -42,6 +42,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - EPUB import API
 - webpage URL import API
 - chapter translation API
+- persisted translation job API for batch translation progress
 - translation caching based on source hash + provider/model + prompt hash
 - configurable CORS origins through `ALLOWED_ORIGINS`
 - upload and webpage import size limits through `MAX_UPLOAD_MB` and `MAX_WEBPAGE_MB`
@@ -57,6 +58,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - per-book glossary entries override global glossary entries
 - Japanese-aware chunk splitting for long chapters, preferring paragraphs, sentence endings, dialogue closings, and ellipses before hard length fallback
 - normal translation can reuse matching cached results, while retranslation bypasses the cache and calls the provider again
+- backend batch translation jobs are stored in SQLite and processed sequentially in-process for single-user NAS use
 - API keys are masked in settings read responses and preserved when the settings form submits an empty or masked key
 - provider request failures redact configured API keys before errors are returned to the frontend
 

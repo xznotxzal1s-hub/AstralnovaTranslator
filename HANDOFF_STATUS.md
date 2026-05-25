@@ -148,6 +148,15 @@ Completed in code and covered by backend regression tests:
 - very long sentences still fall back to hard length splitting
 - empty chunks are filtered out
 
+### Translation job backend foundation
+Completed in code and covered by backend regression tests:
+- added persisted `TranslationJob` storage for simple batch translation progress
+- added startup schema migration for the `translation_jobs` table
+- added `POST /books/{book_id}/translation-jobs`
+- added `GET /translation-jobs/{job_id}`
+- added `POST /translation-jobs/{job_id}/cancel`
+- jobs process untranslated chapters sequentially through the existing translation service without Redis/Celery
+
 ### UI-R1 bookshelf refinement
 Implemented in the first slice:
 - modernized bookshelf layout while preserving the existing client-side book refresh flow
@@ -258,6 +267,7 @@ Verified working locally at this point:
 - books can be deleted
 - chapters can be deleted
 - batch translation works sequentially from the book detail page
+- persisted backend translation jobs are available for the next frontend batch-translation polling pass
 - chapter pagination works on the book detail page
 - reader opens in translation-only mode by default and can still switch to bilingual mode
 - bookshelf refresh still uses the browser-side API fetch after page load and after create/import/delete actions

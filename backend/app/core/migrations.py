@@ -109,6 +109,29 @@ def _add_translation_preset_fields(connection: Connection) -> None:
         )
 
 
+def _create_translation_jobs_table(connection: Connection) -> None:
+    connection.exec_driver_sql(
+        """
+        CREATE TABLE IF NOT EXISTS translation_jobs (
+            id INTEGER NOT NULL PRIMARY KEY,
+            book_id INTEGER,
+            chapter_id INTEGER,
+            status VARCHAR(32) NOT NULL DEFAULT 'pending',
+            total_items INTEGER NOT NULL DEFAULT 0,
+            completed_items INTEGER NOT NULL DEFAULT 0,
+            current_item_label VARCHAR(255),
+            error_message TEXT,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(book_id) REFERENCES books (id) ON DELETE CASCADE,
+            FOREIGN KEY(chapter_id) REFERENCES chapters (id) ON DELETE CASCADE
+        )
+        """,
+    )
+    connection.exec_driver_sql("CREATE INDEX IF NOT EXISTS ix_translation_jobs_book_id ON translation_jobs (book_id)")
+    connection.exec_driver_sql("CREATE INDEX IF NOT EXISTS ix_translation_jobs_chapter_id ON translation_jobs (chapter_id)")
+
+
 MIGRATIONS: tuple[SchemaMigration, ...] = (
     SchemaMigration(
         version="001_chapter_index_unique_constraint",
@@ -129,6 +152,11 @@ MIGRATIONS: tuple[SchemaMigration, ...] = (
         version="004_translation_preset_fields",
         description="Add translation preset name and active marker fields.",
         apply=_add_translation_preset_fields,
+    ),
+    SchemaMigration(
+        version="005_translation_jobs",
+        description="Add simple persisted translation jobs.",
+        apply=_create_translation_jobs_table,
     ),
 )
 
