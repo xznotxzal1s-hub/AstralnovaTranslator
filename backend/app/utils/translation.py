@@ -1,4 +1,11 @@
 from hashlib import sha256
+import re
+
+
+SENTENCE_ENDINGS = {"。", "！", "？", "!", "?"}
+OPENING_MARKS = {"「", "『", "（", "(", "【", "《", "〈", "［", "[", "｛", "{"}
+CLOSING_MARKS = {"」", "』", "）", ")", "】", "》", "〉", "］", "]", "｝", "}"}
+ELLIPSIS_MARKS = {"…", "‥"}
 
 
 def build_prompt(
@@ -47,37 +54,113 @@ def build_glossary_guidance(
 
 def split_text_into_chunks(source_text: str, chunk_size: int) -> list[str]:
     normalized_text = source_text.strip()
-    if len(normalized_text) <= chunk_size:
+    if not normalized_text:
+        return []
+
+    safe_chunk_size = max(1, chunk_size)
+
+    if len(normalized_text) <= safe_chunk_size:
         return [normalized_text]
 
-    paragraphs = [paragraph.strip() for paragraph in normalized_text.split("\n\n") if paragraph.strip()]
+    paragraphs = [paragraph.strip() for paragraph in re.split(r"\n\s*\n", normalized_text) if paragraph.strip()]
     chunks: list[str] = []
     current_chunk = ""
 
-    for paragraph in paragraphs:
-        candidate = paragraph if not current_chunk else f"{current_chunk}\n\n{paragraph}"
-        if len(candidate) <= chunk_size:
+    def flush_current_chunk() -> None:
+        nonlocal current_chunk
+        if current_chunk.strip():
+            chunks.append(current_chunk.strip())
+        current_chunk = ""
+
+    def append_unit(unit: str, separator: str = "\n\n") -> None:
+        nonlocal current_chunk
+        normalized_unit = unit.strip()
+        if not normalized_unit:
+            return
+
+        if len(normalized_unit) > safe_chunk_size:
+            flush_current_chunk()
+            chunks.extend(_hard_split_text(normalized_unit, safe_chunk_size))
+            return
+
+        candidate = normalized_unit if not current_chunk else f"{current_chunk}{separator}{normalized_unit}"
+        if len(candidate) <= safe_chunk_size:
             current_chunk = candidate
+        else:
+            flush_current_chunk()
+            current_chunk = normalized_unit
+
+    for paragraph in paragraphs:
+        if len(paragraph) <= safe_chunk_size:
+            append_unit(paragraph)
             continue
 
-        if current_chunk:
-            chunks.append(current_chunk)
-            current_chunk = ""
-
-        if len(paragraph) <= chunk_size:
-            current_chunk = paragraph
-            continue
-
-        start = 0
-        while start < len(paragraph):
-            end = start + chunk_size
-            chunks.append(paragraph[start:end])
-            start = end
+        for sentence_index, sentence in enumerate(_split_japanese_sentences(paragraph)):
+            append_unit(sentence, separator="\n\n" if sentence_index == 0 else "")
 
     if current_chunk:
-        chunks.append(current_chunk)
+        flush_current_chunk()
 
-    return chunks or [normalized_text]
+    return [chunk for chunk in chunks if chunk.strip()] or [normalized_text]
+
+
+def _split_japanese_sentences(text: str) -> list[str]:
+    sentences: list[str] = []
+    start = 0
+    index = 0
+    quote_depth = 0
+
+    while index < len(text):
+        char = text[index]
+        if char in OPENING_MARKS:
+            quote_depth += 1
+            index += 1
+            continue
+        if char in CLOSING_MARKS and quote_depth > 0:
+            quote_depth -= 1
+
+        should_split = char in SENTENCE_ENDINGS
+        if char in ELLIPSIS_MARKS:
+            should_split = True
+            while index + 1 < len(text) and text[index + 1] in ELLIPSIS_MARKS:
+                index += 1
+
+        if should_split:
+            end = index + 1
+            while end < len(text) and text[end] in CLOSING_MARKS:
+                end += 1
+            if quote_depth > 0 and end == index + 1:
+                index += 1
+                continue
+            for mark in text[index + 1 : end]:
+                if mark in CLOSING_MARKS and quote_depth > 0:
+                    quote_depth -= 1
+            sentence = text[start:end].strip()
+            if sentence:
+                sentences.append(sentence)
+            start = end
+            index = end
+            continue
+
+        index += 1
+
+    tail = text[start:].strip()
+    if tail:
+        sentences.append(tail)
+
+    return sentences or [text.strip()]
+
+
+def _hard_split_text(text: str, chunk_size: int) -> list[str]:
+    chunks: list[str] = []
+    start = 0
+    while start < len(text):
+        end = min(start + chunk_size, len(text))
+        chunk = text[start:end].strip()
+        if chunk:
+            chunks.append(chunk)
+        start = end
+    return chunks
 
 
 def calculate_source_hash(source_text: str) -> str:

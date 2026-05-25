@@ -55,7 +55,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - glossary-aware prompt assembly
 - glossary guidance is still included when a custom prompt template does not explicitly contain `{glossary_guidance}`
 - per-book glossary entries override global glossary entries
-- sequential chunk translation for long chapters
+- Japanese-aware chunk splitting for long chapters, preferring paragraphs, sentence endings, dialogue closings, and ellipses before hard length fallback
 - normal translation can reuse matching cached results, while retranslation bypasses the cache and calls the provider again
 - API keys are masked in settings read responses and preserved when the settings form submits an empty or masked key
 - provider request failures redact configured API keys before errors are returned to the frontend

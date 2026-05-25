@@ -141,6 +141,13 @@ Completed in code and covered by backend regression tests:
 - templates without `{glossary_guidance}` remain valid because glossary guidance is still appended automatically
 - the settings page validates prompt templates before saving or creating presets
 
+### Japanese-aware chunk splitting refinement
+Completed in code and covered by backend regression tests:
+- `split_text_into_chunks()` now prefers paragraph boundaries before sentence-level splitting
+- long Japanese prose can split at `。！？!?`, closing dialogue marks, and ellipses such as `……`
+- very long sentences still fall back to hard length splitting
+- empty chunks are filtered out
+
 ### UI-R1 bookshelf refinement
 Implemented in the first slice:
 - modernized bookshelf layout while preserving the existing client-side book refresh flow
@@ -240,6 +247,7 @@ Verified working locally at this point:
 - per-book glossary entries stay scoped to the correct book
 - chapter translation works with configured providers
 - glossary-aware translation prompt logic works
+- Japanese-aware chunk splitting is covered by backend tests
 - translation cache prevents repeated identical provider calls
 - retranslation bypasses cached translations instead of returning the old cached text
 - backend regression tests cover the new NAS hardening behavior
