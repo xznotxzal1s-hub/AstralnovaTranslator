@@ -364,11 +364,14 @@ Areas still somewhat rough:
 
 ## Known issues
 - Codex app on Windows may hang on longer frontend verification commands even when the project itself is fine
+- Codex-side verification should not run local frontend production builds unless the user explicitly allows it
+- GitHub Actions is the source of truth for frontend production build verification
+- backend unittest is the preferred Codex-side verification step
 - manual verification is still preferred over long Windows Codex build retries
 - PowerShell input can corrupt Japanese text if entered directly; browser forms or Swagger UI are safer for UTF-8 testing
 - frontend CSS may still produce non-blocking autoprefixer warnings for alignment values depending on environment/tooling
 - Docker Compose scaffolding exists, but the full stack has not been repeatedly re-verified after every late-phase refinement
-- the Docker smoke script is available for manual checks, but it has not been run automatically inside Codex to avoid long local Docker build retries
+- the Docker smoke script is available for manual checks, but Codex should not run Docker smoke tests unless the user explicitly allows it
 - webpage import relies on direct backend HTTP fetches, so pages behind login, heavy client-side rendering, or anti-bot protection may fail or import poorly
 - webpage import intentionally blocks local/private network targets for NAS safety, so it cannot import pages hosted on localhost or LAN-only private IPs
 - API keys are masked in read responses and redacted from provider error messages, but they are still stored unencrypted in the local SQLite database for V1 simplicity
