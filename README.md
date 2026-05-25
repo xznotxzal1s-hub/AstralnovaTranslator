@@ -169,6 +169,8 @@ Provider Integration R4A targeted tests:
 .\.venv\Scripts\python.exe -m unittest tests.test_provider_settings tests.test_schema_migrations tests.test_route_registration
 ```
 
+These tests cover provider connection testing, model-list fetching, advanced provider option persistence, and provider error redaction/normalization.
+
 Lightweight frontend TypeScript check from `frontend/`:
 
 ```powershell

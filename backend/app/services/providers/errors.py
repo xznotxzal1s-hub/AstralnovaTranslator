@@ -31,6 +31,13 @@ def redact_sensitive_text(text: str, *secrets: str) -> str:
     return sanitized_text
 
 
+def _safe_getattr(value: object, attribute_name: str) -> object | None:
+    try:
+        return getattr(value, attribute_name, None)
+    except RuntimeError:
+        return None
+
+
 def build_provider_error_message(provider_name: str, error: Exception, api_key: str) -> str:
     summary = "The provider request failed."
     if isinstance(error, httpx.TimeoutException):
@@ -51,12 +58,12 @@ def build_provider_error_message(provider_name: str, error: Exception, api_key: 
             summary = f"The provider returned HTTP {status_code}."
 
     details = [redact_sensitive_text(str(error), api_key).strip()]
-    request = getattr(error, "request", None)
-    request_url = getattr(request, "url", None)
+    request = _safe_getattr(error, "request")
+    request_url = _safe_getattr(request, "url")
     if request_url is not None:
         details.append(redact_sensitive_text(str(request_url), api_key))
-    response = getattr(error, "response", None)
-    response_text = getattr(response, "text", None)
+    response = _safe_getattr(error, "response")
+    response_text = _safe_getattr(response, "text")
     if response_text:
         details.append(redact_sensitive_text(str(response_text)[:500], api_key))
 

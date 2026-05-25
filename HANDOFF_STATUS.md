@@ -103,14 +103,14 @@ cd backend
 .\.venv\Scripts\python.exe -m unittest discover -s tests -p "test*.py"
 ```
 
-Result: `60 tests OK`
+Result: `67 tests OK`
 
 ```powershell
 cd backend
 .\.venv\Scripts\python.exe -m unittest tests.test_provider_settings tests.test_schema_migrations tests.test_route_registration
 ```
 
-Result: `8 tests OK`
+Result: `15 tests OK`
 
 ```powershell
 cd frontend
@@ -189,6 +189,8 @@ Backend changes:
 - `translation_configs` now stores advanced request options: timeout, retry count, retry backoff, inter-chunk delay, temperature, and max output tokens.
 - Translation uses retry/backoff and optional delay between chunks; providers receive timeout, temperature, and max output token options.
 - Provider errors are normalized and redacted before returning to the UI.
+- Endpoint-level tests cover provider connection testing and model list fetching.
+- Error normalization tests cover invalid credentials, missing models/endpoints, rate limits, timeouts, bad base URLs, and redaction.
 
 Frontend changes:
 - Settings page has provider setup templates.
@@ -197,8 +199,8 @@ Frontend changes:
 - Manual model entry is always available even when model fetching fails.
 
 R4A verification:
-- `python -m unittest tests.test_provider_settings tests.test_schema_migrations tests.test_route_registration` passed in `backend/`.
-- `python -m unittest discover -s tests -p "test*.py"` passed in `backend/`.
+- `python -m unittest tests.test_provider_settings tests.test_schema_migrations tests.test_route_registration` passed in `backend/` with `15 tests OK`.
+- `python -m unittest discover -s tests -p "test*.py"` passed in `backend/` with `67 tests OK`.
 - `npm exec tsc -- --noEmit --incremental false` passed in `frontend/`.
 - local `npm run build` was intentionally skipped because GitHub Actions is the production build source of truth.
 - Docker build/up/smoke was intentionally skipped due to Codex constraints.

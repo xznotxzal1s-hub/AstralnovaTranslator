@@ -144,11 +144,16 @@ def list_provider_models(db: Session, payload: ModelListRequest) -> ModelListRes
             message="Models fetched successfully.",
         )
     except Exception as exc:
+        safe_detail = (
+            build_provider_error_message("Provider", exc, api_key)
+            if isinstance(exc, httpx.HTTPError)
+            else redact_sensitive_text(str(exc), api_key, payload.api_key).strip()
+        )
         return ModelListResponse(
             success=False,
             provider_type=payload.provider_type,
             models=[],
             manual_model_input_required=True,
             message="Could not fetch models. Please enter the model name manually.",
-            detail=redact_sensitive_text(str(exc), api_key, payload.api_key).strip() or None,
+            detail=safe_detail or None,
         )
