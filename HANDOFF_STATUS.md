@@ -4,7 +4,7 @@
 AstralnovaTranslator
 
 ## Current status
-The project is now functionally through the latest URL import feature pass and has entered a gradual UI-R1 frontend refinement pass. The first UI-R1 slice focuses on the bookshelf experience without changing backend behavior, translation behavior, or deployment behavior.
+The project is functionally through the latest URL import feature pass and is now in incremental UI refinement. The current frontend focus is making the reading and bookshelf experience feel calmer, denser where useful, and more comfortable on desktop and mobile without changing backend behavior, translation behavior, or deployment behavior.
 
 The app currently supports:
 - creating books
@@ -23,6 +23,7 @@ The app currently supports:
 - publishing backend/frontend Docker images to GHCR via GitHub Actions
 - NAS deployment with prebuilt images through a separate Compose file
 - UI-R1 bookshelf modernization with a cleaner import workspace and cover-style book cards
+- mobile bookshelf refinement with fixed bottom navigation and compact book rows
 
 ## Completed phases
 
@@ -164,6 +165,13 @@ Implemented in code:
 - refined settings preset cards, settings form grouping, glossary empty state, and glossary entry density
 - kept the pass frontend-only and did not change backend translation or deployment behavior
 
+### Mobile bookshelf usability refinement
+Implemented in code:
+- moved the mobile app navigation into a fixed bottom bar so the top of the page is no longer consumed by the header
+- made the mobile bookshelf use compact horizontal book rows instead of large cover cards
+- tightened the mobile bookshelf hero and import workspace so more library content is visible immediately
+- preserved the desktop bookshelf layout and did not change backend, translation, or deployment behavior
+
 ### Translation correctness refinement
 Completed in code and covered by backend regression tests:
 - `/chapters/{id}/translate` still reuses matching `TranslationRecord` cache entries
@@ -241,13 +249,14 @@ Current UI state:
 - UI-R2 applies a warmer, more consistent paper-and-ink visual language across the app shell, bookshelf, reader, settings, and glossary surfaces
 - the Taste-skill homepage pass makes the first screen feel more like a reading desk than a utility dashboard
 - UI-R3 improves non-homepage management pages and replaces rough browser confirmations with in-app dialogs
+- the mobile app shell now uses a fixed bottom navigation bar and denser bookshelf rows for better one-handed browsing
 - the chapter reading page has the strongest polish and is the best current experience
 - bookshelf and book detail pages are cleaner and more usable than earlier phases
 - interaction feedback is clearer through stronger hover, focus, active, and loading states
 - long chapter lists are more manageable because the book detail page now paginates them
 - settings now support a practical preset-based workflow instead of a single flat config form
 - bookshelf import tools now cover TXT, EPUB, and webpage URL workflows
-- mobile usability is improved, but not fully refined
+- mobile usability is improved, especially on the bookshelf page, but not fully refined across every management page
 - success/error/loading feedback is clearer than before, especially around forms and batch translation
 
 Areas still somewhat rough:

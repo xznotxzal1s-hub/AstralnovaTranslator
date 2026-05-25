@@ -80,6 +80,7 @@ The project is intentionally kept small, beginner-friendly, and focused on priva
 - UI-R2 visual refinement with a calmer paper-and-ink style across the app shell, bookshelf, reader, settings, and glossary pages
 - Taste-skill homepage refinement with an asymmetric reading-desk first screen and no homepage icon dependency
 - UI-R3 non-homepage refinement with in-app confirmation dialogs, direct chapter page links, focused reader chapter navigation, and denser settings/glossary management surfaces
+- mobile bookshelf refinement with fixed bottom navigation and compact book rows
 
 ### Deployment automation
 - GitHub Actions workflow to build and publish backend image to GHCR on push to `main`
@@ -99,8 +100,8 @@ This is still a V1-style private tool. A few things are intentionally simple:
 - delete confirmation now uses a shared in-app confirmation dialog instead of browser-native confirm boxes
 - UI-R3 adds a few reusable frontend primitives, but the stylesheet is still large and could be split further
 - settings and glossary pages are usable and more visually consistent, but still need deeper form/table usability polish
-- reader chapter navigation still renders the full chapter outline, so very large books may need a denser or windowed navigation treatment later
 - book detail chapter pagination supports direct page links, while reader-side navigation intentionally shows a focused chapter window for long books
+- mobile bookshelf browsing is denser than before, but some non-bookshelf management pages may still need additional small-screen polish
 - translation presets are global only and do not yet support import/export or per-book assignment
 - Docker/NAS deployment files exist, but a fresh full end-to-end Docker verification is still recommended after the latest refinements
 - GHCR publishing depends on GitHub repository/package setup; the frontend browser client is intentionally locked to the same-origin `/api/backend` proxy for NAS stability
